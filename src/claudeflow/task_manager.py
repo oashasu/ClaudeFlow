@@ -1,14 +1,19 @@
 """任务管理模块 - 任务CRUD操作
 
 V1核心功能：任务创建、查询、更新、取消
+V2新增功能：alert_handler告警支持、session_id字段、文件损坏告警
 """
 
 import os
 import json
 import uuid
+import asyncio
 from datetime import datetime
 from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from claudeflow.alert_handler import AlertHandler
 
 from claudeflow.state_machine import TaskStatus
 
@@ -16,6 +21,7 @@ from claudeflow.state_machine import TaskStatus
 @dataclass
 class Task:
     """任务数据模型"""
+
     id: str
     name: str
     domain: str
@@ -26,6 +32,7 @@ class Task:
     description: Optional[str] = None
     assigned_employee: Optional[str] = None
     cancel_reason: Optional[str] = None
+    session_id: Optional[str] = None  # V2新增
 
     def to_dict(self) -> Dict[str, Any]:
         """序列化为字典"""
@@ -48,26 +55,44 @@ class TaskNotFoundError(Exception):
 class TaskManager:
     """任务管理器"""
 
-    def __init__(self, tasks_dir: str):
+    def __init__(self, tasks_dir: str, alert_handler: Optional["AlertHandler"] = None):
         """
         初始化任务管理器
 
         Args:
             tasks_dir: 任务存储目录
+            alert_handler: 告警处理器（V2新增，用于文件损坏告警）
         """
         self.tasks_dir = tasks_dir
         self.tasks_file = os.path.join(tasks_dir, "tasks.json")
+        self.alert_handler = alert_handler  # V2新增
         self._tasks: Dict[str, Task] = {}
         self._load_tasks()
 
     def _load_tasks(self):
         """加载任务数据"""
         if os.path.exists(self.tasks_file):
-            with open(self.tasks_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                for task_data in data:
-                    task = Task.from_dict(task_data)
-                    self._tasks[task.id] = task
+            try:
+                with open(self.tasks_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    for task_data in data:
+                        task = Task.from_dict(task_data)
+                        self._tasks[task.id] = task
+            except json.JSONDecodeError as e:
+                # V2新增：发送文件损坏告警
+                if self.alert_handler:
+                    try:
+                        loop = asyncio.get_running_loop()
+                        loop.create_task(
+                            self.alert_handler.send_file_corrupt_alert(
+                                file_path=self.tasks_file,
+                                error_type="JSONDecodeError",
+                                module="task_manager"
+                            )
+                        )
+                    except RuntimeError:
+                        pass
+                # 静默忽略，初始化为空任务列表
 
     def _save_tasks(self):
         """保存任务数据"""

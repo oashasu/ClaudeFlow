@@ -1,14 +1,19 @@
 """Checkpoint模块 - 状态快照保存/恢复/回退
 
 V1核心功能：状态快照保存、恢复、列表、回退
+V2新增功能：LangGraph风格接口、文件损坏告警、format_version
 """
 
 import os
 import json
 import uuid
+import asyncio
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from claudeflow.alert_handler import AlertHandler
 
 
 class CheckpointNotFoundError(Exception):
@@ -27,6 +32,7 @@ class Checkpoint:
     task_state: Dict[str, Any]
     execution_context: Dict[str, Any]
     filename: str
+    checkpoint_format_version: str = "2.0"  # V2新增
 
     def to_dict(self) -> Dict[str, Any]:
         """序列化为字典"""
@@ -37,7 +43,8 @@ class Checkpoint:
             "timestamp": self.timestamp.isoformat() if isinstance(self.timestamp, datetime) else self.timestamp,
             "task_state": self.task_state,
             "execution_context": self.execution_context,
-            "filename": self.filename
+            "filename": self.filename,
+            "checkpoint_format_version": self.checkpoint_format_version
         }
 
     @classmethod
@@ -54,21 +61,26 @@ class Checkpoint:
             timestamp=timestamp,
             task_state=data["task_state"],
             execution_context=data["execution_context"],
-            filename=data["filename"]
+            filename=data["filename"],
+            checkpoint_format_version=data.get("checkpoint_format_version", "1.0")
         )
 
 
 class CheckpointManager:
     """快照管理器"""
 
-    def __init__(self, checkpoint_dir: str):
+    SUPPORTED_FORMAT_VERSIONS = ["1.0", "2.0"]
+
+    def __init__(self, checkpoint_dir: str, alert_handler: Optional["AlertHandler"] = None):
         """
         初始化快照管理器
 
         Args:
             checkpoint_dir: 快照存储目录
+            alert_handler:告警处理器（V2新增，用于文件损坏告警）
         """
         self.checkpoint_dir = checkpoint_dir
+        self.alert_handler = alert_handler
 
         # 确保目录存在
         if not os.path.exists(checkpoint_dir):
@@ -161,19 +173,38 @@ class CheckpointManager:
             if not os.path.exists(filepath):
                 raise CheckpointNotFoundError(f"快照文件不存在: {filename}")
 
-            with open(filepath, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            return Checkpoint.from_dict(data)
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                return Checkpoint.from_dict(data)
+            except json.JSONDecodeError as e:
+                # V2新增：发送文件损坏告警
+                if self.alert_handler:
+                    try:
+                        loop = asyncio.get_running_loop()
+                        loop.create_task(
+                            self.alert_handler.send_file_corrupt_alert(
+                                file_path=filepath,
+                                error_type="JSONDecodeError",
+                                module="checkpoint"
+                            )
+                        )
+                    except RuntimeError:
+                        pass
+                raise CheckpointNotFoundError(f"快照文件损坏: {filename}")
 
         if checkpoint_id:
             # 搜索所有快照文件查找匹配的checkpoint_id
             for f in os.listdir(self.checkpoint_dir):
                 if f.endswith('.json'):
                     filepath = os.path.join(self.checkpoint_dir, f)
-                    with open(filepath, 'r', encoding='utf-8') as fp:
-                        data = json.load(fp)
-                        if data.get("checkpoint_id") == checkpoint_id:
-                            return Checkpoint.from_dict(data)
+                    try:
+                        with open(filepath, 'r', encoding='utf-8') as fp:
+                            data = json.load(fp)
+                            if data.get("checkpoint_id") == checkpoint_id:
+                                return Checkpoint.from_dict(data)
+                    except json.JSONDecodeError:
+                        continue  # 静默忽略损坏文件
 
             raise CheckpointNotFoundError(f"快照不存在: {checkpoint_id}")
 
@@ -207,14 +238,81 @@ class CheckpointManager:
                             continue
 
                         checkpoints.append(checkpoint)
-                except (json.JSONDecodeError, KeyError):
-                    # 忽略无效的快照文件
+                except json.JSONDecodeError as e:
+                    # V2新增：发送文件损坏告警
+                    if self.alert_handler:
+                        try:
+                            loop = asyncio.get_running_loop()
+                            loop.create_task(
+                                self.alert_handler.send_file_corrupt_alert(
+                                    file_path=filepath,
+                                    error_type="JSONDecodeError",
+                                    module="checkpoint"
+                                )
+                            )
+                        except RuntimeError:
+                            # 没有运行的事件循环，同步调用（测试场景）
+                            pass
+                    continue  # 静默忽略，不崩溃
+                except KeyError:
+                    # 忽略缺少必要字段的文件
                     continue
 
         # 按时间排序
         checkpoints.sort(key=lambda cp: cp.timestamp)
 
         return checkpoints
+
+    # V2新增：LangGraph风格接口
+    def get_tuple(self, config: Dict[str, Any]) -> Optional[Checkpoint]:
+        """
+        LangGraph风格接口：获取checkpoint
+
+        Args:
+            config: 配置字典，包含task_id和checkpoint_id
+
+        Returns:
+            Optional[Checkpoint]: checkpoint或None
+        """
+        checkpoint_id = config.get("checkpoint_id")
+        if checkpoint_id:
+            try:
+                return self.restore(checkpoint_id=checkpoint_id)
+            except CheckpointNotFoundError:
+                return None
+        return None
+
+    def put(self, config: Dict[str, Any], checkpoint: Checkpoint) -> None:
+        """
+        LangGraph风格接口：保存checkpoint
+
+        Args:
+            config: 配置字典
+            checkpoint: checkpoint对象
+        """
+        filepath = os.path.join(self.checkpoint_dir, checkpoint.filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(checkpoint.to_dict(), f, ensure_ascii=False, indent=2)
+
+    def put_writes(self, config: Dict[str, Any], writes: List[Dict[str, Any]]) -> None:
+        """
+        LangGraph风格接口：写入checkpoint的writes
+
+        Args:
+            config: 配置字典
+            writes: 写入列表
+        """
+        checkpoint_id = config.get("checkpoint_id")
+        if not checkpoint_id:
+            return
+
+        try:
+            checkpoint = self.restore(checkpoint_id=checkpoint_id)
+            # 添加writes到execution_context
+            checkpoint.execution_context["writes"] = writes
+            self.put(config, checkpoint)
+        except CheckpointNotFoundError:
+            pass
 
     def rollback(
         self,
