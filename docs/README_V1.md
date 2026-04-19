@@ -82,7 +82,7 @@ V1 是 ClaudeFlow 的最小版本，目标是：
 
 | 任务 | 状态 | 测试 | 备注 |
 |------|------|------|------|
-| state_machine | 待开始 | 待写 | TDD |
+| state_machine | **RED完成** | 19个已写 | TDD - 测试全部失败 |
 | task_manager | 待开始 | 待写 | TDD |
 | scheduler | 待开始 | 待写 | TDD |
 | cli_interface | 待开始 | 待写 | TDD |
