@@ -76,6 +76,13 @@ class CheckpointManager:
 
     def _generate_filename(self, checkpoint_id: str, phase: str) -> str:
         """生成快照文件名"""
+        # 处理phase可能是int或字符串的情况
+        if isinstance(phase, int):
+            from claudflow.state_machine import Phase
+            phase = Phase(phase).name.lower()
+        else:
+            phase = str(phase).lower()
+
         # 使用 phase 映射到 v5 格式
         phase_map = {
             "requirements": "v1_req",
@@ -87,9 +94,9 @@ class CheckpointManager:
             "review": "v7_rev",
             "acceptance": "v8_accept"
         }
-        prefix = phase_map.get(phase.lower(), "v5")
+        prefix = phase_map.get(phase, "v5")
         # 包含checkpoint_id确保唯一性
-        return f"{prefix}_{phase.lower()[:3]}_{checkpoint_id}.json"
+        return f"{prefix}_{phase[:3]}_{checkpoint_id}.json"
 
     def save(
         self,
