@@ -10,7 +10,7 @@ from datetime import datetime
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List, Dict, Any
 
-from claudflow.state_machine import TaskStatus
+from claudeflow.state_machine import TaskStatus
 
 
 @dataclass

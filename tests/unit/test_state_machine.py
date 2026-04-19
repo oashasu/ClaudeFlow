@@ -18,14 +18,14 @@ class TestTaskStatus:
             "RETRYING", "HUMAN_INTERVENTION", "ARCHIVED"
         ]
         # 先导入模块验证枚举定义
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.state_machine import TaskStatus
 
         for state in expected_states:
             assert hasattr(TaskStatus, state), f"缺少状态: {state}"
 
     def test_status_enum_values_are_unique(self):
         """测试：状态值唯一"""
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.state_machine import TaskStatus
 
         values = [s.value for s in TaskStatus]
         assert len(values) == len(set(values)), "状态值有重复"
@@ -36,7 +36,7 @@ class TestStateMachine:
 
     def test_pending_to_running_valid(self):
         """测试：待执行→执行中 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.PENDING, "assign_employee")
@@ -44,7 +44,7 @@ class TestStateMachine:
 
     def test_running_to_completed_valid(self):
         """测试：执行中→已完成 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.RUNNING, "success")
@@ -52,7 +52,7 @@ class TestStateMachine:
 
     def test_running_to_failed_valid(self):
         """测试：执行中→已失败 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.RUNNING, "fail")
@@ -60,7 +60,7 @@ class TestStateMachine:
 
     def test_running_to_paused_valid(self):
         """测试：执行中→已暂停 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.RUNNING, "pause")
@@ -68,7 +68,7 @@ class TestStateMachine:
 
     def test_failed_to_retrying_valid(self):
         """测试：已失败→重试中 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         sm.context["retry_count"] = 0
@@ -77,7 +77,7 @@ class TestStateMachine:
 
     def test_retrying_to_running_valid(self):
         """测试：重试中→执行中 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         sm.context["retry_count"] = 1
@@ -86,7 +86,7 @@ class TestStateMachine:
 
     def test_retrying_to_human_intervention_after_3_failures(self):
         """测试：重试3次后→人工介入点"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         sm.context["retry_count"] = 3
@@ -95,7 +95,7 @@ class TestStateMachine:
 
     def test_invalid_transition_raises_error(self):
         """测试：非法状态跳转被拒绝"""
-        from claudflow.state_machine import StateMachine, TaskStatus, InvalidTransitionError
+        from claudeflow.state_machine import StateMachine, TaskStatus, InvalidTransitionError
 
         sm = StateMachine()
         with pytest.raises(InvalidTransitionError):
@@ -103,7 +103,7 @@ class TestStateMachine:
 
     def test_completed_to_archived_valid(self):
         """测试：已完成→已归档 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.COMPLETED, "archive")
@@ -111,7 +111,7 @@ class TestStateMachine:
 
     def test_human_intervention_to_resolved_valid(self):
         """测试：人工介入点→已解决 正确流转"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         new_status = sm.transition(TaskStatus.HUMAN_INTERVENTION, "resolve")
@@ -123,7 +123,7 @@ class TestRetryStrategy:
 
     def test_retry_count_increment(self):
         """测试：重试次数正确递增"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
         sm.context["retry_count"] = 0
@@ -132,7 +132,7 @@ class TestRetryStrategy:
 
     def test_retry_interval_sequence(self):
         """测试：重试间隔正确递增 10s→60s→300s"""
-        from claudflow.state_machine import get_retry_interval
+        from claudeflow.state_machine import get_retry_interval
 
         assert get_retry_interval(1) == 10
         assert get_retry_interval(2) == 60
@@ -140,7 +140,7 @@ class TestRetryStrategy:
 
     def test_retriable_error_types(self):
         """测试：可重试错误类型"""
-        from claudflow.state_machine import is_retriable
+        from claudeflow.state_machine import is_retriable
 
         assert is_retriable("network_timeout") == True
         assert is_retriable("api_rate_limit") == True
@@ -148,7 +148,7 @@ class TestRetryStrategy:
 
     def test_non_retriable_error_types(self):
         """测试：不可重试错误类型"""
-        from claudflow.state_machine import is_retriable
+        from claudeflow.state_machine import is_retriable
 
         assert is_retriable("permission_denied") == False
         assert is_retriable("logic_error") == False
@@ -160,7 +160,7 @@ class TestPhaseNode:
 
     def test_phase_enum_has_eight_phases(self):
         """测试：八阶段枚举完整"""
-        from claudflow.state_machine import Phase
+        from claudeflow.state_machine import Phase
 
         expected_phases = [
             "REQUIREMENTS", "BRAINSTORM", "ARCHITECTURE",
@@ -171,7 +171,7 @@ class TestPhaseNode:
 
     def test_phase_sequence_order(self):
         """测试：阶段顺序正确"""
-        from claudflow.state_machine import Phase
+        from claudeflow.state_machine import Phase
 
         phases = list(Phase)
         expected_order = [
@@ -183,7 +183,7 @@ class TestPhaseNode:
 
     def test_phase_checkpoint_filename(self):
         """测试：阶段checkpoint文件命名正确"""
-        from claudflow.state_machine import Phase
+        from claudeflow.state_machine import Phase
 
         assert Phase.REQUIREMENTS.checkpoint_file == "v1_init.json"
         assert Phase.BRAINSTORM.checkpoint_file == "v2_brainstorm.json"

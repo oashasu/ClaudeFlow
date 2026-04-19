@@ -13,7 +13,7 @@ class TestCliIntegration:
 
     def test_cli_create_list_show_flow(self):
         """测试：CLI创建-列出-查看流程"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -45,7 +45,7 @@ class TestCliIntegration:
 
     def test_cli_status_all_flow(self):
         """测试：CLI全局状态查询"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -64,7 +64,7 @@ class TestCliIntegration:
 
     def test_cli_status_task_flow(self):
         """测试：CLI指定任务状态查询"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -86,7 +86,7 @@ class TestCliIntegration:
 
     def test_cli_error_handling(self):
         """测试：CLI错误处理"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -105,7 +105,7 @@ class TestCliIntegration:
 
     def test_cli_task_with_description(self):
         """测试：CLI创建带描述的任务"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -128,8 +128,8 @@ class TestCliIntegration:
 
     def test_cli_list_with_status_filter(self):
         """测试：CLI按状态过滤列表"""
-        from claudflow.cli import CliApp
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.cli import CliApp
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -154,7 +154,7 @@ class TestCliResultFormat:
 
     def test_cli_output_format(self):
         """测试：CLI输出格式"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -174,7 +174,7 @@ class TestCliResultFormat:
 
     def test_cli_empty_list_output(self):
         """测试：CLI空列表输出"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -191,8 +191,8 @@ class TestCliFullWorkflow:
 
     def test_cli_complete_task_workflow(self):
         """测试：CLI完整任务工作流"""
-        from claudflow.cli import CliApp
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.cli import CliApp
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)

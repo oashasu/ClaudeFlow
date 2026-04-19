@@ -140,7 +140,20 @@ V1 是 ClaudeFlow 的最小版本，目标是：
 
 ---
 
-## 八、下一步
+## 八、运行测试
+
+```bash
+# 设置PYTHONPATH后运行测试
+PYTHONPATH=src python3 -m pytest --cov=src/claudeflow --cov-report=term-missing
+
+# 或安装模块后运行（需要pip>=22.0）
+pip install -e .
+pytest --cov=src/claudeflow
+```
+
+---
+
+## 九、下一步
 
 1. ~~创建设计文档目录结构~~ ✅
 2. ~~编写各模块详细设计~~ ✅

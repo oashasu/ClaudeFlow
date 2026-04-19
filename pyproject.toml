@@ -1,5 +1,5 @@
 [project]
-name = "claudflow"
+name = "claudeflow"
 version = "0.1.0"
 description = "AI-assisted development flow orchestration system"
 readme = "README.md"
@@ -10,7 +10,7 @@ dependencies = []
 dev = ["pytest>=7.0", "pytest-cov>=4.0"]
 
 [project.scripts]
-claudflow = "claudflow.cli:main"
+claudeflow = "claudeflow.cli:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -27,7 +27,7 @@ python_functions = ["test_*"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]
-source = ["src/claudflow"]
+source = ["src/claudeflow"]
 branch = true
 
 [tool.coverage.report]

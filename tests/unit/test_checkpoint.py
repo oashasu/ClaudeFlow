@@ -15,7 +15,7 @@ class TestCheckpointSave:
 
     def test_checkpoint_save_success(self):
         """测试：快照保存成功"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -33,7 +33,7 @@ class TestCheckpointSave:
 
     def test_checkpoint_save_creates_file(self):
         """测试：保存快照创建文件"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -53,7 +53,7 @@ class TestCheckpointSave:
 
     def test_checkpoint_save_with_phase_naming(self):
         """测试：快照命名包含阶段信息"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -75,7 +75,7 @@ class TestCheckpointRestore:
 
     def test_checkpoint_restore_success(self):
         """测试：快照恢复成功"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -98,7 +98,7 @@ class TestCheckpointRestore:
 
     def test_checkpoint_restore_by_filename(self):
         """测试：按文件名恢复快照"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -116,7 +116,7 @@ class TestCheckpointRestore:
 
     def test_checkpoint_restore_not_found(self):
         """测试：恢复不存在快照"""
-        from claudflow.checkpoint import CheckpointManager, CheckpointNotFoundError
+        from claudeflow.checkpoint import CheckpointManager, CheckpointNotFoundError
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -131,7 +131,7 @@ class TestCheckpointList:
 
     def test_checkpoint_list_empty(self):
         """测试：空快照列表"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -142,7 +142,7 @@ class TestCheckpointList:
 
     def test_checkpoint_list_for_task(self):
         """测试：列出任务的所有快照"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -158,7 +158,7 @@ class TestCheckpointList:
 
     def test_checkpoint_list_sorted_by_time(self):
         """测试：快照按时间排序"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -177,7 +177,7 @@ class TestCheckpointData:
 
     def test_checkpoint_has_required_fields(self):
         """测试：快照包含必需字段"""
-        from claudflow.checkpoint import Checkpoint
+        from claudeflow.checkpoint import Checkpoint
 
         checkpoint = Checkpoint(
             checkpoint_id="cp_001",
@@ -198,7 +198,7 @@ class TestCheckpointData:
 
     def test_checkpoint_to_dict(self):
         """测试：快照序列化为字典"""
-        from claudflow.checkpoint import Checkpoint
+        from claudeflow.checkpoint import Checkpoint
 
         checkpoint = Checkpoint(
             checkpoint_id="cp_001",
@@ -216,7 +216,7 @@ class TestCheckpointData:
 
     def test_checkpoint_from_dict(self):
         """测试：从字典反序列化快照"""
-        from claudflow.checkpoint import Checkpoint
+        from claudeflow.checkpoint import Checkpoint
 
         data = {
             "checkpoint_id": "cp_001",
@@ -237,7 +237,7 @@ class TestCheckpointRollback:
 
     def test_checkpoint_rollback_to_previous(self):
         """测试：回退到上一个快照"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -255,7 +255,7 @@ class TestCheckpointRollback:
 
     def test_checkpoint_rollback_deletes_later_checkpoints(self):
         """测试：回退删除后续快照"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")

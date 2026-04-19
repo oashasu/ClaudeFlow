@@ -78,7 +78,7 @@ class CheckpointManager:
         """生成快照文件名"""
         # 处理phase可能是int或字符串的情况
         if isinstance(phase, int):
-            from claudflow.state_machine import Phase
+            from claudeflow.state_machine import Phase
             phase = Phase(phase).name.lower()
         else:
             phase = str(phase).lower()

@@ -13,9 +13,9 @@ class TestSchedulerCheckpointIntegration:
 
     def test_checkpoint_save_on_phase_advance(self):
         """测试：阶段推进时保存快照"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tasks_dir = os.path.join(tmpdir, "tasks")
@@ -45,9 +45,9 @@ class TestSchedulerCheckpointIntegration:
 
     def test_checkpoint_restore_after_failure(self):
         """测试：失败后恢复快照"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tasks_dir = os.path.join(tmpdir, "tasks")
@@ -84,9 +84,9 @@ class TestSchedulerCheckpointIntegration:
 
     def test_checkpoint_rollback_flow(self):
         """测试：回退到之前的阶段"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tasks_dir = os.path.join(tmpdir, "tasks")
@@ -129,9 +129,9 @@ class TestSchedulerCheckpointIntegration:
 
     def test_checkpoint_list_by_task(self):
         """测试：按任务列出快照"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tasks_dir = os.path.join(tmpdir, "tasks")
@@ -179,7 +179,7 @@ class TestCheckpointPersistence:
 
     def test_checkpoint_persist_to_disk(self):
         """测试：快照持久化到磁盘"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -199,7 +199,7 @@ class TestCheckpointPersistence:
 
     def test_checkpoint_restore_from_disk(self):
         """测试：从磁盘恢复快照"""
-        from claudflow.checkpoint import CheckpointManager, Checkpoint
+        from claudeflow.checkpoint import CheckpointManager, Checkpoint
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")

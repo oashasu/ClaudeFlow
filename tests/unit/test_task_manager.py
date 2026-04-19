@@ -14,7 +14,7 @@ class TestTaskCreation:
 
     def test_create_task_success(self):
         """测试：正常创建任务"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -32,7 +32,7 @@ class TestTaskCreation:
 
     def test_create_task_with_description(self):
         """测试：创建带描述的任务"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -47,7 +47,7 @@ class TestTaskCreation:
 
     def test_create_task_generates_task_dir(self):
         """测试：创建任务时生成目录结构"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -60,7 +60,7 @@ class TestTaskCreation:
 
     def test_create_task_duplicate_name_adds_suffix(self):
         """测试：任务名称重复时自动添加后缀"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -76,7 +76,7 @@ class TestTaskQuery:
 
     def test_get_task_by_id(self):
         """测试：按ID查询任务"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -89,7 +89,7 @@ class TestTaskQuery:
 
     def test_get_task_not_found_raises_error(self):
         """测试：查询不存在任务抛出错误"""
-        from claudflow.task_manager import TaskManager, TaskNotFoundError
+        from claudeflow.task_manager import TaskManager, TaskNotFoundError
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -99,7 +99,7 @@ class TestTaskQuery:
 
     def test_list_tasks_empty(self):
         """测试：空任务列表"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -109,8 +109,8 @@ class TestTaskQuery:
 
     def test_list_tasks_with_filter(self):
         """测试：按状态过滤任务列表"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -123,7 +123,7 @@ class TestTaskQuery:
 
     def test_list_tasks_with_limit(self):
         """测试：任务列表限制数量"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -140,8 +140,8 @@ class TestTaskUpdate:
 
     def test_update_task_status(self):
         """测试：更新任务状态"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -153,7 +153,7 @@ class TestTaskUpdate:
 
     def test_update_task_priority(self):
         """测试：更新任务优先级"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -165,7 +165,7 @@ class TestTaskUpdate:
 
     def test_update_task_assigned_employee(self):
         """测试：更新任务分配员工"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -181,8 +181,8 @@ class TestTaskDelete:
 
     def test_cancel_task(self):
         """测试：取消任务"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -195,7 +195,7 @@ class TestTaskDelete:
 
     def test_cancel_task_with_reason(self):
         """测试：取消任务记录原因"""
-        from claudflow.task_manager import TaskManager
+        from claudeflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -212,7 +212,7 @@ class TestTaskData:
 
     def test_task_has_required_fields(self):
         """测试：任务包含必需字段"""
-        from claudflow.task_manager import Task
+        from claudeflow.task_manager import Task
 
         task = Task(
             id="task_001",
@@ -234,7 +234,7 @@ class TestTaskData:
 
     def test_task_to_dict(self):
         """测试：任务序列化为字典"""
-        from claudflow.task_manager import Task
+        from claudeflow.task_manager import Task
 
         task = Task(
             id="task_001",
@@ -252,7 +252,7 @@ class TestTaskData:
 
     def test_task_from_dict(self):
         """测试：从字典反序列化任务"""
-        from claudflow.task_manager import Task
+        from claudeflow.task_manager import Task
 
         data = {
             "id": "task_001",

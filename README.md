@@ -35,7 +35,7 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 ## 目录结构
 
 ```
-claudflow/
+claudeflow/
 ├── docs/           # 设计文档
 ├── src/            # 源代码
 ├── tests/          # 测试代码

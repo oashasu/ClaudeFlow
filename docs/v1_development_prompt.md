@@ -10,7 +10,7 @@
 
 新会话开始时，请确认当前分支：
 ```bash
-cd /Users/claw/sandbox/personal/claudflow
+cd /Users/claw/sandbox/personal/claudeflow
 git branch --show-current
 ```
 
@@ -46,7 +46,7 @@ git push -u origin v1.0.1
 
 - GitHub仓库已创建：https://github.com/oashasu/ClaudeFlow
 - 已克隆仓库并切换到 `v1.0.0` 分支
-- 设计文档已阅读：`/Users/claw/sandbox/personal/claudflow/docs/INDEX.md`
+- 设计文档已阅读：`/Users/claw/sandbox/personal/claudeflow/docs/INDEX.md`
 
 ## V1模块清单
 
@@ -75,15 +75,15 @@ git push -u origin v1.0.1
 ### Step 1：项目结构初始化
 
 ```bash
-cd /Users/claw/sandbox/personal/claudflow
-mkdir -p src/claudflow tests/unit tests/integration tests/e2e
-touch src/claudflow/__init__.py
+cd /Users/claw/sandbox/personal/claudeflow
+mkdir -p src/claudeflow tests/unit tests/integration tests/e2e
+touch src/claudeflow/__init__.py
 ```
 
 创建pyproject.toml：
 ```toml
 [project]
-name = "claudflow"
+name = "claudeflow"
 version = "0.1.0"
 
 [tool.pytest.ini_options]
@@ -119,13 +119,13 @@ touch tests/unit/test_<module>.py
 pytest tests/unit/test_<module>.py -v
 
 # 3. 创建实现文件
-touch src/claudflow/<module>.py
+touch src/claudeflow/<module>.py
 
 # 4. 写最小实现（让测试通过）
 pytest tests/unit/test_<module>.py -v
 
 # 5. 重构 + 验证覆盖率
-pytest --cov=src/claudflow tests/
+pytest --cov=src/claudeflow tests/
 ```
 
 ## V1验收标准
@@ -138,7 +138,7 @@ pytest --cov=src/claudflow tests/
 
 ## 参考文档
 
-- `/Users/claw/sandbox/personal/claudflow/docs/INDEX.md` - V1设计
+- `/Users/claw/sandbox/personal/claudeflow/docs/INDEX.md` - V1设计
 - `/Users/claw/sandbox/tasks/2026-04-18_ClaudeFlow系统设计/04_详细设计/` - V1详细设计（参考）
 
 ## 注意事项

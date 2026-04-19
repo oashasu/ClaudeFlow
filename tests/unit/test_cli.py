@@ -14,7 +14,7 @@ class TestCliTaskCreate:
 
     def test_cli_task_create_success(self):
         """测试：CLI创建任务成功"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -27,7 +27,7 @@ class TestCliTaskCreate:
 
     def test_cli_task_create_with_priority(self):
         """测试：CLI创建任务指定优先级"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -43,7 +43,7 @@ class TestCliTaskCreate:
 
     def test_cli_task_create_missing_name(self):
         """测试：CLI创建任务缺少名称"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -59,7 +59,7 @@ class TestCliTaskList:
 
     def test_cli_task_list_empty(self):
         """测试：CLI空任务列表"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -71,7 +71,7 @@ class TestCliTaskList:
 
     def test_cli_task_list_with_tasks(self):
         """测试：CLI显示任务列表"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -89,7 +89,7 @@ class TestCliTaskList:
 
     def test_cli_task_list_with_status_filter(self):
         """测试：CLI按状态过滤任务列表"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -106,7 +106,7 @@ class TestCliTaskShow:
 
     def test_cli_task_show_success(self):
         """测试：CLI显示任务详情"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -124,7 +124,7 @@ class TestCliTaskShow:
 
     def test_cli_task_show_not_found(self):
         """测试：CLI显示不存在任务"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -140,7 +140,7 @@ class TestCliStatus:
 
     def test_cli_status_all(self):
         """测试：CLI全局状态"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -152,7 +152,7 @@ class TestCliStatus:
 
     def test_cli_status_task(self):
         """测试：CLI指定任务状态"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -171,7 +171,7 @@ class TestCliResult:
 
     def test_cli_result_has_required_fields(self):
         """测试：CLI结果包含必需字段"""
-        from claudflow.cli import CliResult
+        from claudeflow.cli import CliResult
 
         result = CliResult(success=True, output="测试输出")
 
@@ -180,7 +180,7 @@ class TestCliResult:
 
     def test_cli_result_error_field(self):
         """测试：CLI结果错误字段"""
-        from claudflow.cli import CliResult
+        from claudeflow.cli import CliResult
 
         result = CliResult(success=False, error="测试错误")
 
@@ -192,7 +192,7 @@ class TestCliApp:
 
     def test_cli_app_initialization(self):
         """测试：CLI应用初始化"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -201,7 +201,7 @@ class TestCliApp:
 
     def test_cli_app_has_task_manager(self):
         """测试：CLI应用包含任务管理器"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -210,7 +210,7 @@ class TestCliApp:
 
     def test_cli_app_has_scheduler(self):
         """测试：CLI应用包含调度器"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)

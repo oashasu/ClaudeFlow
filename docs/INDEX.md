@@ -1,7 +1,7 @@
 # ClaudeFlow系统设计
 
 > **日期**: 2026-04-19
-> **项目位置**: `/Users/claw/sandbox/personal/claudflow/`
+> **项目位置**: `/Users/claw/sandbox/personal/claudeflow/`
 
 ---
 

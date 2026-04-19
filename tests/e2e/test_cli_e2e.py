@@ -14,7 +14,7 @@ class TestE2eCliWorkflow:
 
     def test_e2e_task_create_list_show(self):
         """E2E测试：创建任务→列出任务→查看详情"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -45,7 +45,7 @@ class TestE2eCliWorkflow:
 
     def test_e2e_status_all(self):
         """E2E测试：创建多个任务→查询全局状态"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -67,7 +67,7 @@ class TestE2eCliWorkflow:
 
     def test_e2e_cli_error_handling(self):
         """E2E测试：错误处理"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -88,7 +88,7 @@ class TestE2eTaskPersistence:
 
     def test_e2e_task_persistence(self):
         """E2E测试：任务持久化验证"""
-        from claudflow.cli import CliApp
+        from claudeflow.cli import CliApp
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -125,7 +125,7 @@ class TestE2eCheckpointPersistence:
 
     def test_e2e_checkpoint_save_restore(self):
         """E2E测试：Checkpoint保存恢复"""
-        from claudflow.checkpoint import CheckpointManager
+        from claudeflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -157,9 +157,9 @@ class TestE2eCompleteWorkflow:
 
     def test_e2e_full_task_lifecycle(self):
         """E2E测试：任务完整生命周期"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -195,9 +195,9 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_phase_progression(self):
         """E2E测试：调度器阶段推进"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.state_machine import Phase
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -218,9 +218,9 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_failure_recovery(self):
         """E2E测试：调度器失败恢复"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -243,8 +243,8 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_progress_tracking(self):
         """E2E测试：调度器进度追踪"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -267,8 +267,8 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_employee_management(self):
         """E2E测试：调度器员工管理"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.scheduler import Scheduler
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)

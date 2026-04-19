@@ -6,11 +6,11 @@ V1核心功能：员工分配、阶段推进、失败处理、重试调度
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from claudflow.state_machine import (
+from claudeflow.state_machine import (
     TaskStatus, Phase, StateMachine,
     is_retriable, get_retry_interval
 )
-from claudflow.task_manager import TaskManager
+from claudeflow.task_manager import TaskManager
 
 
 class Scheduler:

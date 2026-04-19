@@ -12,7 +12,7 @@ class TestStateMachineIntegration:
 
     def test_task_status_enum_values(self):
         """测试：任务状态枚举值"""
-        from claudflow.state_machine import TaskStatus
+        from claudeflow.state_machine import TaskStatus
 
         # 验证七状态模型
         assert TaskStatus.PENDING.value == "pending"
@@ -25,7 +25,7 @@ class TestStateMachineIntegration:
 
     def test_state_machine_transition_methods(self):
         """测试：状态机转换方法"""
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         sm = StateMachine()
 
@@ -39,8 +39,8 @@ class TestStateMachineIntegration:
 
     def test_state_machine_with_task_manager(self):
         """测试：状态机与任务管理器协作"""
-        from claudflow.task_manager import TaskManager
-        from claudflow.state_machine import StateMachine, TaskStatus
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.state_machine import StateMachine, TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -61,7 +61,7 @@ class TestRetryStrategyIntegration:
 
     def test_retry_interval_sequence(self):
         """测试：重试间隔序列"""
-        from claudflow.state_machine import get_retry_interval
+        from claudeflow.state_machine import get_retry_interval
 
         intervals = [
             get_retry_interval(1),
@@ -74,7 +74,7 @@ class TestRetryStrategyIntegration:
 
     def test_retriable_vs_non_retriable(self):
         """测试：可重试与不可重试错误分类"""
-        from claudflow.state_machine import is_retriable
+        from claudeflow.state_machine import is_retriable
 
         # 可重试
         assert is_retriable("network_timeout") == True
@@ -92,7 +92,7 @@ class TestPhaseSequenceIntegration:
 
     def test_phase_sequence_complete(self):
         """测试：完整阶段序列"""
-        from claudflow.state_machine import Phase
+        from claudeflow.state_machine import Phase
 
         phases = [
             Phase.REQUIREMENTS,
@@ -111,7 +111,7 @@ class TestPhaseSequenceIntegration:
 
     def test_phase_checkpoint_filenames(self):
         """测试：阶段快照文件名"""
-        from claudflow.state_machine import Phase
+        from claudeflow.state_machine import Phase
 
         expected_filenames = {
             Phase.REQUIREMENTS: "v1_init.json",
