@@ -28,7 +28,7 @@ class TestTaskCreation:
             assert task.id is not None
             assert task.name == "测试任务"
             assert task.domain == "AT_支付域"
-            assert task.status.value == "pending"
+            assert task.status == "pending"  # status是字符串值
 
     def test_create_task_with_description(self):
         """测试：创建带描述的任务"""
@@ -149,7 +149,7 @@ class TestTaskUpdate:
             task = tm.create_task(name="状态更新", domain="AT_支付域")
             updated = tm.update_task(task.id, status=TaskStatus.RUNNING)
 
-            assert updated.status == TaskStatus.RUNNING
+            assert updated.status == TaskStatus.RUNNING.value  # status是字符串
 
     def test_update_task_priority(self):
         """测试：更新任务优先级"""
@@ -191,7 +191,7 @@ class TestTaskDelete:
             tm.cancel_task(task.id, reason="需求变更")
 
             found = tm.get_task(task.id)
-            assert found.status == TaskStatus.ARCHIVED
+            assert found.status == TaskStatus.ARCHIVED.value  # status是字符串
 
     def test_cancel_task_with_reason(self):
         """测试：取消任务记录原因"""

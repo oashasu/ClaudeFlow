@@ -82,8 +82,8 @@ V1 是 ClaudeFlow 的最小版本，目标是：
 
 | 任务 | 状态 | 测试 | 备注 |
 |------|------|------|------|
-| state_machine | **RED完成** | 19个已写 | TDD - 测试全部失败 |
-| task_manager | 待开始 | 待写 | TDD |
+| state_machine | **GREEN完成** | 19个通过 | TDD - 状态机实现完成 |
+| task_manager | **RED完成** | 17个已写 | TDD - 测试全部失败 |
 | scheduler | 待开始 | 待写 | TDD |
 | cli_interface | 待开始 | 待写 | TDD |
 
