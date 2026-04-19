@@ -103,21 +103,20 @@ class TestE2eTaskPersistence:
 
             assert result.success == True
 
-            # 验证文件存在
-            task_files = os.listdir(tmpdir)
-            assert len(task_files) > 0
+            # 验证tasks.json文件存在
+            tasks_file = os.path.join(tmpdir, "tasks.json")
+            assert os.path.exists(tasks_file)
 
             # 验证文件内容
-            task_file = os.path.join(tmpdir, task_files[0])
-            with open(task_file, 'r') as f:
+            with open(tasks_file, 'r') as f:
                 data = json.load(f)
 
-            # data可能是列表或字典
-            if isinstance(data, list):
-                data = data[0]
+            # tasks.json保存的是列表
+            assert len(data) > 0
+            task_data = data[0]
 
-            assert data["name"] == "持久化测试"
-            assert data["domain"] == "AT_支付域"
+            assert task_data["name"] == "持久化测试"
+            assert task_data["domain"] == "AT_支付域"
 
 
 class TestE2eCheckpointPersistence:

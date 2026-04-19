@@ -292,3 +292,102 @@ class TestSchedulerContext:
 
             task_ctx = scheduler.get_task_context(task.id)
             assert task_ctx["current_phase"] == Phase.REQUIREMENTS.value
+
+
+class TestSessionLifecycle:
+    """Session生命周期管理测试（V2新增）"""
+
+    def test_create_session_for_task(self):
+        """测试：为任务创建Session"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="Session测试", domain="AT_支付域")
+            session_id = scheduler.create_session(task.id)
+
+            assert session_id is not None
+            assert session_id.startswith("session_")
+
+    def test_session_linked_to_task(self):
+        """测试：Session关联到任务"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="Session关联", domain="AT_支付域")
+            session_id = scheduler.create_session(task.id)
+
+            # 任务应该有session_id
+            updated = tm.get_task(task.id)
+            assert updated.session_id == session_id
+
+    def test_get_session_state(self):
+        """测试：获取Session状态"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="Session状态", domain="AT_支付域")
+            session_id = scheduler.create_session(task.id)
+
+            state = scheduler.get_session_state(session_id)
+            assert state == "running"
+
+    def test_end_session(self):
+        """测试：结束Session"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="结束Session", domain="AT_支付域")
+            session_id = scheduler.create_session(task.id)
+
+            scheduler.end_session(session_id)
+
+            state = scheduler.get_session_state(session_id)
+            assert state == "completed"
+
+    def test_get_session_by_task(self):
+        """测试：通过任务获取Session"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="获取Session", domain="AT_支付域")
+            session_id = scheduler.create_session(task.id)
+
+            retrieved = scheduler.get_session_by_task(task.id)
+            assert retrieved == session_id
+
+    def test_multiple_sessions_for_different_tasks(self):
+        """测试：不同任务有不同Session"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task1 = tm.create_task(name="任务1", domain="AT_支付域")
+            task2 = tm.create_task(name="任务2", domain="AT_支付域")
+
+            session1 = scheduler.create_session(task1.id)
+            session2 = scheduler.create_session(task2.id)
+
+            assert session1 != session2

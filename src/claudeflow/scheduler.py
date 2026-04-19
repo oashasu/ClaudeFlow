@@ -1,8 +1,10 @@
 """流程调度模块 - 任务流程调度
 
 V1核心功能：员工分配、阶段推进、失败处理、重试调度
+V2新增功能：Session生命周期管理
 """
 
+import uuid
 from typing import Dict, Any, Optional
 from datetime import datetime
 
@@ -26,6 +28,9 @@ class Scheduler:
         self.task_manager = task_manager
         self._task_contexts: Dict[str, Dict[str, Any]] = {}
         self._employee_status: Dict[str, str] = {}  # employee_id -> status
+        # V2新增：Session生命周期管理
+        self._sessions: Dict[str, Dict[str, Any]] = {}  # session_id -> session_info
+        self._task_sessions: Dict[str, str] = {}  # task_id -> session_id
 
     def _init_task_context(self, task_id: str):
         """初始化任务上下文"""
@@ -181,3 +186,72 @@ class Scheduler:
         # 释放员工
         if task.assigned_employee:
             self.release_employee(task.assigned_employee)
+
+    # ==================== V2新增：Session生命周期管理 ====================
+
+    def create_session(self, task_id: str) -> str:
+        """
+        为任务创建Session
+
+        Args:
+            task_id: 任务ID
+
+        Returns:
+            生成的session_id
+        """
+        session_id = f"session_{uuid.uuid4().hex[:8]}"
+
+        # 创建Session信息
+        self._sessions[session_id] = {
+            "task_id": task_id,
+            "state": "running",
+            "created_at": datetime.now().isoformat(),
+        }
+
+        # 关联任务到Session
+        self._task_sessions[task_id] = session_id
+
+        # 更新任务的session_id字段
+        task = self.task_manager.get_task(task_id)
+        task.session_id = session_id
+        self.task_manager._save_tasks()
+
+        return session_id
+
+    def get_session_state(self, session_id: str) -> str:
+        """
+        获取Session状态
+
+        Args:
+            session_id: Session ID
+
+        Returns:
+            Session状态：running | completed | failed
+        """
+        session = self._sessions.get(session_id)
+        if session:
+            return session["state"]
+        return "unknown"
+
+    def end_session(self, session_id: str):
+        """
+        结束Session
+
+        Args:
+            session_id: Session ID
+        """
+        if session_id in self._sessions:
+            self._sessions[session_id]["state"] = "completed"
+            self._sessions[session_id]["ended_at"] = datetime.now().isoformat()
+
+    def get_session_by_task(self, task_id: str) -> Optional[str]:
+        """
+        通过任务获取Session
+
+        Args:
+            task_id: 任务ID
+
+        Returns:
+            关联的session_id，不存在返回None
+        """
+        return self._task_sessions.get(task_id)
