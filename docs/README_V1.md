@@ -23,7 +23,7 @@ V1 是 ClaudeFlow 的最小版本，目标是：
 | task_manager | 任务 CRUD | P0 | 待开发 |
 | scheduler | 流程调度 | P0 | 待开发 |
 | cli_interface | CLI 命令 | P0 | 待开发 |
-| checkpoint | 状态快照 | P1 | 待开发 |
+| checkpoint | 状态快照 | P1 | **完成** |
 | employee_pool | 三层员工池 | P2 | 待开发 |
 | knowledge_retrieval | 三层检索 | P2 | 待开发 |
 
@@ -78,20 +78,24 @@ V1 是 ClaudeFlow 的最小版本，目标是：
 
 ## 六、开发进度
 
-### Sprint 1: P0 模块
+### Sprint 1: P0 模块 ✅
 
 | 任务 | 状态 | 测试 | 备注 |
 |------|------|------|------|
 | state_machine | **GREEN完成** | 19个通过 | TDD - 状态机实现完成 |
 | task_manager | **GREEN完成** | 17个通过 | TDD - 任务CRUD实现完成 |
 | scheduler | **GREEN完成** | 15个通过 | TDD - 流程调度实现完成 |
-| cli_interface | **RED完成** | 15个已写 | TDD - 测试全部失败 |
+| cli_interface | **GREEN完成** | 15个通过 | TDD - CLI命令实现完成 |
 
-### Sprint 2: P1 模块
+**P0合计**: 66个单元测试通过
+
+### Sprint 2: P1 模块 ✅
 
 | 任务 | 状态 | 测试 | 备注 |
 |------|------|------|------|
-| checkpoint | 待开始 | 待写 | TDD |
+| checkpoint | **GREEN完成** | 14个通过 | TDD - 快照保存/恢复/回退实现完成 |
+
+**P1合计**: 14个单元测试通过
 
 ### Sprint 3: P2 模块
 
