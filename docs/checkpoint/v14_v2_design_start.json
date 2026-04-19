@@ -1,0 +1,74 @@
+{
+  "checkpoint_version": "v14_v2_design_start",
+  "checkpoint_type": "phase_transition",
+  "task_id": "task_001",
+  "task_name": "Hermes系统设计",
+  "timestamp": "2026-04-19T02:30:00Z",
+
+  "transition": {
+    "from_phase": "Phase1_V1_Complete",
+    "to_phase": "Phase1_V2_Design",
+    "reason": "追加设计内容，迭代V1代码"
+  },
+
+  "v1_summary": {
+    "status": "已完成",
+    "modules": 7,
+    "tests": 271,
+    "documentation": ["API参考.md", "CLI用户手册.md", "Phase1验收报告.md"]
+  },
+
+  "v2_design_topics": [
+    {
+      "topic": "通信层设计",
+      "problem": "HTTP REST在人工介入场景实时性不足",
+      "solution": "WebSocket(Python→Java) + SSE(Java→Vue)",
+      "file": "01_通信层设计.md"
+    },
+    {
+      "topic": "Agent提炼机制",
+      "problem": "Claude Code会话死循环刷屏",
+      "solution": "分层提炼：实时进度+阶段总结+阶段复盘+任务复盘",
+      "file": "02_Agent提炼机制设计.md"
+    },
+    {
+      "topic": "前置拆分流程",
+      "problem": "长任务上下文膨胀",
+      "solution": "Phase0拆分Agent+审查Agent → Phase1-8按计划执行",
+      "file": "03_前置拆分流程设计.md"
+    },
+    {
+      "topic": "强制checkpoint",
+      "problem": "被动触发总结不可靠",
+      "solution": "阻塞式prompt注入，必须总结才能继续",
+      "file": "04_强制checkpoint机制设计.md"
+    },
+    {
+      "topic": "子Agent异步总结",
+      "problem": "总结阻塞主任务执行",
+      "solution": "Haiku异步复盘+系统级通知(0膨胀)",
+      "file": "05_子Agent异步总结设计.md"
+    }
+  ],
+
+  "v2_code_iteration_plan": {
+    "new_modules": [
+      "websocket_client.py",
+      "session_summarizer.py",
+      "node_summarizer.py",
+      "task_splitter.py",
+      "haiku_client.py",
+      "context_manager.py"
+    ],
+    "modified_modules": [
+      "scheduler.py（强制checkpoint逻辑）",
+      "checkpoint.py（增强）"
+    ]
+  },
+
+  "next_steps": [
+    "完成V2设计文档审查",
+    "迭代Phase1代码（V2版本）",
+    "Phase2开发（Spring Boot + Vue）"
+  ]
+}
