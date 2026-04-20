@@ -127,12 +127,43 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 
 ---
 
-## 设计问题清单
+---
 
-见 [07_V2设计问题清单.md](07_V2设计问题清单.md)
+## Agent Token治理架构
 
-已解决：P1模块边界、P8必要性、P9开源方案
-待解决：P2-P7（可在开发阶段逐步解决）
+> 设计文档: [2026-04-21-agent-token-governance-design.md](superpowers/specs/2026-04-21-agent-token-governance-design.md)
+
+五层治理体系：熔断层 + 快照层 + 验收层 + 工具层 + 恢复层
+
+核心模块：
+| 模块 | 职责 | 实现方式 |
+|------|------|----------|
+| 熔断机制 | 探索阶段硬阈值拦截 | 10轮上限 + 50K累计Token + 相似度检测(bge-small-zh) |
+| 快照体系 | 基线+增量双轨快照 | JSON模板 + Git绑定 |
+| 验收分层 | 三级自动化验收 | L1强制量化 + L2半量化 + L3纯人工 |
+| 工具治理 | Hook文件读取限流 | PostToolUse拦截 + Prompt兜底 |
+| 异常恢复 | 熔断后自动回滚 | 快照回滚 + 增量记录 |
+
+---
+
+## V2.3.0 异步复盘模块
+
+| 模块 | 职责 | 文件 |
+|------|------|------|
+| HaikuClient | Haiku API调用 | claudeflow/haiku_client.py |
+| PhaseReviewer | Phase级复盘 | claudeflow/phase_reviewer.py |
+| TaskReviewer | Task级复盘+知识提取 | claudeflow/task_reviewer.py |
+
+**测试覆盖**：
+- 30个单元测试（Mock模式）
+- WebSocket集成测试（Python→Java）
+- SSE稳定性测试
+- 总覆盖率 88%（310测试通过）
+
+**待验证**（需Java 17+环境）：
+- 真实后端集成测试
+- Python→WebSocket实时通信
+- 大量步骤滚动性能
 
 ---
 
