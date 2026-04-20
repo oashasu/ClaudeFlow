@@ -1,6 +1,6 @@
 """ClaudeFlow - AI驱动的敏捷工作流系统
 
-V2架构：12个核心模块协同工作
+V2架构：15个核心模块协同工作
 """
 
 from claudeflow.checkpoint import CheckpointManager, Checkpoint
@@ -15,6 +15,10 @@ from claudeflow.progress_reporter import ProgressReporter
 from claudeflow.session_parser import SessionParser
 from claudeflow.thinking_filter import ThinkingFilter
 from claudeflow.websocket_client import WebSocketClient
+from claudeflow.session_utils import get_current_session_id, format_session_id_for_resume, get_resume_command
+from claudeflow.haiku_client import HaikuClient, HaikuConfig
+from claudeflow.phase_reviewer import PhaseReviewer
+from claudeflow.task_reviewer import TaskReviewer
 
 __all__ = [
     # Checkpoint
@@ -45,6 +49,15 @@ __all__ = [
     "SessionParser",
     "ThinkingFilter",
     "WebSocketClient",
+    # Session Utilities
+    "get_current_session_id",
+    "format_session_id_for_resume",
+    "get_resume_command",
+    # Reviewer (V2)
+    "HaikuClient",
+    "HaikuConfig",
+    "PhaseReviewer",
+    "TaskReviewer",
 ]
 
-__version__ = "2.0.0"
+__version__ = "2.3.0"
