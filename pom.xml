@@ -7,19 +7,19 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>2.6.15</version>
         <relativePath/>
     </parent>
 
     <groupId>com.claudeflow</groupId>
     <artifactId>claudeflow-console</artifactId>
-    <version>2.2.0</version>
+    <version>2.4.0</version>
     <packaging>jar</packaging>
     <name>ClaudeFlow Console</name>
     <description>Web console for ClaudeFlow task management</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>1.8</java.version>
         <sqlite.version>3.46.0.0</sqlite.version>
     </properties>
 
@@ -43,10 +43,11 @@
             <version>${sqlite.version}</version>
         </dependency>
 
-        <!-- SQLite Dialect for Hibernate -->
+        <!-- SQLite Dialect for Hibernate 5.x -->
         <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-community-dialects</artifactId>
+            <groupId>com.github.gwenn</groupId>
+            <artifactId>sqlite-dialect</artifactId>
+            <version>0.1.2</version>
         </dependency>
 
         <!-- Lombok -->
