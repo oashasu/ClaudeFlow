@@ -18,7 +18,7 @@ class TestWebSocketConfig:
     def test_default_config(self):
         """测试默认配置"""
         config = WebSocketConfig()
-        assert config.uri == "ws://localhost:8080/ws/hermes"
+        assert config.uri == "ws://localhost:8080/ws/python"
         assert config.reconnect_max_attempts == 5
         assert config.reconnect_base_delay == 1
 
