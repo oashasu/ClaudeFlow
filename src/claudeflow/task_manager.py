@@ -33,6 +33,9 @@ class Task:
     assigned_employee: Optional[str] = None
     cancel_reason: Optional[str] = None
     session_id: Optional[str] = None  # V2新增
+    pause_on_doubt: bool = False  # V2.1.0新增：质量检查有问题时是否暂停
+    quality_score: Optional[int] = None  # V2.1.0新增：阶段质量评分
+    doubt_flag: bool = False  # V2.1.0新增：是否有疑虑需人工确认
 
     def to_dict(self) -> Dict[str, Any]:
         """序列化为字典"""
@@ -124,7 +127,8 @@ class TaskManager:
         name: str,
         domain: str,
         priority: str = "中",
-        description: Optional[str] = None
+        description: Optional[str] = None,
+        pause_on_doubt: bool = False  # V2.1.0新增
     ) -> Task:
         """
         创建任务
@@ -134,6 +138,7 @@ class TaskManager:
             domain: 所属领域
             priority: 优先级
             description: 任务描述
+            pause_on_doubt: 质疑时是否暂停（V2.1.0新增）
 
         Returns:
             创建的任务对象
@@ -150,7 +155,8 @@ class TaskManager:
             priority=priority,
             created_at=datetime.now(),
             task_dir_name=task_dir_name,
-            description=description
+            description=description,
+            pause_on_doubt=pause_on_doubt  # V2.1.0新增
         )
 
         # 创建任务目录

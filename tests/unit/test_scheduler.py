@@ -391,3 +391,217 @@ class TestSessionLifecycle:
             session2 = scheduler.create_session(task2.id)
 
             assert session1 != session2
+
+
+class TestSubtaskDetection:
+    """子任务检测测试（V2.1.0新增）"""
+
+    def test_detect_explicit_marker(self):
+        """测试：检测显式完成标记"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.subtask_detector import CompletionType
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="标记检测", domain="AT_支付域")
+
+            output = "工作已完成\n# SUBTASK_COMPLETE"
+            is_complete, prompt = scheduler.detect_and_handle_completion(
+                task.id, output
+            )
+
+            assert is_complete is True
+            assert prompt is not None
+            assert "总结本阶段工作" in prompt
+
+    def test_detect_tests_passed(self):
+        """测试：检测pytest测试通过"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+        from claudeflow.subtask_detector import CompletionType
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="测试检测", domain="AT_支付域")
+
+            output = "运行pytest结果：\n5 passed, 0 failed"
+            is_complete, prompt = scheduler.detect_and_handle_completion(
+                task.id, output
+            )
+
+            assert is_complete is True
+            assert prompt is not None
+
+    def test_detect_not_complete(self):
+        """测试：未完成情况不触发"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="未完成", domain="AT_支付域")
+
+            output = "正在进行开发..."
+            is_complete, prompt = scheduler.detect_and_handle_completion(
+                task.id, output
+            )
+
+            assert is_complete is False
+            assert prompt is None
+
+    def test_completion_type_recorded_in_context(self):
+        """测试：完成类型记录到上下文"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="上下文记录", domain="AT_支付域")
+
+            output = "# SUBTASK_COMPLETE"
+            scheduler.detect_and_handle_completion(task.id, output)
+
+            ctx = scheduler.get_task_context(task.id)
+            assert ctx["last_completion_type"] == "explicit_marker"
+
+
+class TestQualityCheck:
+    """质量检查测试（V2.1.0新增）"""
+
+    def test_parse_quality_score(self):
+        """测试：解析质量评分"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            output = "总结完成\n自评质量（1-10分）：8"
+            score, doubt = scheduler.parse_quality_check(output)
+
+            assert score == 8
+            assert doubt is False
+
+    def test_parse_doubt_flag_yes(self):
+        """测试：解析疑虑标记（是）"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            output = "总结完成\n是否有疑虑需人工确认？（是/否）：是"
+            score, doubt = scheduler.parse_quality_check(output)
+
+            assert doubt is True
+
+    def test_parse_doubt_flag_no(self):
+        """测试：解析疑虑标记（否）"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            output = "总结完成\n是否有疑虑需人工确认？（是/否）：否"
+            score, doubt = scheduler.parse_quality_check(output)
+
+            assert doubt is False
+
+    def test_should_pause_on_doubt(self):
+        """测试：疑虑标记触发暂停"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(
+                name="暂停测试",
+                domain="AT_支付域",
+                pause_on_doubt=True
+            )
+            scheduler.update_quality_metrics(task.id, 7, True)
+
+            should_pause = scheduler.should_pause_for_review(task.id)
+            assert should_pause is True
+
+    def test_should_pause_on_low_score(self):
+        """测试：低评分触发暂停"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="低分暂停", domain="AT_支付域")
+            scheduler.update_quality_metrics(task.id, 3, False)
+
+            should_pause = scheduler.should_pause_for_review(task.id)
+            assert should_pause is True
+
+    def test_should_not_pause_on_high_score(self):
+        """测试：高评分不暂停"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="高分不暂停", domain="AT_支付域")
+            scheduler.update_quality_metrics(task.id, 8, False)
+
+            should_pause = scheduler.should_pause_for_review(task.id)
+            assert should_pause is False
+
+    def test_update_quality_metrics(self):
+        """测试：更新质量指标"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="质量更新", domain="AT_支付域")
+            scheduler.update_quality_metrics(task.id, 9, False)
+
+            updated = tm.get_task(task.id)
+            assert updated.quality_score == 9
+            assert updated.doubt_flag is False
+
+    def test_clear_subtask_state(self):
+        """测试：清除子任务状态"""
+        from claudeflow.scheduler import Scheduler
+        from claudeflow.task_manager import TaskManager
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tm = TaskManager(tasks_dir=tmpdir)
+            scheduler = Scheduler(task_manager=tm)
+
+            task = tm.create_task(name="清除状态", domain="AT_支付域")
+
+            # 先设置完成状态
+            output = "# SUBTASK_COMPLETE"
+            scheduler.detect_and_handle_completion(task.id, output)
+
+            # 清除状态
+            scheduler.clear_subtask_state(task.id)
+
+            ctx = scheduler.get_task_context(task.id)
+            assert "last_completion_type" not in ctx

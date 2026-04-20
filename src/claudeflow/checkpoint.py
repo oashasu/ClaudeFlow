@@ -86,8 +86,15 @@ class CheckpointManager:
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
 
-    def _generate_filename(self, checkpoint_id: str, phase: str) -> str:
-        """生成快照文件名"""
+    def _generate_filename(self, checkpoint_id: str, phase: str, checkpoint_type: str = "phase") -> str:
+        """生成快照文件名
+
+        V2.1.0新增：支持子任务级别的命名规范
+        命名规则：v_{阶段}_{事件}.json
+        - phase级别：v_phase0_split_complete.json, v_phase1_complete.json
+        - subtask级别：v_sub_1_complete.json, v_sub_2_complete.json
+        - review级别：v_phase1_review.json
+        """
         # 处理phase可能是int或字符串的情况
         if isinstance(phase, int):
             from claudeflow.state_machine import Phase
@@ -95,27 +102,39 @@ class CheckpointManager:
         else:
             phase = str(phase).lower()
 
-        # 使用 phase 映射到 v5 格式
-        phase_map = {
-            "requirements": "v1_req",
-            "brainstorm": "v2_brain",
-            "architecture": "v3_arch",
-            "design": "v4_design",
-            "development": "v5_dev",
-            "testing": "v6_test",
-            "review": "v7_rev",
-            "acceptance": "v8_accept"
-        }
-        prefix = phase_map.get(phase, "v5")
-        # 包含checkpoint_id确保唯一性
-        return f"{prefix}_{phase[:3]}_{checkpoint_id}.json"
+        # V2.1.0：根据checkpoint_type生成不同格式
+        if checkpoint_type == "subtask":
+            # 子任务级别：v_sub_N_complete.json
+            # phase在此场景下是子任务编号如 "sub_1", "sub_2"
+            return f"v_{phase}_complete.json"
+        elif checkpoint_type == "review":
+            # 复盘级别：v_phase_N_review.json
+            return f"v_{phase}_review.json"
+        else:
+            # 阶段级别（原有格式）
+            phase_map = {
+                "requirements": "v1_req",
+                "brainstorm": "v2_brain",
+                "architecture": "v3_arch",
+                "design": "v4_design",
+                "development": "v5_dev",
+                "testing": "v6_test",
+                "review": "v7_rev",
+                "acceptance": "v8_accept",
+                "phase0": "v_phase0",
+                "phase1": "v_phase1",
+                "phase2": "v_phase2",
+            }
+            prefix = phase_map.get(phase, f"v_{phase[:3]}")
+            return f"{prefix}_complete.json"
 
     def save(
         self,
         task_id: str,
         phase: str,
         task_state: Dict[str, Any],
-        execution_context: Dict[str, Any]
+        execution_context: Dict[str, Any],
+        checkpoint_type: str = "phase"  # V2.1.0新增：phase | subtask | review
     ) -> Checkpoint:
         """
         保存快照
@@ -131,7 +150,7 @@ class CheckpointManager:
         """
         checkpoint_id = f"cp_{uuid.uuid4().hex[:8]}"
         timestamp = datetime.now()
-        filename = self._generate_filename(checkpoint_id, phase)
+        filename = self._generate_filename(checkpoint_id, phase, checkpoint_type)
 
         checkpoint = Checkpoint(
             checkpoint_id=checkpoint_id,

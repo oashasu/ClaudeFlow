@@ -2,10 +2,12 @@
 
 V1核心功能：员工分配、阶段推进、失败处理、重试调度
 V2新增功能：Session生命周期管理
+V2.1.0新增功能：子任务检测、自然边界阻断、总结prompt注入、质量检查分支
 """
 
 import uuid
-from typing import Dict, Any, Optional
+import re
+from typing import Dict, Any, Optional, Tuple, List
 from datetime import datetime
 
 from claudeflow.state_machine import (
@@ -13,6 +15,22 @@ from claudeflow.state_machine import (
     is_retriable, get_retry_interval
 )
 from claudeflow.task_manager import TaskManager
+from claudeflow.subtask_detector import SubtaskDetector, CompletionType
+
+
+# V2.1.0：阶段总结prompt模板（包含快速质量检查）
+SUMMARY_PROMPT_TEMPLATE = """
+子任务已完成，请总结本阶段工作（200字以内）：
+
+- 关键决策：...
+- 产出文件：...
+- 遇到的问题及解决方案：...
+
+自评质量（1-10分）：__
+是否有疑虑需人工确认？（是/否）：__
+
+完成总结后输出 # SUMMARY_COMPLETE
+"""
 
 
 class Scheduler:
@@ -31,6 +49,8 @@ class Scheduler:
         # V2新增：Session生命周期管理
         self._sessions: Dict[str, Dict[str, Any]] = {}  # session_id -> session_info
         self._task_sessions: Dict[str, str] = {}  # task_id -> session_id
+        # V2.1.0新增：子任务检测器
+        self._subtask_detector = SubtaskDetector()
 
     def _init_task_context(self, task_id: str):
         """初始化任务上下文"""
@@ -255,3 +275,127 @@ class Scheduler:
             关联的session_id，不存在返回None
         """
         return self._task_sessions.get(task_id)
+
+    # ==================== V2.1.0新增：子任务检测与质量检查 ====================
+
+    def detect_and_handle_completion(
+        self,
+        task_id: str,
+        output: str,
+        tool_results: Optional[List[Dict[str, Any]]] = None
+    ) -> Tuple[bool, Optional[str]]:
+        """
+        检测子任务完成并处理
+
+        Args:
+            task_id: 任务ID
+            output: Claude Code输出文本
+            tool_results: 工具调用结果列表
+
+        Returns:
+            Tuple[bool, Optional[str]]:
+                - 是否检测到完成
+                - 需注入的prompt（如SUMMARY_PROMPT_TEMPLATE）或None
+        """
+        result = self._subtask_detector.detect_completion(
+            task_id, output, tool_results
+        )
+
+        if result.is_complete:
+            # 记录完成类型到上下文
+            ctx = self.get_task_context(task_id)
+            ctx["last_completion_type"] = result.completion_type.value
+            ctx["last_completion_details"] = result.details
+
+            # 返回需要注入的总结prompt
+            return True, SUMMARY_PROMPT_TEMPLATE
+
+        return False, None
+
+    def parse_quality_check(self, output: str) -> Tuple[Optional[int], bool]:
+        """
+        从总结输出中解析质量检查结果
+
+        Args:
+            output: 包含总结和质量自评的输出文本
+
+        Returns:
+            Tuple[Optional[int], bool]:
+                - 质量评分（1-10），解析失败返回None
+                - 是否有疑虑需人工确认
+        """
+        # 提取质量评分
+        quality_score = None
+        quality_match = re.search(r"自评质量[（(].*?[）)]\s*[:：]?\s*(\d+)", output)
+        if quality_match:
+            try:
+                quality_score = int(quality_match.group(1))
+                if quality_score < 1 or quality_score > 10:
+                    quality_score = None
+            except ValueError:
+                pass
+
+        # 提取疑虑标记
+        doubt_flag = False
+        doubt_match = re.search(
+            r"是否有疑虑需人工确认[？?].*?[（(].*?[）)]\s*[:：]?\s*(是|yes|y)",
+            output,
+            re.IGNORECASE
+        )
+        if doubt_match:
+            doubt_flag = True
+
+        return quality_score, doubt_flag
+
+    def should_pause_for_review(self, task_id: str) -> bool:
+        """
+        判断任务是否需要暂停等待人工确认
+
+        Args:
+            task_id: 任务ID
+
+        Returns:
+            是否需要暂停
+        """
+        task = self.task_manager.get_task(task_id)
+
+        # 检查pause_on_doubt配置和质量标记
+        if task.pause_on_doubt and task.doubt_flag:
+            return True
+
+        # 检查质量评分过低（<6分）
+        if task.quality_score is not None and task.quality_score < 6:
+            return True
+
+        return False
+
+    def update_quality_metrics(
+        self,
+        task_id: str,
+        quality_score: Optional[int],
+        doubt_flag: bool
+    ):
+        """
+        更新任务质量指标
+
+        Args:
+            task_id: 任务ID
+            quality_score: 质量评分
+            doubt_flag: 是否有疑虑
+        """
+        task = self.task_manager.get_task(task_id)
+        task.quality_score = quality_score
+        task.doubt_flag = doubt_flag
+        self.task_manager._save_tasks()
+
+    def clear_subtask_state(self, task_id: str):
+        """
+        清除子任务状态（进入下一子任务前调用）
+
+        Args:
+            task_id: 任务ID
+        """
+        self._subtask_detector.clear_pending_edits(task_id)
+        ctx = self.get_task_context(task_id)
+        ctx.pop("last_completion_type", None)
+        ctx.pop("last_completion_details", None)

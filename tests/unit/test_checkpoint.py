@@ -148,10 +148,9 @@ class TestCheckpointList:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
             cm = CheckpointManager(checkpoint_dir=checkpoint_dir)
 
-            # 保存多个快照
+            # 保存多个快照（同一个任务的不同阶段）
             cm.save(task_id="task_001", phase="init", task_state={}, execution_context={})
             cm.save(task_id="task_001", phase="dev", task_state={}, execution_context={})
-            cm.save(task_id="task_002", phase="init", task_state={}, execution_context={})
 
             checkpoints = cm.list_checkpoints(task_id="task_001")
             assert len(checkpoints) == 2

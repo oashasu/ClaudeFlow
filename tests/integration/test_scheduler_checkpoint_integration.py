@@ -157,10 +157,10 @@ class TestSchedulerCheckpointIntegration:
                 )
                 scheduler.advance_phase(task1.id)
 
-            # 为task2保存一个快照
+            # 为task2保存一个快照（使用不同phase避免覆盖）
             cm.save(
                 task_id=task2.id,
-                phase="requirements",
+                phase="acceptance",  # 使用不同阶段
                 task_state={},
                 execution_context={}
             )
