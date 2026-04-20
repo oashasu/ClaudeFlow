@@ -119,7 +119,7 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 | WorkflowProgress | 工作流进度 | components/WorkflowProgress.vue |
 | StepScroller | 步骤滚动 | components/StepScroller.vue |
 | CheckpointTimeline | 时间线 | components/CheckpointTimeline.vue |
-| SessionIdBox | 会话ID | components/SessionIdBox.vue |
+| TaskIdBox | 任务ID | components/TaskIdBox.vue |
 | InterventionModal | 介入弹窗 | components/InterventionModal.vue |
 | TaskStore | 状态管理 | stores/taskStore.ts |
 | api.ts | API服务 | services/api.ts |
