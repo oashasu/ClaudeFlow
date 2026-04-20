@@ -33,6 +33,10 @@ V2.1.0（Checkpoint增强）→ 强制checkpoint + 异步总结
     ↓
 V2.2.0（Web控制台）→ Spring Boot后端 + Vue前端控制台
     ↓
+V2.2.1（sessionId获取）→ 修复sessionId获取方式
+    ↓
+V2.3.0（异步复盘）→ haiku_client/phase_reviewer/task_reviewer + 集成测试
+    ↓
 Phase2（完整Web版本）→ 功能扩展与优化
 ```
 

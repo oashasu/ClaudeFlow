@@ -1,0 +1,93 @@
+<h2>ClaudeFlow Web控制台 - Dashboard原型</h2>
+<p class="subtitle">任务管理界面布局预览</p>
+
+<div class="mockup">
+  <div class="mockup-header">
+    <span style="font-weight:bold;">ClaudeFlow 控制台</span>
+    <span style="float:right;color:#888;">● SSE已连接</span>
+  </div>
+  <div class="mockup-body">
+    <!-- 顶部统计 -->
+    <div style="display:flex;gap:16px;margin-bottom:20px;">
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:bold;">5</div>
+        <div style="color:#888;">运行中</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:bold;">12</div>
+        <div style="color:#888;">已完成</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:bold;">3</div>
+        <div style="color:#888;">等待介入</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;background:#fee;">
+        <div style="font-size:24px;font-weight:bold;color:#c00;">2</div>
+        <div style="color:#c00;">告警</div>
+      </div>
+    </div>
+
+    <!-- 任务列表 -->
+    <div style="margin-bottom:20px;">
+      <div style="font-weight:bold;margin-bottom:8px;">任务列表</div>
+      <div class="placeholder" style="padding:12px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span><strong>task_001</strong> - Phase3: 开发</span>
+          <span style="color:#4a4;">运行中</span>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="background:#ddd;height:8px;border-radius:4px;">
+            <div style="background:#4a4;height:8px;border-radius:4px;width:60%;"></div>
+          </div>
+          <span style="color:#888;">60% - 子任务3/5</span>
+        </div>
+      </div>
+      <div class="placeholder" style="padding:12px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span><strong>task_002</strong> - Phase5: 测试</span>
+          <span style="color:#4a4;">运行中</span>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="background:#ddd;height:8px;border-radius:4px;">
+            <div style="background:#4a4;height:8px;border-radius:4px;width:80%;"></div>
+          </div>
+          <span style="color:#888;">80% - 单元测试完成</span>
+        </div>
+      </div>
+      <div class="placeholder" style="padding:12px;margin-bottom:8px;background:#fff3cd;">
+        <div style="display:flex;justify-content:space-between;">
+          <span><strong>task_003</strong> - Phase4: 审查</span>
+          <span style="color:#c00;">等待介入</span>
+        </div>
+        <div style="margin-top:8px;color:#c00;">
+          ⚠️ 质量评分低于阈值，需人工确认
+        </div>
+        <button class="mock-button" style="margin-top:8px;">确认介入</button>
+      </div>
+      <div class="placeholder" style="padding:12px;background:#f0f0f0;">
+        <div style="display:flex;justify-content:space-between;">
+          <span><strong>task_004</strong> - 已完成</span>
+          <span style="color:#888;">已完成</span>
+        </div>
+        <div style="margin-top:8px;color:#888;">
+          2026-04-20 09:30 完成
+        </div>
+      </div>
+    </div>
+
+    <!-- 告警面板 -->
+    <div>
+      <div style="font-weight:bold;margin-bottom:8px;">告警面板</div>
+      <div class="placeholder" style="padding:12px;background:#fee;border-left:4px solid #c00;">
+        <div style="font-weight:bold;">⚠️ 文件损坏告警</div>
+        <div style="color:#888;">/path/to/checkpoint.json - JSONDecodeError</div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button class="mock-button">确认处理</button>
+          <button class="mock-button" style="background:#888;color:#fff;">忽略</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:16px;color:#888;">这是Dashboard首页的原型，展示了任务列表、进度条、告警面板的布局。</p>

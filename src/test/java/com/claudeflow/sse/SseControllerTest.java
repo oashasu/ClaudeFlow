@@ -66,8 +66,8 @@ class SseControllerTest {
 
         com.claudeflow.dto.ToolCallEvent event = new com.claudeflow.dto.ToolCallEvent();
         event.setTaskId("task-001");
-        event.setTool("Glob");
-        event.setInput("{\"pattern\":\"src/**/*.java\"}");
+        event.setToolName("Glob");
+        event.setAction("{\"pattern\":\"src/**/*.java\"}");
 
         sseController.sendToolCall(event);
 

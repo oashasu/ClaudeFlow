@@ -1,0 +1,175 @@
+<h2>ClaudeFlow Web控制台 - Dashboard原型 v3</h2>
+<p class="subtitle">顶部统计卡片可点击，任务列表联动过滤</p>
+
+<div class="mockup">
+  <div class="mockup-header">
+    <span style="font-weight:bold;">ClaudeFlow 控制台</span>
+    <span style="float:right;color:#888;">● SSE已连接</span>
+  </div>
+  <div class="mockup-body">
+    <!-- 顶部统计 - 可点击样式 -->
+    <div style="display:flex;gap:16px;margin-bottom:20px;">
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.2s;" onclick="this.style.border='2px solid #2196F3';this.style.background='#e3f2fd'">
+        <div style="font-size:24px;font-weight:bold;">5</div>
+        <div style="color:#888;">运行中</div>
+        <div style="font-size:10px;color:#2196F3;margin-top:4px;">点击筛选</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.2s;" onclick="this.style.border='2px solid #4a4';this.style.background='#e8f5e9'">
+        <div style="font-size:24px;font-weight:bold;">12</div>
+        <div style="color:#888;">已完成</div>
+        <div style="font-size:10px;color:#4a4;margin-top:4px;">点击筛选</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.2s;" onclick="this.style.border='2px solid #ff9800';this.style.background='#fff3e0'">
+        <div style="font-size:24px;font-weight:bold;">3</div>
+        <div style="color:#888;">等待介入</div>
+        <div style="font-size:10px;color:#ff9800;margin-top:4px;">点击筛选</div>
+      </div>
+      <div class="placeholder" style="flex:1;padding:12px;text-align:center;background:#fee;cursor:pointer;border:2px solid transparent;transition:all 0.2s;" onclick="this.style.border='2px solid #c00';this.style.background='#ffebee'">
+        <div style="font-size:24px;font-weight:bold;color:#c00;">2</div>
+        <div style="color:#c00;">告警</div>
+        <div style="font-size:10px;color:#c00;margin-top:4px;">点击查看</div>
+      </div>
+    </div>
+
+    <!-- 当前筛选状态提示 -->
+    <div style="padding:8px;background:#e3f2fd;border-radius:4px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span>当前筛选：<strong style="color:#2196F3;">运行中</strong> · 显示 5 个任务</span>
+      <button class="mock-button" style="padding:4px 12px;font-size:12px;">清除筛选</button>
+    </div>
+
+    <!-- 任务列表 - 筛选后只显示运行中的任务 -->
+    <div style="margin-bottom:20px;">
+      <div style="font-weight:bold;margin-bottom:8px;">任务列表</div>
+
+      <!-- 任务卡片1 - 运行中 Phase3 -->
+      <div class="placeholder" style="padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+          <span><strong>task_001</strong></span>
+          <span style="color:#4a4;">运行中</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">0</div>
+            <div style="font-size:11px;margin-top:4px;">拆分</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">1</div>
+            <div style="font-size:11px;margin-top:4px;">规划</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">2</div>
+            <div style="font-size:11px;margin-top:4px;">准备</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#2196F3;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 8px #2196F3;">3</div>
+            <div style="font-size:11px;margin-top:4px;color:#2196F3;font-weight:bold;">开发</div>
+          </div>
+          <div style="height:2px;background:#ddd;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;">4</div>
+            <div style="font-size:11px;margin-top:4px;color:#888;">审查</div>
+          </div>
+          <div style="height:2px;background:#ddd;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;">5</div>
+            <div style="font-size:11px;margin-top:4px;color:#888;">测试</div>
+          </div>
+          <div style="height:2px;background:#ddd;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;">6</div>
+            <div style="font-size:11px;margin-top:4px;color:#888;">完成</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:8px;background:#e3f2fd;border-radius:4px;">
+          <div style="display:flex;justify-content:space-between;"><span>Phase3: 开发</span><span>60%</span></div>
+          <div style="background:#ddd;height:8px;border-radius:4px;margin-top:4px;">
+            <div style="background:#2196F3;height:8px;border-radius:4px;width:60%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 任务卡片2 - 运行中 Phase5 -->
+      <div class="placeholder" style="padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+          <span><strong>task_005</strong></span>
+          <span style="color:#4a4;">运行中</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">0</div>
+            <div style="font-size:11px;margin-top:4px;">拆分</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">1</div>
+            <div style="font-size:11px;margin-top:4px;">规划</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">2</div>
+            <div style="font-size:11px;margin-top:4px;">准备</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">3</div>
+            <div style="font-size:11px;margin-top:4px;">开发</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">4</div>
+            <div style="font-size:11px;margin-top:4px;">审查</div>
+          </div>
+          <div style="height:2px;background:#4a4;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#2196F3;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 8px #2196F3;">5</div>
+            <div style="font-size:11px;margin-top:4px;color:#2196F3;font-weight:bold;">测试</div>
+          </div>
+          <div style="height:2px;background:#ddd;width:30px;"></div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;">6</div>
+            <div style="font-size:11px;margin-top:4px;color:#888;">完成</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:8px;background:#e3f2fd;border-radius:4px;">
+          <div style="display:flex;justify-content:space-between;"><span>Phase5: 测试</span><span>80%</span></div>
+          <div style="background:#ddd;height:8px;border-radius:4px;margin-top:4px;">
+            <div style="background:#2196F3;height:8px;border-radius:4px;width:80%;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 交互说明 -->
+    <div style="background:#f5f5f5;padding:12px;border-radius:4px;margin-top:16px;">
+      <div style="font-weight:bold;margin-bottom:8px;">交互说明：</div>
+      <ul style="margin:0;padding-left:20px;color:#666;">
+        <li>点击顶部「运行中」卡片 → 任务列表只显示运行中的任务</li>
+        <li>点击顶部「已完成」卡片 → 任务列表只显示已完成的任务</li>
+        <li>点击顶部「等待介入」卡片 → 任务列表只显示等待介入的任务</li>
+        <li>点击顶部「告警」卡片 → 跳转到告警面板页</li>
+        <li>点击「清除筛选」按钮 → 显示全部任务</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:16px;">
+  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>满意，继续设计TaskDetail页</h3>
+      <p>顶部筛选交互清晰</p>
+    </div>
+  </div>
+  <div class="option" data-choice="adjust" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>需要调整</h3>
+      <p>请描述具体需求</p>
+    </div>
+  </div>
+</div>

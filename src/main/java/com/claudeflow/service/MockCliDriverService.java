@@ -21,8 +21,10 @@ public class MockCliDriverService implements CliDriverService {
         String sessionId = UUID.randomUUID().toString();
         MockSession session = new MockSession(prompt);
         sessions.put(sessionId, session);
-        // 添加模拟的初始事件
-        session.addEvent(CliEvent.toolUse("Glob", Map.of("pattern", "src/**/*.java")));
+        // 添加模拟的初始事件 (Java 8兼容语法)
+        Map<String, Object> globInput = new HashMap<>();
+        globInput.put("pattern", "src/**/*.java");
+        session.addEvent(CliEvent.toolUse("Glob", globInput));
         session.addEvent(CliEvent.checkpoint("cp_001", "Phase1", 1, "初始化完成"));
         return sessionId;
     }
@@ -40,7 +42,9 @@ public class MockCliDriverService implements CliDriverService {
     public void intervene(String sessionId, String prompt) {
         MockSession session = sessions.get(sessionId);
         if (session != null) {
-            session.addEvent(CliEvent.toolUse("Read", Map.of("file", prompt)));
+            Map<String, Object> readInput = new HashMap<>();
+            readInput.put("file", prompt);
+            session.addEvent(CliEvent.toolUse("Read", readInput));
             session.setStatus("running");
         }
     }

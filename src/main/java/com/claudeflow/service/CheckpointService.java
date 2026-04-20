@@ -68,7 +68,7 @@ public class CheckpointService {
         dto.setStepIndex(entity.getStepIndex());
         dto.setSummary(entity.getSummary());
         dto.setGmtCreate(entity.getGmtCreate());
-        dto.setIsCurrent(false); // 后续逻辑判断
+        dto.setCurrent(false); // 后续逻辑判断
         return dto;
     }
 

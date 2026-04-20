@@ -1,0 +1,2 @@
+[console_scripts]
+claudeflow = claudeflow.cli:main

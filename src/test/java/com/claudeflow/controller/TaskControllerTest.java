@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +47,7 @@ class TaskControllerTest {
         TaskEntity task2 = createTask("task-002", "测试任务2", "completed");
         when(taskRepository.findAll()).thenReturn(Arrays.asList(task1, task2));
 
-        var result = taskController.getTaskList(null);
+        List<TaskDTO> result = taskController.getTaskList(null);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getId()).isEqualTo("task-001");
@@ -59,7 +60,7 @@ class TaskControllerTest {
         TaskEntity task1 = createTask("task-001", "测试任务1", "running");
         when(taskRepository.findByStatus("running")).thenReturn(Arrays.asList(task1));
 
-        var result = taskController.getTaskList("running");
+        List<TaskDTO> result = taskController.getTaskList("running");
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getStatus()).isEqualTo("running");

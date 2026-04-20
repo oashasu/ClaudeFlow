@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 数据清理定时任务
@@ -42,7 +43,7 @@ public class CleanupScheduler {
         List<String> taskIds = taskRepository.findForCleanup(statusesToClean, threshold)
                 .stream()
                 .map(task -> task.getId())
-                .toList();
+                .collect(Collectors.toList());
 
         if (taskIds.isEmpty()) {
             log.info("No tasks to cleanup");

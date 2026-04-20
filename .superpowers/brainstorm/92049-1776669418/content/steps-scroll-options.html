@@ -1,0 +1,151 @@
+<h2>步骤横向滚动方案</h2>
+<p class="subtitle">当步骤数量多时，支持左右滑动</p>
+
+<div class="mockup">
+  <div class="mockup-header">步骤区域可横向滚动</div>
+  <div class="mockup-body">
+    <div class="placeholder" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span><strong>task_001</strong></span>
+        <span style="color:#4a4;">运行中</span>
+      </div>
+
+      <!-- 工作流 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">0</div>
+          <div style="font-size:11px;margin-top:4px;">拆分</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">1</div>
+          <div style="font-size:11px;margin-top:4px;">规划</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">2</div>
+          <div style="font-size:11px;margin-top:4px;">准备</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <!-- Phase3 当前 -->
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2196F3;box-shadow:0 0 8px #2196F3;">3</div>
+          <div style="font-size:11px;margin-top:4px;color:#2196F3;font-weight:bold;">开发 ▼</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">4</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">审查</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">5</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">测试</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">6</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">完成</div>
+        </div>
+      </div>
+
+      <!-- Phase3步骤 - 可横向滚动 -->
+      <div style="margin-top:12px;padding:12px;background:#e3f2fd;border-radius:8px;border:1px solid #2196F3;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-weight:bold;color:#2196F3;">Phase3: 开发 · 12个步骤</span>
+          <span style="font-size:12px;color:#888;">◀ 左右滑动查看更多 ▶</span>
+        </div>
+
+        <!-- 横向滚动区域 -->
+        <div style="overflow-x:auto;white-space:nowrap;padding-bottom:8px;" style-scroll="::-webkit-scrollbar{height:6px;}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}">
+          <div style="display:inline-flex;gap:8px;">
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤1</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤2</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤3</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤4</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤5</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤6</div>
+            <div style="padding:8px 16px;background:#4a4;color:#fff;border-radius:4px;white-space:nowrap;">✓ 步骤7</div>
+            <div style="padding:8px 16px;background:#2196F3;color:#fff;border-radius:4px;white-space:nowrap;box-shadow:0 0 4px #2196F3;">▶ 步骤8</div>
+            <div style="padding:8px 16px;background:#ddd;color:#888;border-radius:4px;white-space:nowrap;">○ 步骤9</div>
+            <div style="padding:8px 16px;background:#ddd;color:#888;border-radius:4px;white-space:nowrap;">○ 步骤10</div>
+            <div style="padding:8px 16px;background:#ddd;color:#888;border-radius:4px;white-space:nowrap;">○ 步骤11</div>
+            <div style="padding:8px 16px;background:#ddd;color:#888;border-radius:4px;white-space:nowrap;">○ 步骤12</div>
+          </div>
+        </div>
+
+        <!-- 进度指示 -->
+        <div style="margin-top:8px;font-size:12px;color:#888;">
+          当前: 步骤8 - API接口开发 · 进度 7/12 (58%)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:16px;">
+  <div class="mockup-header">紧凑进度条模式（步骤特别多时）</div>
+  <div class="mockup-body">
+    <div class="placeholder" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span><strong>task_002</strong></span>
+        <span style="color:#4a4;">Phase3 步骤18/30</span>
+      </div>
+
+      <!-- 紧凑工作流 -->
+      <div style="display:flex;align-items:center;font-size:12px;margin-bottom:8px;">
+        <span style="color:#4a4;">●0</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#4a4;">●1</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#4a4;">●2</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#2196F3;font-weight:bold;">●3</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○4</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○5</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○6</span>
+      </div>
+
+      <!-- 紧凑进度条（30个步骤） -->
+      <div style="background:#ddd;height:20px;border-radius:4px;overflow:hidden;position:relative;">
+        <div style="background:#4a4;height:20px;width:60%;border-radius:4px;"></div>
+        <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;color:#fff;font-weight:bold;">18/30</div>
+      </div>
+
+      <!-- 当前步骤信息 -->
+      <div style="margin-top:6px;font-size:12px;color:#888;">
+        当前执行: 步骤18 - 数据库连接池配置
+      </div>
+
+      <!-- 查看详情按钮 -->
+      <button class="mock-button" style="margin-top:8px;">查看全部步骤</button>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:16px;">
+  <div class="option" data-choice="scroll" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>横向滚动模式</h3>
+      <p>步骤卡片横向排列，可滑动查看</p>
+    </div>
+  </div>
+  <div class="option" data-choice="compact" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>紧凑进度条模式</h3>
+      <p>步骤很多时用进度条+数字，点击查看详情</p>
+    </div>
+  </div>
+  <div class="option" data-choice="auto" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>自动适配模式（推荐）</h3>
+      <p>≤8步骤横向滚动，>8步骤紧凑进度条</p>
+    </div>
+  </div>
+</div>
