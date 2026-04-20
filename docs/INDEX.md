@@ -101,6 +101,32 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 
 ---
 
+## V2.2.0 Web控制台
+
+| 模块 | 职责 | 文件 |
+|------|------|------|
+| TaskController | REST API | controller/TaskController.java |
+| CheckpointController | Checkpoint API | controller/CheckpointController.java |
+| SseController | SSE推送 | sse/SseController.java |
+| PythonWebSocketHandler | WebSocket处理 | websocket/PythonWebSocketHandler.java |
+| TaskService | 任务业务 | service/TaskService.java |
+| CheckpointService | Checkpoint业务 | service/CheckpointService.java |
+| CleanupScheduler | 定时清理 | scheduler/CleanupScheduler.java |
+| Dashboard | 主页面 | views/Dashboard.vue |
+| TaskDetail | 详情页 | views/TaskDetail.vue |
+| StatsCard | 统计卡片 | components/StatsCard.vue |
+| TaskCard | 任务卡片 | components/TaskCard.vue |
+| WorkflowProgress | 工作流进度 | components/WorkflowProgress.vue |
+| StepScroller | 步骤滚动 | components/StepScroller.vue |
+| CheckpointTimeline | 时间线 | components/CheckpointTimeline.vue |
+| SessionIdBox | 会话ID | components/SessionIdBox.vue |
+| InterventionModal | 介入弹窗 | components/InterventionModal.vue |
+| TaskStore | 状态管理 | stores/taskStore.ts |
+| api.ts | API服务 | services/api.ts |
+| sse.ts | SSE服务 | services/sse.ts |
+
+---
+
 ## 设计问题清单
 
 见 [07_V2设计问题清单.md](07_V2设计问题清单.md)

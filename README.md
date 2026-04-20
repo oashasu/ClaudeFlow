@@ -29,7 +29,11 @@ V1（最小版本）→ 验证核心功能 + TDD流程可行性
     ↓
 V2（扩展版本）→ 在V1基础上添加通信层/提炼机制等
     ↓
-Phase2（Web版本）→ Spring Boot + Vue控制台
+V2.1.0（Checkpoint增强）→ 强制checkpoint + 异步总结
+    ↓
+V2.2.0（Web控制台）→ Spring Boot后端 + Vue前端控制台
+    ↓
+Phase2（完整Web版本）→ 功能扩展与优化
 ```
 
 ## 目录结构
@@ -37,8 +41,10 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 ```
 claudeflow/
 ├── docs/           # 设计文档
-├── src/            # 源代码
+├── src/            # Python源代码
+│   └── main/java/  # Spring Boot后端
 ├── tests/          # 测试代码
+├── console/        # Vue前端控制台
 └── README.md       # 项目说明
 ```
 
