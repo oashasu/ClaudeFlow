@@ -188,6 +188,34 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 
 ---
 
+## V2.4.0 指令集注入整合
+
+| 文件 | 职责 |
+|------|------|
+| CLAUDE.md | Hermes管理者指令段 |
+| test_hermes_cli_integration.py | Hermes CLI集成测试 |
+
+**注入内容**：
+- 核心身份定义：ClaudeFlow是任务调度管理系统，不是直接执行者
+- 启动命令模板：subprocess启动CLI
+- 干预命令模板：--resume恢复会话
+- 事件解析规则：tool_use→进度追踪，text→阶段完成，result→任务完成
+- 干预时机：质量检查、人工介入、异常检测
+
+**测试覆盖**：
+- 19个集成测试
+- Hermes启动CLI并捕获session_id
+- Hermes监控事件流并报告进度
+- Hermes创建checkpoint
+- Hermes干预会话（质量检查）
+- Hermes检测任务完成
+
+**总测试覆盖**：
+- 379个测试通过
+- 总覆盖率88%
+
+---
+
 ## 下一步
 
 1. **创建GitHub仓库**
