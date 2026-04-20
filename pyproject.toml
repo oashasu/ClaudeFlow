@@ -25,6 +25,10 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+markers = [
+    "integration: integration tests requiring backend",
+    "e2e: end-to-end tests"
+]
 
 [tool.coverage.run]
 source = ["src/claudeflow"]

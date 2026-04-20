@@ -33,7 +33,7 @@ class WebSocketState(Enum):
 class WebSocketConfig:
     """WebSocket配置"""
 
-    uri: str = "ws://localhost:8080/ws/hermes"
+    uri: str = "ws://localhost:8080/ws/python"
     reconnect_max_attempts: int = 5
     reconnect_base_delay: float = 1.0  # 秒
     reconnect_max_delay: float = 30.0  # 秒
