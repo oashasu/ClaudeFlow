@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import TaskDetail from '../src/views/TaskDetail.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
 
 // Mock API
 vi.mock('../src/services/api', () => ({
@@ -13,6 +14,9 @@ vi.mock('../src/services/api', () => ({
       status: 'running',
       phase: 'Phase2',
       progress: 50,
+      gmtCreate: '2026-04-21',
+      gmtModified: '2026-04-21',
+      description: '测试描述',
     }),
     pause: vi.fn(),
     resume: vi.fn(),
@@ -49,6 +53,11 @@ describe('TaskDetail', () => {
       },
     })
 
+    // 等待异步数据加载
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await nextTick()
+
     // 应该显示任务名称
     expect(wrapper.find('.task-header h2').text()).toBe('测试任务')
   })
@@ -62,6 +71,11 @@ describe('TaskDetail', () => {
         plugins: [router],
       },
     })
+
+    // 等待异步数据加载
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await nextTick()
 
     const badge = wrapper.find('.status-badge')
     expect(badge.text()).toBe('running')
@@ -78,7 +92,14 @@ describe('TaskDetail', () => {
       },
     })
 
+    // 等待异步数据加载
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await nextTick()
+
     // 应该有暂停按钮
-    expect(wrapper.find('.action-buttons button').text()).toContain('暂停')
+    const buttons = wrapper.find('.action-buttons').findAll('button')
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(buttons[0].text()).toContain('暂停')
   })
 })

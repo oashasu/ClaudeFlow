@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ProgressStream from '../src/components/ProgressStream.vue'
 
-// Mock SSE
+// Mock SSE - 使用工厂函数避免hoisting问题
 const mockConnectSSE = vi.fn()
 const mockDisconnectSSE = vi.fn()
 
 vi.mock('../src/services/sse', () => ({
-  connectSSE: mockConnectSSE,
-  disconnectSSE: mockDisconnectSSE,
+  connectSSE: (...args: unknown[]) => mockConnectSSE(...args),
+  disconnectSSE: (...args: unknown[]) => mockDisconnectSSE(...args),
 }))
 
 describe('ProgressStream', () => {
