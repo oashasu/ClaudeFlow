@@ -167,6 +167,27 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 
 ---
 
+## V2.4.0 CLI驱动模块
+
+| 模块 | 职责 | 文件 |
+|------|------|------|
+| CliDriver | CLI进程驱动 | claudeflow/cli_driver.py |
+| CliSession | 会话信息管理 | claudeflow/cli_driver.py |
+
+**核心机制**（基于验证报告）：
+- 启动：`claude -p "prompt" --output-format stream-json --verbose`
+- session追踪：从首事件提取session_id
+- 干预：`claude -p --resume session_id "新prompt"`
+- 解析：assistant事件包含thinking/tool_use/text
+
+**测试覆盖**：
+- 40个单元测试（Mock模式）
+- 覆盖率96%
+- 会话生命周期测试
+- 干预恢复测试
+
+---
+
 ## 下一步
 
 1. **创建GitHub仓库**

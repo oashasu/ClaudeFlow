@@ -19,6 +19,7 @@ from claudeflow.session_utils import get_current_session_id, format_session_id_f
 from claudeflow.haiku_client import HaikuClient, HaikuConfig
 from claudeflow.phase_reviewer import PhaseReviewer
 from claudeflow.task_reviewer import TaskReviewer
+from claudeflow.cli_driver import CliDriver, CliSession
 
 __all__ = [
     # Checkpoint
@@ -58,6 +59,9 @@ __all__ = [
     "HaikuConfig",
     "PhaseReviewer",
     "TaskReviewer",
+    # CLI Driver (V2.4.0)
+    "CliDriver",
+    "CliSession",
 ]
 
-__version__ = "2.3.0"
+__version__ = "2.4.0"
