@@ -4,6 +4,7 @@ V2新增模块：
 - WebSocket连接管理
 - 断线重连机制
 - 消息发送/接收
+- sessionId自动获取与传递
 """
 
 import json
@@ -11,6 +12,8 @@ import asyncio
 from enum import Enum
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Optional, Callable
+
+from .session_utils import get_current_session_id
 
 # websockets库可选，Mock测试时不需要
 try:
@@ -39,14 +42,17 @@ class WebSocketConfig:
 class WebSocketClient:
     """WebSocket客户端"""
 
-    def __init__(self, config: Optional[WebSocketConfig] = None):
+    def __init__(self, config: Optional[WebSocketConfig] = None, project_dir: Optional[str] = None):
         """
         初始化客户端
 
         Args:
             config: 配置对象
+            project_dir: 项目目录（用于获取sessionId）
         """
         self.config = config or WebSocketConfig()
+        self.project_dir = project_dir
+        self.session_id: Optional[str] = None
         self.ws: Optional[Any] = None
         self.state = WebSocketState.DISCONNECTED
         self._message_callback: Optional[Callable] = None
@@ -70,11 +76,15 @@ class WebSocketClient:
             self.state = WebSocketState.CONNECTING
             self.ws = await websockets.connect(self.config.uri)
 
-            # 发送注册消息
+            # 获取当前sessionId
+            self.session_id = get_current_session_id(self.project_dir)
+
+            # 发送注册消息（包含sessionId）
             await self.send({
                 "type": "worker_register",
                 "worker_id": worker_id,
-                "task_id": task_id
+                "task_id": task_id,
+                "session_id": self.session_id
             })
 
             self.state = WebSocketState.CONNECTED
