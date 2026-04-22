@@ -74,6 +74,7 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 | 04_强制checkpoint | 被动不可靠 | 阻塞式注入 |
 | 05_子Agent异步总结 | 阻塞主任务 | Haiku异步 |
 | 06_Claude_Code输出格式 | 提取困难 | 解析规范 |
+| 08_V3_Checkpoint版本快照优化 | 无法回退代码 | Git绑定+文件边界 |
 
 ### V2新增模块
 
