@@ -8,6 +8,11 @@ const routes = [
     component: () => import('../views/Dashboard.vue'),
   },
   {
+    path: '/runtime',
+    name: 'RuntimeConsole',
+    component: () => import('../views/RuntimeConsole.vue'),
+  },
+  {
     path: '/task/:id',
     name: 'TaskDetail',
     component: () => import('../views/TaskDetail.vue'),

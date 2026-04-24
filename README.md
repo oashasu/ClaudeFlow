@@ -66,6 +66,91 @@ git clone git@github.com:oashasu/ClaudeFlow.git
 git checkout v1.0.0
 ```
 
+## Runtime PoC
+
+当前版本已包含最小多会话 runtime PoC，可通过 CLI 初始化运行时目录并启动/完成 worker：
+
+```bash
+claudeflow runtime init
+
+claudeflow runtime status
+
+claudeflow runtime show --task-id impl_auth_controller
+
+claudeflow runtime start \
+  --task-id impl_auth_controller \
+  --prompt "实现 AuthController" \
+  --write-path src/controllers/AuthController.java \
+  --protocol-ref auth_api@v2
+
+claudeflow runtime start \
+  --task-id impl_auth_controller \
+  --task-graph-file ./examples/task-graph.json
+
+claudeflow runtime dispatch \
+  --task-graph-file ./examples/task-graph.sample.json \
+  --max-concurrent 2
+
+claudeflow runtime explain \
+  --task-id impl_auth_tests \
+  --task-graph-file ./examples/task-graph.sample.json
+
+claudeflow runtime plan \
+  --task-graph-file ./examples/task-graph.sample.json
+
+claudeflow runtime plan \
+  --task-graph-file ./examples/task-graph.sample.json \
+  --json
+
+claudeflow runtime explain \
+  --task-id impl_auth_tests \
+  --task-graph-file ./examples/task-graph.sample.json \
+  --json
+
+claudeflow runtime dispatch \
+  --task-graph-file ./examples/task-graph.sample.json \
+  --json
+
+claudeflow runtime complete \
+  --task-id impl_auth_controller \
+  --summary "Controller 已实现" \
+  --changed-file src/controllers/AuthController.java \
+  --test-status passed \
+  --test-count 3
+
+claudeflow runtime fail \
+  --task-id impl_auth_controller \
+  --reason "测试失败，需要人工介入"
+```
+
+`runtime complete` 现在会直接输出新变为 runnable 的任务，便于继续调度下一批节点；`runtime fail` 会把任务标记为失败，并让 runtime 状态进入 `intervention_required = true`。
+`runtime dispatch` 会按任务 `priority` 排序启动可运行节点，并输出当前 blocked 任务及其原因，例如“等待依赖完成”或“上游失败，按策略跳过”；`--max-concurrent` 会按当前 active session 数量计算剩余槽位。`runtime explain` 可单独解释某个任务现在为什么不能跑，`runtime plan` 则会汇总 runnable / blocked / running 三类任务。blocked 和 skipped 结果现在同时带 `reason_code`，且 `dispatch / plan / explain` 都支持 `--json`，便于后续控制台或自动化逻辑稳定消费。
+
+## Runtime Console
+
+当前仓库已经新增独立的 runtime 工作台页面 `/runtime`，它和旧的 `Dashboard / TaskDetail` 分层存在：
+
+- 旧页面负责任务流视图
+- `Runtime Console` 负责 runtime / session / dispatch 视图
+
+当前 Runtime Console 已支持：
+
+- sample / live 双模式
+- live `status / sessions / plan / explain / dispatch`
+- 自动刷新
+- session 列表动作：
+  - `解释任务`
+  - `查看事件`
+- session inspector：查看当前 session 事件流与摘要
+
+## 文档同步约束
+
+从 2026-04-24 起，凡是涉及 runtime、Hermes runtime API、Runtime Console 的功能更新，都必须同步更新实现文档：
+
+- [docs/09_Runtime实现与变更记录.md](docs/09_Runtime实现与变更记录.md)
+
+如果改动了输出结构或对象协议，还需要同步更新 `examples/*.schema.json`。
+
 ## 文档索引
 
 详见 [docs/INDEX.md](docs/INDEX.md)
