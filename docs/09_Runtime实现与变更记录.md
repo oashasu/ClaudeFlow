@@ -114,16 +114,13 @@
 
 状态：`pending`
 
-已登记到正式规格文档：
+已拆分为月度路线图和 4 份独立规格文档：
 
-- [spec.md](/Users/claw/sandbox/personal/claudeflow/docs/spec.md)
-
-规划内容：
-
-- 为 session 级动作补充确认机制和操作审计
-- 将 Runtime Console 拆为更清晰的状态驱动结构
-- 为 runtime 返回体补齐更严格的 schema 校验
-- 提升调度器对 `shared_files / IntegrationTask / 失败回流` 的支持
+- [2026-04-24-runtime-monthly-roadmap.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-monthly-roadmap.md)
+- [2026-04-24-runtime-action-audit-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-action-audit-spec.md)
+- [2026-04-24-runtime-console-refactor-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-console-refactor-spec.md)
+- [2026-04-24-runtime-schema-validation-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-schema-validation-spec.md)
+- [2026-04-24-runtime-scheduler-enhancement-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-scheduler-enhancement-spec.md)
 
 ## 约束
 
@@ -146,6 +143,6 @@
 
 ## 下一步建议
 
-- 优先按 [spec.md](/Users/claw/sandbox/personal/claudeflow/docs/spec.md) 推进 P0：操作确认与审计
-- 在进入实现前，把 `spec.md` 再拆成可执行任务
+- 优先按 [2026-04-24-runtime-action-audit-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-action-audit-spec.md) 推进 P0：操作确认与审计
+- 实现时按月度路线图分批推进，而不是一次性并行开做
 - session 事件查看后续继续收敛成可过滤、可分页、可定位工具调用的视图
