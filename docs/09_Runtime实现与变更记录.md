@@ -122,6 +122,22 @@
 - [2026-04-24-runtime-schema-validation-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-schema-validation-spec.md)
 - [2026-04-24-runtime-scheduler-enhancement-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-runtime-scheduler-enhancement-spec.md)
 
+### 2026-04-24 Hermes 遗留清理准备文档
+
+状态：`pending`
+
+已新增交接文档：
+
+- [2026-04-24-hermes-legacy-cleanup-analysis.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-hermes-legacy-cleanup-analysis.md)
+- [2026-04-24-hermes-legacy-cleanup-spec.md](/Users/claw/sandbox/personal/claudeflow/docs/specs/2026-04-24-hermes-legacy-cleanup-spec.md)
+
+用途：
+
+- 为另一个执行模型提供清理边界
+- 明确不可直接删除项
+- 固定安全迁移顺序
+- 为后续专项代码审查提供审查基线
+
 ## 约束
 
 后续每次涉及以下范围的功能变更，必须同步更新文档：

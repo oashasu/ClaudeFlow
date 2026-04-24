@@ -222,6 +222,10 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 > 实现文档: [09_Runtime实现与变更记录.md](09_Runtime实现与变更记录.md)
 >
 > 月度路线图: [specs/2026-04-24-runtime-monthly-roadmap.md](specs/2026-04-24-runtime-monthly-roadmap.md)
+>
+> 清理分析: [specs/2026-04-24-hermes-legacy-cleanup-analysis.md](specs/2026-04-24-hermes-legacy-cleanup-analysis.md)
+>
+> 清理规格: [specs/2026-04-24-hermes-legacy-cleanup-spec.md](specs/2026-04-24-hermes-legacy-cleanup-spec.md)
 
 当前仓库已经额外落地了一个面向多会话 runtime 的 PoC，和旧的 V1/V2 设计并行存在：
 
@@ -231,6 +235,7 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 - Vue console 已新增独立 `/runtime` 工作台
 - 后续 runtime / console 相关改动必须同步更新实现文档
 - 下一阶段优化需求已拆分为 4 份独立 spec，统一由月度路线图管理
+- Hermes 遗留清理已补充专项分析和专项规格，供后续独立执行
 
 ---
 
