@@ -108,6 +108,23 @@
 - 增加 session 级操作入口，前端可直接触发 `intervene / complete / fail`
 - 将 `Dashboard / TaskDetail` 做成入口层，只负责跳转到 Runtime Console，不混入 runtime 状态模型
 
+## 待实现需求
+
+### 2026-04-24 下一阶段 Runtime 优化规格
+
+状态：`pending`
+
+已登记到正式规格文档：
+
+- [spec.md](/Users/claw/sandbox/personal/claudeflow/docs/spec.md)
+
+规划内容：
+
+- 为 session 级动作补充确认机制和操作审计
+- 将 Runtime Console 拆为更清晰的状态驱动结构
+- 为 runtime 返回体补齐更严格的 schema 校验
+- 提升调度器对 `shared_files / IntegrationTask / 失败回流` 的支持
+
 ## 约束
 
 后续每次涉及以下范围的功能变更，必须同步更新文档：
@@ -129,6 +146,6 @@
 
 ## 下一步建议
 
-- 为 session 级动作补充确认机制和操作审计
-- 为 runtime JSON 返回体补更严格的接口 schema 校验
-- 将 session 事件查看进一步收敛成可过滤、可分页、可定位工具调用的视图
+- 优先按 [spec.md](/Users/claw/sandbox/personal/claudeflow/docs/spec.md) 推进 P0：操作确认与审计
+- 在进入实现前，把 `spec.md` 再拆成可执行任务
+- session 事件查看后续继续收敛成可过滤、可分页、可定位工具调用的视图

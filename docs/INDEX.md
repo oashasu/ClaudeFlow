@@ -220,6 +220,8 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 ## Runtime实现记录
 
 > 实现文档: [09_Runtime实现与变更记录.md](09_Runtime实现与变更记录.md)
+>
+> 待实现规格: [spec.md](spec.md)
 
 当前仓库已经额外落地了一个面向多会话 runtime 的 PoC，和旧的 V1/V2 设计并行存在：
 
@@ -228,6 +230,7 @@ Phase2（Web版本）→ Spring Boot + Vue控制台
 - Hermes 已暴露 `runtime status / sessions / plan / explain / dispatch`
 - Vue console 已新增独立 `/runtime` 工作台
 - 后续 runtime / console 相关改动必须同步更新实现文档
+- 下一阶段优化需求已冻结到 `spec.md`，状态为 `pending`
 
 ---
 
