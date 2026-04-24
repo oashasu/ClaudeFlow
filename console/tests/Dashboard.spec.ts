@@ -4,6 +4,18 @@ import { createPinia, setActivePinia } from 'pinia'
 import Dashboard from '../src/views/Dashboard.vue'
 import StatsCard from '../src/components/StatsCard.vue'
 
+vi.mock('../src/services/api', () => ({
+  taskApi: {
+    list: vi.fn().mockResolvedValue([]),
+    stats: vi.fn().mockResolvedValue({
+      running: 0,
+      completed: 0,
+      waiting: 0,
+      alert: 0,
+    }),
+  },
+}))
+
 // Mock SSE
 vi.mock('../src/services/sse', () => ({
   connectSSE: vi.fn(),
@@ -42,5 +54,12 @@ describe('Dashboard', () => {
 
     // 应该显示过滤提示
     expect(wrapper.find('.filter-bar').exists()).toBe(true)
+  })
+
+  it('提供 Runtime Console 入口卡片', () => {
+    const wrapper = mount(Dashboard)
+
+    expect(wrapper.text()).toContain('进入 Runtime Console')
+    expect(wrapper.find('a.workspace-card.runtime').attributes('href')).toBe('/runtime')
   })
 })

@@ -43,7 +43,10 @@
 - `GET /api/runtime/plan`
 - `GET /api/runtime/explain/{task_id}`
 - `POST /api/runtime/dispatch`
+- `POST /api/runtime/task/{task_id}/complete`
+- `POST /api/runtime/task/{task_id}/fail`
 - `GET /api/session/{session_id}/events-list`
+- `POST /api/session/{session_id}/intervene`
 
 ### 3. Runtime Console
 
@@ -68,11 +71,18 @@
 - session 列表动作：
   - `解释任务`
   - `查看事件`
+  - `发送干预`
+  - `标记完成`
+  - `标记失败`
 - session inspector：
   - 当前 session 摘要
   - 事件列表
   - 最近读取时间
   - 数据来源标记
+  - 直接执行 intervene / complete / fail
+- 与旧控制台的导航整合：
+  - `Dashboard` 首页新增 Runtime 入口卡片
+  - `TaskDetail` 顶部新增 Runtime 跳转入口
 
 ## 2026-04-24 实现记录
 
@@ -95,6 +105,8 @@
 - 接入 live runtime API
 - 页面从 JSON 编辑器风格收敛为结构化控制台
 - 增加总览栏、自动刷新、session 列表、session inspector
+- 增加 session 级操作入口，前端可直接触发 `intervene / complete / fail`
+- 将 `Dashboard / TaskDetail` 做成入口层，只负责跳转到 Runtime Console，不混入 runtime 状态模型
 
 ## 约束
 
@@ -117,9 +129,6 @@
 
 ## 下一步建议
 
-- 在 Runtime Console 中增加真正的操作按钮：
-  - `intervene`
-  - `fail`
-  - `complete`
+- 为 session 级动作补充确认机制和操作审计
 - 为 runtime JSON 返回体补更严格的接口 schema 校验
 - 将 session 事件查看进一步收敛成可过滤、可分页、可定位工具调用的视图

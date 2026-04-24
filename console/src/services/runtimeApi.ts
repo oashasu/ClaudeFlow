@@ -79,6 +79,13 @@ export interface RuntimeSessionEvents {
   raw_events: unknown[]
 }
 
+export interface RuntimeSessionActionResponse {
+  session_id?: string
+  task_id?: string
+  status: string
+  summary?: string
+}
+
 const RUNTIME_BASE = '/hermes/runtime'
 const SESSION_BASE = '/hermes/session'
 
@@ -93,6 +100,22 @@ async function fetchRuntime<T>(path: string, options?: RequestInit): Promise<T> 
 
   if (!response.ok) {
     throw new Error(`Runtime API Error: ${response.status} ${response.statusText}`)
+  }
+
+  return response.json() as Promise<T>
+}
+
+async function fetchSession<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${SESSION_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Runtime Session API Error: ${response.status} ${response.statusText}`)
   }
 
   return response.json() as Promise<T>
@@ -225,18 +248,25 @@ export const runtimeApi = {
   sessions: () => fetchRuntime<{ sessions: RuntimeSession[] }>('/sessions'),
   plan: () => fetchRuntime<RuntimePlan>('/plan'),
   explain: (taskId: string) => fetchRuntime<RuntimeExplain>(`/explain/${taskId}`),
-  sessionEvents: async (sessionId: string) => {
-    const response = await fetch(`${SESSION_BASE}/${sessionId}/events-list`)
-
-    if (!response.ok) {
-      throw new Error(`Runtime Session API Error: ${response.status} ${response.statusText}`)
-    }
-
-    return response.json() as Promise<RuntimeSessionEvents>
-  },
+  sessionEvents: (sessionId: string) => fetchSession<RuntimeSessionEvents>(`/${sessionId}/events-list`),
+  interveneSession: (sessionId: string, prompt: string) =>
+    fetchSession<RuntimeSessionActionResponse>(`/${sessionId}/intervene`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    }),
   dispatch: (payload: { base_branch?: string; limit?: number | null; max_concurrent?: number | null }) =>
     fetchRuntime<RuntimeDispatch>('/dispatch', {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+  completeTask: (taskId: string, payload: { summary?: string; changed_files?: string[]; test_status?: string; test_count?: number }) =>
+    fetchRuntime<RuntimeSessionActionResponse>(`/task/${taskId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  failTask: (taskId: string, reason: string) =>
+    fetchRuntime<RuntimeSessionActionResponse>(`/task/${taskId}/fail`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
     }),
 }

@@ -102,4 +102,22 @@ describe('TaskDetail', () => {
     expect(buttons.length).toBeGreaterThan(0)
     expect(buttons[0].text()).toContain('暂停')
   })
+
+  it('提供 Runtime Console 跳转入口', async () => {
+    router.push('/task/task-001')
+    await router.isReady()
+
+    const wrapper = mount(TaskDetail, {
+      global: {
+        plugins: [router],
+      },
+    })
+
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await nextTick()
+
+    expect(wrapper.find('a.runtime-link').attributes('href')).toBe('/runtime')
+    expect(wrapper.text()).toContain('打开 Runtime Console')
+  })
 })

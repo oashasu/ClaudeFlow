@@ -6,6 +6,7 @@ import WorkflowProgress from '../components/WorkflowProgress.vue'
 import StepScroller from '../components/StepScroller.vue'
 import CheckpointTimeline from '../components/CheckpointTimeline.vue'
 import SessionIdBox from '../components/SessionIdBox.vue'
+import EventStream from '../components/EventStream.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -63,7 +64,10 @@ function goBack() {
 
     <template v-else-if="store.currentTask">
       <!-- 返回按钮 -->
-      <button class="back-btn" @click="goBack">← 返回列表</button>
+      <div class="top-actions">
+        <button class="back-btn" @click="goBack">← 返回列表</button>
+        <a class="runtime-link" href="/runtime">打开 Runtime Console</a>
+      </div>
 
       <!-- 任务基本信息 -->
       <div class="task-header">
@@ -108,6 +112,13 @@ function goBack() {
         @revert="store.revertCheckpoint"
       />
 
+      <!-- 实时执行日志 -->
+      <EventStream
+        v-if="store.currentTask.sessionId"
+        :sessionId="store.currentTask.sessionId"
+        :isRunning="isRunning"
+      />
+
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <button v-if="isRunning" @click="handlePause">暂停任务</button>
@@ -129,13 +140,31 @@ function goBack() {
   margin: 0 auto;
 }
 
-.back-btn {
+.top-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.back-btn {
   padding: 8px 16px;
   background: #f5f5f5;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.runtime-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #13261d;
+  color: #f4f8f3;
+  text-decoration: none;
+  font-size: 14px;
 }
 
 .task-header {
@@ -199,5 +228,12 @@ function goBack() {
   text-align: center;
   padding: 40px;
   color: #666;
+}
+
+@media (max-width: 700px) {
+  .top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>

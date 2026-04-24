@@ -34,6 +34,12 @@ const sessionEventsSource = ref<'sample' | 'live'>('sample')
 const sessionEventsLoading = ref(false)
 const sessionEventsError = ref<string | null>(null)
 const sessionEventsLoadedAt = ref<string | null>(null)
+const actionLoading = ref(false)
+const actionError = ref<string | null>(null)
+const actionSuccess = ref<string | null>(null)
+const intervenePrompt = ref('请先总结当前阻塞点，再继续下一步实现。')
+const completeSummary = ref('已完成当前 task 的实现与必要验证。')
+const failReason = ref('当前 task 遇到阻塞，需人工介入或上游协议回流。')
 
 const parseError = ref<string | null>(null)
 const liveError = ref<string | null>(null)
@@ -97,6 +103,8 @@ function loadSamples() {
   lastRefreshedAt.value = null
   parseError.value = null
   liveError.value = null
+  actionError.value = null
+  actionSuccess.value = null
 }
 
 async function loadLivePlan() {
@@ -160,6 +168,8 @@ async function loadLiveSessionEvents(session: RuntimeSession) {
 async function runLiveDispatch() {
   try {
     liveError.value = null
+    actionError.value = null
+    actionSuccess.value = null
     const payload = await runtimeApi.dispatch({ max_concurrent: 2 })
     dispatchInput.value = JSON.stringify(payload, null, 2)
     dispatchSource.value = 'live'
@@ -176,6 +186,70 @@ async function explainTask(taskId: string) {
 
 async function viewSessionEvents(session: RuntimeSession) {
   await loadLiveSessionEvents(session)
+}
+
+function selectSession(session: RuntimeSession) {
+  selectedSession.value = session
+  actionError.value = null
+  actionSuccess.value = null
+}
+
+async function handleInterveneSession(session: RuntimeSession) {
+  if (!intervenePrompt.value.trim()) {
+    actionError.value = '干预内容不能为空。'
+    return
+  }
+  try {
+    actionLoading.value = true
+    actionError.value = null
+    actionSuccess.value = null
+    selectSession(session)
+    await runtimeApi.interveneSession(session.session_id, intervenePrompt.value.trim())
+    actionSuccess.value = `已向 ${session.task_id} 发送干预指令。`
+    await loadLiveSessionEvents(session)
+  } catch (error) {
+    actionError.value = `发送干预失败: ${(error as Error).message}`
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function handleCompleteTask(session: RuntimeSession) {
+  try {
+    actionLoading.value = true
+    actionError.value = null
+    actionSuccess.value = null
+    selectSession(session)
+    await runtimeApi.completeTask(session.task_id, {
+      summary: completeSummary.value.trim(),
+    })
+    actionSuccess.value = `已将 ${session.task_id} 标记为 completed。`
+    await retryLiveReads()
+  } catch (error) {
+    actionError.value = `标记完成失败: ${(error as Error).message}`
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function handleFailTask(session: RuntimeSession) {
+  if (!failReason.value.trim()) {
+    actionError.value = '失败原因不能为空。'
+    return
+  }
+  try {
+    actionLoading.value = true
+    actionError.value = null
+    actionSuccess.value = null
+    selectSession(session)
+    await runtimeApi.failTask(session.task_id, failReason.value.trim())
+    actionSuccess.value = `已将 ${session.task_id} 标记为 failed。`
+    await retryLiveReads()
+  } catch (error) {
+    actionError.value = `标记失败失败: ${(error as Error).message}`
+  } finally {
+    actionLoading.value = false
+  }
 }
 
 async function retryLiveReads() {
@@ -301,6 +375,9 @@ onUnmounted(() => {
         :sessions="runtimeSessions"
         @explain-task="explainTask"
         @view-events="viewSessionEvents"
+        @intervene-session="handleInterveneSession"
+        @complete-task="handleCompleteTask"
+        @fail-task="handleFailTask"
       />
       <RuntimeSessionInspector
         :session="selectedSession"
@@ -309,6 +386,18 @@ onUnmounted(() => {
         :error="sessionEventsError"
         :source="sessionEventsSource"
         :last-loaded-at="sessionEventsLoadedAt"
+        :action-loading="actionLoading"
+        :action-error="actionError"
+        :action-success="actionSuccess"
+        :intervene-prompt="intervenePrompt"
+        :complete-summary="completeSummary"
+        :fail-reason="failReason"
+        @update:intervene-prompt="intervenePrompt = $event"
+        @update:complete-summary="completeSummary = $event"
+        @update:fail-reason="failReason = $event"
+        @intervene="selectedSession && handleInterveneSession(selectedSession)"
+        @complete="selectedSession && handleCompleteTask(selectedSession)"
+        @fail="selectedSession && handleFailTask(selectedSession)"
       />
     </section>
 

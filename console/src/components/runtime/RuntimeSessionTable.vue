@@ -16,6 +16,9 @@ defineProps<{
 const emit = defineEmits<{
   explainTask: [taskId: string]
   viewEvents: [session: RuntimeSession]
+  interveneSession: [session: RuntimeSession]
+  completeTask: [session: RuntimeSession]
+  failTask: [session: RuntimeSession]
 }>()
 </script>
 
@@ -40,6 +43,27 @@ const emit = defineEmits<{
       <div class="actions">
         <button class="action-btn" @click="emit('explainTask', session.task_id)">解释任务</button>
         <button class="action-btn secondary" @click="emit('viewEvents', session as RuntimeSession)">查看事件</button>
+        <button
+          v-if="session.status === 'running'"
+          class="action-btn accent"
+          @click="emit('interveneSession', session as RuntimeSession)"
+        >
+          发送干预
+        </button>
+        <button
+          v-if="session.status === 'running'"
+          class="action-btn success"
+          @click="emit('completeTask', session as RuntimeSession)"
+        >
+          标记完成
+        </button>
+        <button
+          v-if="session.status === 'running'"
+          class="action-btn danger"
+          @click="emit('failTask', session as RuntimeSession)"
+        >
+          标记失败
+        </button>
       </div>
       <p v-if="session.summary">{{ session.summary }}</p>
     </div>
@@ -111,6 +135,24 @@ const emit = defineEmits<{
   background: #f3ead5;
   color: #183024;
   border-color: #c6b58d;
+}
+
+.action-btn.accent {
+  background: #ebefff;
+  color: #214089;
+  border-color: #95a8e0;
+}
+
+.action-btn.success {
+  background: #e5f4e7;
+  color: #1d5a2d;
+  border-color: #8cc09c;
+}
+
+.action-btn.danger {
+  background: #ffe8e2;
+  color: #8a2f26;
+  border-color: #e2a49a;
 }
 
 .empty {

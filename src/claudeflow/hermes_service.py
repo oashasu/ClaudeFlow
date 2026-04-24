@@ -41,6 +41,21 @@ class RuntimeDispatchRequest(BaseModel):
     max_concurrent: Optional[int] = Field(default=None, ge=0, description="最大并发槽位")
 
 
+class RuntimeCompleteRequest(BaseModel):
+    """运行时完成任务请求。"""
+
+    summary: str = Field(default="", description="完成摘要")
+    changed_files: list[str] = Field(default_factory=list, description="变更文件")
+    test_status: Optional[str] = Field(default=None, description="测试状态")
+    test_count: Optional[int] = Field(default=None, ge=0, description="测试数量")
+
+
+class RuntimeFailRequest(BaseModel):
+    """运行时失败任务请求。"""
+
+    reason: str = Field(..., min_length=1, description="失败原因")
+
+
 # 响应模型
 class SessionResponse(BaseModel):
     """会话响应"""
@@ -326,6 +341,34 @@ async def dispatch_runtime(request: RuntimeDispatchRequest):
         limit=request.limit,
         max_concurrent=request.max_concurrent,
     )
+
+
+@app.post("/api/runtime/task/{task_id}/complete")
+async def complete_runtime_task(task_id: str, request: RuntimeCompleteRequest):
+    """将运行时任务标记为完成。"""
+    try:
+        tests = {}
+        if request.test_status is not None:
+            tests["status"] = request.test_status
+        if request.test_count is not None:
+            tests["count"] = request.test_count
+        return runtime_manager.complete_worker(
+            task_id,
+            summary=request.summary,
+            changed_files=request.changed_files,
+            tests=tests or None,
+        )
+    except UnknownTaskError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@app.post("/api/runtime/task/{task_id}/fail")
+async def fail_runtime_task(task_id: str, request: RuntimeFailRequest):
+    """将运行时任务标记为失败。"""
+    try:
+        return runtime_manager.fail_worker(task_id, request.reason)
+    except UnknownTaskError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
 
 
 @app.get("/health")

@@ -141,7 +141,11 @@ claudeflow runtime fail \
 - session 列表动作：
   - `解释任务`
   - `查看事件`
+  - `发送干预`
+  - `标记完成`
+  - `标记失败`
 - session inspector：查看当前 session 事件流与摘要
+- 旧 `Dashboard / TaskDetail` 到 Runtime Console 的入口跳转
 
 ## 文档同步约束
 

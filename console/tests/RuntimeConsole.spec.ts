@@ -56,6 +56,9 @@ describe('RuntimeConsole', () => {
 
     expect(wrapper.text()).toContain('解释任务')
     expect(wrapper.text()).toContain('查看事件')
+    expect(wrapper.text()).toContain('发送干预')
+    expect(wrapper.text()).toContain('标记完成')
+    expect(wrapper.text()).toContain('标记失败')
   })
 
   it('显示 session inspector 面板', () => {
@@ -63,5 +66,13 @@ describe('RuntimeConsole', () => {
 
     expect(wrapper.text()).toContain('Session 事件查看')
     expect(wrapper.text()).toContain('最近读取')
+  })
+
+  it('在 inspector 中显示动作面板', () => {
+    const wrapper = mount(RuntimeConsole)
+
+    expect(wrapper.text()).toContain('Session 干预')
+    expect(wrapper.text()).toContain('标记完成')
+    expect(wrapper.text()).toContain('标记失败')
   })
 })

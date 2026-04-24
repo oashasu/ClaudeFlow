@@ -136,6 +136,164 @@ class TestEventsStreamApi:
             assert response.status_code == 404
 
 
+class TestRuntimeApi:
+    """Runtime API 测试"""
+
+    def test_runtime_status_returns_payload(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "get_runtime_status",
+            return_value={
+                "repo_path": "/tmp/repo",
+                "active_agents": 2,
+                "queued_tasks": 3,
+                "completed_tasks": 4,
+                "failed_tasks": 1,
+                "intervention_required": True,
+                "running_tasks": ["task_a", "task_b"],
+            },
+        ):
+            client = TestClient(app)
+            response = client.get("/api/runtime/status")
+
+            assert response.status_code == 200
+            assert response.json()["active_agents"] == 2
+
+    def test_runtime_sessions_returns_payload(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "list_session_indexes",
+            return_value=[
+                {
+                    "task_id": "task_a",
+                    "session_id": "sess-a",
+                    "status": "running",
+                    "priority": "high",
+                }
+            ],
+        ):
+            client = TestClient(app)
+            response = client.get("/api/runtime/sessions")
+
+            assert response.status_code == 200
+            assert response.json()["sessions"][0]["task_id"] == "task_a"
+
+    def test_runtime_plan_returns_payload(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "get_dispatch_plan",
+            return_value={
+                "runnable": [],
+                "blocked": [{"task_id": "task_b", "priority": "medium", "reason_code": "waiting_dependency", "reason": "等待依赖完成"}],
+                "running": [{"task_id": "task_a", "priority": "high", "reason_code": "session_running", "reason": "任务已有运行中的会话"}],
+            },
+        ):
+            client = TestClient(app)
+            response = client.get("/api/runtime/plan")
+
+            assert response.status_code == 200
+            data = response.json()
+            assert data["blocked"][0]["reason_code"] == "waiting_dependency"
+            assert data["running"][0]["task_id"] == "task_a"
+
+    def test_runtime_explain_returns_404_for_unknown_task(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from claudeflow.runtime import UnknownTaskError
+        from fastapi.testclient import TestClient
+
+        with patch.object(runtime_manager, "explain_task", side_effect=UnknownTaskError("task graph 中不存在任务: missing")):
+            client = TestClient(app)
+            response = client.get("/api/runtime/explain/missing")
+
+            assert response.status_code == 404
+
+    def test_runtime_dispatch_returns_result(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "dispatch_runnable_tasks",
+            return_value={
+                "runnable_count": 1,
+                "blocked_count": 0,
+                "active_agents": 0,
+                "available_slots": 1,
+                "max_concurrent": 2,
+                "started": [{"task_id": "task_a", "session_id": "sess-a", "priority": "high"}],
+                "skipped": [],
+                "blocked": [],
+            },
+        ) as mock_dispatch:
+            client = TestClient(app)
+            response = client.post("/api/runtime/dispatch", json={"max_concurrent": 2})
+
+            assert response.status_code == 200
+            data = response.json()
+            assert data["started"][0]["task_id"] == "task_a"
+            mock_dispatch.assert_called_once_with(base_branch="HEAD", limit=None, max_concurrent=2)
+
+    def test_runtime_complete_returns_updated_task(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "complete_worker",
+            return_value={
+                "task_id": "task_a",
+                "status": "completed",
+                "summary": "done",
+            },
+        ) as mock_complete:
+            client = TestClient(app)
+            response = client.post(
+                "/api/runtime/task/task_a/complete",
+                json={"summary": "done", "changed_files": ["a.py"], "test_status": "passed", "test_count": 2},
+            )
+
+            assert response.status_code == 200
+            assert response.json()["status"] == "completed"
+            mock_complete.assert_called_once_with(
+                "task_a",
+                summary="done",
+                changed_files=["a.py"],
+                tests={"status": "passed", "count": 2},
+            )
+
+    def test_runtime_fail_returns_updated_task(self):
+        from claudeflow.hermes_service import app, runtime_manager
+        from fastapi.testclient import TestClient
+
+        with patch.object(
+            runtime_manager,
+            "fail_worker",
+            return_value={
+                "task_id": "task_a",
+                "status": "failed",
+                "summary": "blocked",
+            },
+        ) as mock_fail:
+            client = TestClient(app)
+            response = client.post(
+                "/api/runtime/task/task_a/fail",
+                json={"reason": "blocked"},
+            )
+
+            assert response.status_code == 200
+            assert response.json()["status"] == "failed"
+            mock_fail.assert_called_once_with("task_a", "blocked")
+
+
 class TestInterveneApi:
     """干预会话API测试"""
 

@@ -18,7 +18,11 @@
 - session 动作：
   - `解释任务`
   - `查看事件`
+  - `发送干预`
+  - `标记完成`
+  - `标记失败`
 - session inspector
+- `Dashboard / TaskDetail` 到 Runtime Console 的导航入口
 
 ## 文档要求
 

@@ -8,6 +8,21 @@ defineProps<{
   error: string | null
   source: 'sample' | 'live'
   lastLoadedAt: string | null
+  actionLoading: boolean
+  actionError: string | null
+  actionSuccess: string | null
+  intervenePrompt: string
+  completeSummary: string
+  failReason: string
+}>()
+
+const emit = defineEmits<{
+  'update:intervenePrompt': [value: string]
+  'update:completeSummary': [value: string]
+  'update:failReason': [value: string]
+  intervene: []
+  complete: []
+  fail: []
 }>()
 
 function formatToolInput(input: unknown): string {
@@ -58,6 +73,59 @@ function formatToolInput(input: unknown): string {
       </div>
 
       <div v-if="error" class="error">{{ error }}</div>
+      <div v-if="actionError" class="error">{{ actionError }}</div>
+      <div v-if="actionSuccess" class="success">{{ actionSuccess }}</div>
+
+      <div v-if="session.status === 'running'" class="action-grid">
+        <div class="action-card">
+          <div class="action-head">
+            <strong>Session 干预</strong>
+            <span>向当前 Claude session 发送新的指令。</span>
+          </div>
+          <textarea
+            :value="intervenePrompt"
+            class="action-input"
+            placeholder="例如：请先补齐支付网关的回归测试，再继续实现。"
+            @input="emit('update:intervenePrompt', ($event.target as HTMLTextAreaElement).value)"
+          />
+          <button class="action-btn accent" :disabled="actionLoading" @click="emit('intervene')">
+            {{ actionLoading ? '提交中...' : '发送干预' }}
+          </button>
+        </div>
+
+        <div class="action-card">
+          <div class="action-head">
+            <strong>标记完成</strong>
+            <span>为运行中的 task 写入 summary 并结束 runtime 节点。</span>
+          </div>
+          <textarea
+            :value="completeSummary"
+            class="action-input"
+            placeholder="例如：支付网关骨架和测试已完成，准备进入集成阶段。"
+            @input="emit('update:completeSummary', ($event.target as HTMLTextAreaElement).value)"
+          />
+          <button class="action-btn success" :disabled="actionLoading" @click="emit('complete')">
+            {{ actionLoading ? '提交中...' : '标记完成' }}
+          </button>
+        </div>
+
+        <div class="action-card">
+          <div class="action-head">
+            <strong>标记失败</strong>
+            <span>写入失败原因并将 runtime 标记为需要人工介入。</span>
+          </div>
+          <textarea
+            :value="failReason"
+            class="action-input"
+            placeholder="例如：发现上游协议缺字段，需先回流设计。"
+            @input="emit('update:failReason', ($event.target as HTMLTextAreaElement).value)"
+          />
+          <button class="action-btn danger" :disabled="actionLoading" @click="emit('fail')">
+            {{ actionLoading ? '提交中...' : '标记失败' }}
+          </button>
+        </div>
+      </div>
+
       <div v-else-if="loading" class="empty">正在加载 session 事件...</div>
       <div v-else-if="events.length === 0" class="empty">当前 session 暂无事件。</div>
       <div v-else class="event-list">
@@ -155,7 +223,8 @@ function formatToolInput(input: unknown): string {
 }
 
 .empty,
-.error {
+.error,
+.success {
   padding: 14px;
   border-radius: 14px;
   font-size: 13px;
@@ -170,6 +239,87 @@ function formatToolInput(input: unknown): string {
   background: #ffe3de;
   color: #8c2d21;
   border: 1px solid #f0a295;
+}
+
+.success {
+  margin-top: 10px;
+  background: #e5f6e9;
+  color: #215a33;
+  border: 1px solid #9fd0ac;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.action-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: #fffdf8;
+  border: 1px solid #e6dec8;
+}
+
+.action-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.action-head strong {
+  color: #1d2c1f;
+}
+
+.action-head span {
+  font-size: 12px;
+  color: #5d6b5a;
+}
+
+.action-input {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid #d7ddd3;
+  padding: 10px 12px;
+  font: inherit;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.action-btn {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.action-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.action-btn.accent {
+  background: #ebefff;
+  color: #214089;
+  border-color: #95a8e0;
+}
+
+.action-btn.success {
+  background: #e5f4e7;
+  color: #1d5a2d;
+  border-color: #8cc09c;
+}
+
+.action-btn.danger {
+  background: #ffe8e2;
+  color: #8a2f26;
+  border-color: #e2a49a;
 }
 
 .event-list {
@@ -235,6 +385,10 @@ function formatToolInput(input: unknown): string {
   }
 
   .session-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid {
     grid-template-columns: 1fr;
   }
 }
