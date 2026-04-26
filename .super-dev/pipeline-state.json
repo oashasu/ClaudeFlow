@@ -1,0 +1,135 @@
+{
+  "workflow_version": "v1",
+  "project": "claudeflow",
+  "current_phase": "phase-1",
+  "current_stage": "delivery",
+  "current_gate": "quality_gate",
+  "gate_status": "passed",
+  "governor": {
+    "host": "codex",
+    "mode": "governor"
+  },
+  "advance_allowed": true,
+  "reopen_required": false,
+  "phases": {
+    "phase-1": {
+      "status": "completed",
+      "docs_ready": true,
+      "docs_confirm_comment": "文档确认",
+      "docs_confirm_timestamp": "2026-04-26T17:45:00Z",
+      "tasks_ready": true,
+      "quality_gate_passed": true,
+      "quality_gate_timestamp": "2026-04-26T21:00:00Z",
+      "completed_tasks": ["T101", "T102", "T103", "T104", "T105", "T106", "T107", "T108", "T109"],
+      "pending_tasks": [],
+      "blocker_fixes": {
+        "timestamp": "2026-04-26T19:35:00Z",
+        "fixes": [
+          {
+            "issue": "start_worker 锁泄露",
+            "fix": "try/except 包装，失败时 release_write_lock",
+            "test": "test_start_worker_releases_lock_on_failure"
+          },
+          {
+            "issue": "get_dispatch_plan 双轨模型",
+            "fix": "切到 RuntimeTaskSpec 主模型，兼容层 get_dispatch_plan_compat",
+            "test": "T109 全部测试"
+          },
+          {
+            "issue": "dispatch_from_governance 返回契约错位",
+            "fix": "统一返回结构与 dispatch_runnable_tasks 相同",
+            "test": "test_runtime_manager_dispatch_from_governance_populates_fields"
+          },
+          {
+            "issue": "plan 输出访问不存在字段 owner_role/task_type",
+            "fix": "删除旧字段，输出 RuntimeTaskSpec 实有字段",
+            "test": "TestRuntimePlan 全部测试"
+          }
+        ]
+      }
+    }
+  },
+  "tasks": {
+    "T101": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/driver_base.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestA01DriverAbstract"
+    },
+    "T102": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/claude_driver.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestA02ClaudePathRunnable"
+    },
+    "T103": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/codex_driver.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestA03CodexPathRunnable"
+    },
+    "T104": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/governance_adapter.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestA05GovernanceTaskToDispatch"
+    },
+    "T105": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/manager.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestA06SessionIndexHostFields,TestA07ResultCollectionUnified"
+    },
+    "T106": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/cli.py, src/claudeflow/runtime/api.py",
+      "tests": "tests/unit/test_cli.py::TestCliRuntime::test_cli_runtime_dispatch_governance_entry_success, tests/unit/test_runtime_api.py::TestRuntimeGovernanceDispatch",
+      "summary": "CLI/API 治理入口与宿主字段输出：dispatch --governance-root/--phase-id，executor_type/driver_name"
+    },
+    "T107": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "tests/unit/test_cli.py, tests/unit/test_runtime_api.py",
+      "tests": "tests/unit/test_phase1_multi_host.py, tests/unit/test_cli.py, tests/unit/test_runtime_api.py (576 passed)",
+      "summary": "多宿主执行层测试回归：claude/codex/unsupported 路径、治理入口、API 宿主字段"
+    },
+    "T108": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/manager.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestT108MainlineHostification",
+      "summary": "主链宿主化：start_worker/dispatch_runnable_tasks/explain_task 通过 registry 派发",
+      "blocker_fix": "锁泄露修复：try/except 包装"
+    },
+    "T109": {
+      "phase_id": "phase-1",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/runtime/manager.py",
+      "tests": "tests/unit/test_phase1_multi_host.py::TestT109RuntimeTaskSpecMainModel",
+      "summary": "RuntimeTaskSpec 主模型：get_runnable_specs/get_dispatch_plan_specs 主链入口",
+      "blocker_fix": "get_dispatch_plan 切到 RuntimeTaskSpec 主模型"
+    }
+  },
+  "timestamps": {
+    "updated_at": "2026-04-26T21:00:00Z"
+  }
+}
