@@ -3,7 +3,7 @@
   "project": "claudeflow",
   "current_phase": "phase-1",
   "current_stage": "delivery",
-  "current_gate": "quality_gate",
+  "current_gate": "delivery_complete",
   "gate_status": "passed",
   "governor": {
     "host": "codex",
@@ -20,6 +20,8 @@
       "tasks_ready": true,
       "quality_gate_passed": true,
       "quality_gate_timestamp": "2026-04-26T21:00:00Z",
+      "delivery_complete": true,
+      "delivery_timestamp": "2026-04-26T21:15:00Z",
       "completed_tasks": ["T101", "T102", "T103", "T104", "T105", "T106", "T107", "T108", "T109"],
       "pending_tasks": [],
       "blocker_fixes": {
@@ -129,7 +131,11 @@
       "blocker_fix": "get_dispatch_plan 切到 RuntimeTaskSpec 主模型"
     }
   },
+  "commits": {
+    "phase-1-core": "c5eb314 feat(runtime): Phase 1 多宿主执行层完成",
+    "phase-1-cli": "2a813f1 feat(cli): T106 治理入口 + 宿主字段输出 + 契约修复"
+  },
   "timestamps": {
-    "updated_at": "2026-04-26T21:00:00Z"
+    "updated_at": "2026-04-26T21:15:00Z"
   }
 }
