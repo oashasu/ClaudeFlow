@@ -12,9 +12,9 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 
-from claudeflow.governance.config import GovernanceConfig
-from claudeflow.governance.similarity import SimilarityCalculator
-from claudeflow.governance.circuit_breaker import (
+from claudeflow.legacy.governance.config import GovernanceConfig
+from claudeflow.legacy.governance.similarity import SimilarityCalculator
+from claudeflow.legacy.governance.circuit_breaker import (
     CircuitBreaker,
     CircuitState,
     CircuitBreakerTrigger,
@@ -71,13 +71,13 @@ class TestGovernanceConfig:
 class TestSimilarityCalculator:
     """相似度计算测试"""
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_init_model(self, mock_sentence_transformer):
         """模型初始化正确"""
         calculator = SimilarityCalculator()
         mock_sentence_transformer.assert_called_once_with("BAAI/bge-small-zh-v1.5")
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_calculate_similarity_high(self, mock_sentence_transformer):
         """高度相似文本返回高相似度"""
         mock_model = MagicMock()
@@ -89,7 +89,7 @@ class TestSimilarityCalculator:
 
         assert similarity >= 0.95
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_calculate_similarity_low(self, mock_sentence_transformer):
         """不相似文本返回低相似度"""
         mock_model = MagicMock()
@@ -102,7 +102,7 @@ class TestSimilarityCalculator:
 
         assert similarity < 0.95
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_is_similar_above_threshold(self, mock_sentence_transformer):
         """超过阈值判定为相似"""
         mock_model = MagicMock()
@@ -114,7 +114,7 @@ class TestSimilarityCalculator:
         result = calculator.is_similar("文本A", "文本B")
         assert result is True
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_is_similar_below_threshold(self, mock_sentence_transformer):
         """低于阈值判定为不相似"""
         mock_model = MagicMock()
@@ -125,7 +125,7 @@ class TestSimilarityCalculator:
         result = calculator.is_similar("文本A", "文本B")
         assert result is False
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_empty_text_handling(self, mock_sentence_transformer):
         """空文本处理正确"""
         mock_model = MagicMock()
@@ -329,7 +329,7 @@ class TestCircuitBreaker:
 class TestCircuitBreakerIntegration:
     """熔断器集成测试"""
 
-    @patch("claudeflow.governance.similarity.SentenceTransformer")
+    @patch("claudeflow.legacy.governance.similarity.SentenceTransformer")
     def test_full_flow_with_real_similarity(self, mock_sentence_transformer):
         """完整流程测试"""
         # 模拟相似度计算返回相似

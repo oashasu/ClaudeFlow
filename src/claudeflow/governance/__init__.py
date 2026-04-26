@@ -1,83 +1,25 @@
-"""Governance治理层
+"""ClaudeFlow governance module — Phase A minimal governance skeleton."""
 
-熔断层：阈值拦截 + 相似度检测 + 熔断动作
-快照层：baseline/incremental JSON模板 + 存储管理 + Git绑定
-验收层：L1强制量化 + L2半量化 + L3人工入口
-恢复层：熔断回滚 + 异常重试 + 增量快照生成
-"""
-
-from claudeflow.governance.config import GovernanceConfig
-from claudeflow.governance.similarity import SimilarityCalculator
-from claudeflow.governance.circuit_breaker import (
-    CircuitBreaker,
-    CircuitState,
-    CircuitBreakerTrigger,
-    CircuitBreakerResult,
+from claudeflow.governance.workspace import GovernanceWorkspace
+from claudeflow.governance.pipeline_state import PipelineStateStore, PipelineStateError
+from claudeflow.governance.task_loader import TaskPackageLoader, TaskPackageError
+from claudeflow.governance.state_machine import (
+    GovernancePhase,
+    GateStatus,
+    GovernanceStateMachine,
+    IllegalTransitionError,
 )
-from claudeflow.governance.snapshot import (
-    SnapshotManager,
-    BaselineSchema,
-    IncrementalSchema,
-    get_git_commit_hash,
-    create_baseline_snapshot,
-    create_incremental_snapshot,
-)
-from claudeflow.governance.acceptance import (
-    parse_coverage_output,
-    L1Validator,
-    L2Validator,
-    L3Validator,
-    AcceptanceManager,
-    AcceptanceResult,
-    ViolationRecord,
-    L3ReviewRequest,
-    AcceptanceError,
-)
-from claudeflow.governance.recovery import (
-    RecoveryManager,
-    RecoveryResult,
-    RecoveryError,
-    ToolCallError,
-    AcceptanceRetryError,
-    rollback,
-    retry_tool_call,
-    handle_acceptance_failure,
-)
+from claudeflow.governance.poller import GovernancePoller
 
 __all__ = [
-    # Config
-    "GovernanceConfig",
-    # Similarity
-    "SimilarityCalculator",
-    # Circuit Breaker
-    "CircuitBreaker",
-    "CircuitState",
-    "CircuitBreakerTrigger",
-    "CircuitBreakerResult",
-    # Snapshot
-    "SnapshotManager",
-    "BaselineSchema",
-    "IncrementalSchema",
-    "get_git_commit_hash",
-    "create_baseline_snapshot",
-    "create_incremental_snapshot",
-    # Acceptance
-    "parse_coverage_output",
-    "L1Validator",
-    "L2Validator",
-    "L3Validator",
-    "AcceptanceManager",
-    "AcceptanceResult",
-    "ViolationRecord",
-    "L3ReviewRequest",
-    "AcceptanceError",
-    # Recovery
-    "RecoveryManager",
-    "RecoveryResult",
-    "RecoveryError",
-    "ToolCallError",
-    "AcceptanceRetryError",
-    "rollback",
-    "retry_tool_call",
-    "handle_acceptance_failure",
+    "GovernanceWorkspace",
+    "PipelineStateStore",
+    "PipelineStateError",
+    "TaskPackageLoader",
+    "TaskPackageError",
+    "GovernancePhase",
+    "GateStatus",
+    "GovernanceStateMachine",
+    "IllegalTransitionError",
+    "GovernancePoller",
 ]
