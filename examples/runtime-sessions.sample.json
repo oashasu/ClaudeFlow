@@ -1,0 +1,30 @@
+[
+  {
+    "task_id": "impl_auth_module",
+    "session_id": "sess-auth-001",
+    "worktree": "/tmp/claudeflow/worktree-auth",
+    "status": "running",
+    "owner_role": "backend-agent",
+    "task_type": "ImplementTask",
+    "priority": "high",
+    "summary": "认证模块骨架已完成，正在补充测试"
+  },
+  {
+    "task_id": "fix_payment_bug",
+    "session_id": "sess-pay-001",
+    "status": "completed",
+    "owner_role": "backend-agent",
+    "task_type": "FixTask",
+    "priority": "critical",
+    "summary": "支付网关超时问题已修复并通过验证"
+  },
+  {
+    "task_id": "impl_ui_dashboard",
+    "session_id": "sess-ui-001",
+    "status": "blocked",
+    "owner_role": "frontend-agent",
+    "task_type": "ImplementTask",
+    "priority": "medium",
+    "summary": "等待后端 API 接口定义"
+  }
+]

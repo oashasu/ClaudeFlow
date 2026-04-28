@@ -1,0 +1,31 @@
+id: T204
+phase_id: phase-2
+title: 实现 gate report 写入与 phase 汇总
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../spec.md
+  - ../acceptance.md
+  - ../tasks/T201.yaml
+  - ../tasks/T202.yaml
+constraints:
+  - gate report 必须落盘到 phase 根目录
+  - advance_allowed 与 reopen_required 必须有明确来源
+allowed_write_paths:
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A25
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+done_definition:
+  - gate_report_writer_added
+  - phase_summary_visible
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

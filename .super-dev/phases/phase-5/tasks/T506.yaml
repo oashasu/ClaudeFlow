@@ -1,0 +1,44 @@
+id: T506
+phase_id: phase-5
+title: 补齐 Phase 5 回归与阶段验收测试
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../acceptance.md
+  - ../task-plan.md
+  - ./T501.yaml
+  - ./T502.yaml
+  - ./T503.yaml
+  - ./T504.yaml
+  - ./T505.yaml
+constraints:
+  - 必须覆盖 release gate、readiness 分层、post-release verification、rollback contract 的真实证据
+  - 不得回退 Phase 1-4 已验收主链
+allowed_write_paths:
+  - docs/**
+  - scripts/**
+  - output/**
+  - tests/**
+acceptance_refs:
+  - A51
+  - A52
+  - A53
+  - A54
+  - A55
+  - A56
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 通过删门禁或降标准换取 release-ready
+  - 只补 happy path 不补 blocker / warning 分层证据
+done_definition:
+  - phase5_acceptance_covered
+  - release_decision_evidence_ready
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

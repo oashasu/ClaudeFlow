@@ -1,0 +1,30 @@
+id: T201
+phase_id: phase-2
+title: 建立 review artifact 模型与写入能力
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+constraints:
+  - review artifact 必须落盘到 phase reviews 目录
+  - 不得只在内存中保留审查结论
+allowed_write_paths:
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A21
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+done_definition:
+  - review_artifact_writer_added
+  - review_artifact_testable
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

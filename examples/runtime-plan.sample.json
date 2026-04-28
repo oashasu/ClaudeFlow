@@ -1,0 +1,26 @@
+{
+  "runnable": [
+    {
+      "task_id": "impl_auth_controller",
+      "priority": "high",
+      "owner_role": "backend-agent",
+      "task_type": "ImplementTask"
+    }
+  ],
+  "blocked": [
+    {
+      "task_id": "impl_auth_tests",
+      "priority": "medium",
+      "reason_code": "waiting_dependency",
+      "reason": "等待依赖完成: impl_auth_controller(running)"
+    }
+  ],
+  "running": [
+    {
+      "task_id": "impl_payment_gateway",
+      "priority": "high",
+      "reason_code": "session_running",
+      "reason": "任务已有运行中的会话"
+    }
+  ]
+}

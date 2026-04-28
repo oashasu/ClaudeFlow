@@ -1,0 +1,10 @@
+{
+  "task_id": "impl_auth_tests",
+  "state": "blocked",
+  "priority": "medium",
+  "reason_code": "waiting_dependency",
+  "reason": "等待依赖完成: impl_auth_controller(running)",
+  "dependencies": [
+    "impl_auth_controller"
+  ]
+}

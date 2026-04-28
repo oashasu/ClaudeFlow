@@ -1,119 +1,138 @@
-# ClaudeFlow系统设计
+# ClaudeFlow 系统索引
 
-> **日期**: 2026-04-19
-> **项目位置**: `/Users/claw/sandbox/personal/claudflow/`
+> 最后更新：2026-04-27
+> 项目位置：`/Users/claw/sandbox/personal/claudeflow/`
 
----
-
-## 分阶段开发策略
-
-**核心原则**：不一次性做全，分阶段实现
-
-```
-V1（最小版本）→ 验证核心功能 + TDD流程可行性
-    ↓
-V2（扩展版本）→ 在V1基础上添加通信层/提炼机制等
-    ↓
-Phase2（Web版本）→ Spring Boot + Vue控制台
-```
-
-**V1不可取代的原因**：
-1. 验证CLI + 流程调度核心功能
-2. 验证TDD流程（先写测试再写代码）
-3. 为V2提供稳定基础
+文档导航入口：[docs/README.md](README.md)
 
 ---
 
-## V1设计（最小版本）
+## 当前版本：Runtime V3（v3.0.0）
 
-**目标**：核心功能 + TDD验证
+ClaudeFlow 是一个任务调度管理系统，通过 Runtime 多会话内核调度 Claude Code CLI 执行具体任务。当前主线为 Runtime V3，V1/V2 的设计已沉淀到实现中或降级到 `legacy/`。
 
-### V1模块清单
+### 核心模块
 
-| 模块 | 职责 | 优先级 |
-|------|------|--------|
-| state_machine | 七状态模型 | P0 |
-| task_manager | 任务CRUD | P0 |
-| scheduler | 流程调度 | P0 |
-| cli_interface | CLI命令 | P0 |
-| checkpoint | 状态快照 | P1 |
-| employee_pool | 三层员工池 | P2 |
-| knowledge_retrieval | 三层检索 | P2 |
+| 模块 | 职责 | 路径 |
+|------|------|------|
+| Runtime Manager | 多会话生命周期管理 | `src/claudeflow/runtime/manager.py` |
+| Runtime CLI Driver | CLI 进程驱动与会话追踪 | `src/claudeflow/runtime/cli_driver.py` |
+| Runtime API | FastAPI 路由层（18 条端点） | `src/claudeflow/runtime/api.py` |
+| CLI 入口 | 命令行工具 | `src/claudeflow/cli.py` |
+| Workflow Engine | 状态机 / 调度器 / 任务管理 | `src/claudeflow/workflow/` |
+| Runtime Console | Vue 前端控制台 | `console/src/views/RuntimeConsole.vue` |
 
-### V1范围
+### Runtime 能力
 
-- ✅ CLI交互
-- ✅ 任务创建/查询/更新
-- ✅ 状态流转（七状态模型）
-- ✅ 流程调度
-- ✅ Checkpoint保存/恢复
-- ❌ WebSocket通信（V2）
-- ❌ Agent提炼（V2）
-- ❌ 前置拆分（V2）
-- ❌ Web控制台（Phase2）
+- `runtime start / complete / fail / status / show`
+- `runtime dispatch / plan / explain`
+- `priority` 排序、`max_concurrent` 并发槽位
+- `reason_code + reason` 稳定阻塞原因输出
+- `--json` 输出供脚本和前端消费
+- task graph 加载、schema 校验、依赖判断
+- 独立 git worktree 隔离
+- `write_paths` 逻辑锁防并发写冲突
+- SSE 实时事件推送
 
-### V1验收标准
+### Runtime API 端点
 
-- 271测试通过（单元+集成+E2E）
-- TDD流程验证可行
-- CLI可用
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/runtime/status` | GET | 全局状态 |
+| `/api/runtime/sessions` | GET | 会话列表 |
+| `/api/runtime/plan` | GET | 执行计划 |
+| `/api/runtime/explain/{task_id}` | GET | 任务解释 |
+| `/api/runtime/dispatch` | POST | 调度任务 |
+| `/api/runtime/task/{task_id}/complete` | POST | 标记完成 |
+| `/api/runtime/task/{task_id}/fail` | POST | 标记失败 |
+| `/api/session/start` | POST | 启动会话 |
+| `/api/session/{id}/events` | GET (SSE) | 事件流 |
+| `/api/session/{id}/events-list` | GET | 事件列表 |
+| `/api/session/{id}/intervene` | POST | 注入干预 |
+| `/api/session/{id}/cancel` | POST | 取消会话 |
+| `/api/session/{id}/status` | GET | 会话状态 |
+| `/health` | GET | 健康检查 |
+
+### Runtime Console
+
+独立 `/runtime` 路由，sample / live 双模式，支持：
+
+- 总览栏：runnable / blocked / running / started 统计
+- session 列表：解释任务 / 查看事件 / 发送干预 / 标记完成 / 标记失败
+- session inspector：当前摘要 / 事件列表 / 直接操作
+- 自动刷新与轮询间隔控制
+- Dashboard 首页 Runtime 入口卡片、TaskDetail Runtime 跳转入口
+- **Phase 3 新增**:
+  - 结构拆分：types / validators / composables / components
+  - 高影响动作确认对话框（intervene/complete/fail）
+  - 审计记录查询与展示
+  - 协议校验与 parseError 显示
+- **Phase 4 新增**:
+  - 测试 harness 标准化（withComposable, flushPromises, mock 基座）
+  - parse/validate 错误路径稳定断言
+  - Smoke 入口真实可运行（status/sessions/events/dispatch/audit）
+
+### 测试与可观测性
+
+测试入口、mock 约定、smoke 入口、排障顺序详见 [runtime/testing-observability.md](runtime/testing-observability.md)。
+
+| 层级 | 入口 | 命令 |
+|------|------|------|
+| 前端单元 | Vitest | `cd console && npm test` |
+| Python 单元 | pytest | `PYTHONPATH=src python3 -m pytest tests/unit/` |
+| Smoke 入口 | Python | `PYTHONPATH=src python3 scripts/runtime_smoke.py` |
+
+### Java HTTP 消费层
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/runtime-consume/status` | GET | Runtime 状态代理 |
+| `/api/runtime-consume/sessions` | GET | Runtime sessions 代理 |
+| `/api/runtime-consume/plan` | GET | Runtime plan 代理 |
+| `/api/runtime-consume/explain/{taskId}` | GET | 任务解释代理 |
+| `/api/runtime-consume/audit` | GET | 审计记录代理 |
+
+边界约定见 [runtime/java-http-boundary.md](runtime/java-http-boundary.md)。
 
 ---
 
-## V2设计（扩展版本）
+## 文档导航
 
-**前提**：V1完成并通过验收
+| 分类 | 目录 | 说明 |
+|------|------|------|
+| 核心 | [runtime/](runtime/) | 变更记录 + 测试与可观测性 |
+| 运维 | [operations/](operations/) | 操作手册、部署指南 |
+| 历史 | [archive/](archive/) | V1/V2 早期设计文档 |
+| 规格 | [specs/](specs/) | 功能规格与路线图 |
+| 扩展 | [superpowers/](superpowers/) | Token 治理、Console 等专题设计 |
 
-### V2追加内容
+核心文档：
+- [runtime/changelog.md](runtime/changelog.md) - 实现变更记录
+- [runtime/testing-observability.md](runtime/testing-observability.md) - 测试入口、mock 约定、排障顺序
+- [runtime/java-http-boundary.md](runtime/java-http-boundary.md) - Java HTTP 消费层契约
 
-| 设计文档 | 问题 | 方案 |
-|----------|------|------|
-| 01_通信层设计 | HTTP延迟 | WebSocket+SSE |
-| 02_Agent提炼机制 | 死循环刷屏 | 分层提炼 |
-| 03_前置拆分流程 | 上下文膨胀 | Phase0拆分 |
-| 04_强制checkpoint | 被动不可靠 | 阻塞式注入 |
-| 05_子Agent异步总结 | 阻塞主任务 | Haiku异步 |
-| 06_Claude_Code输出格式 | 提取困难 | 解析规范 |
-
-### V2新增模块
-
-| 模块 | 职责 | 基于V1 |
-|------|------|--------|
-| websocket_client | WebSocket通信 | 新增 |
-| session_parser | 解析.jsonl | 新增 |
-| thinking_filter | 死循环检测 | 新增 |
-| phase_reviewer | 阶段复盘 | 新增 |
-| task_reviewer | 任务复盘 | 新增 |
-| progress_reporter | 进度推送 | 新增 |
-| alert_handler | 告警处理 | 新增 |
-| checkpoint | LangGraph接口 | 修改V1 |
+完整索引见 [docs/README.md](README.md)。
 
 ---
 
-## Phase2设计（Web版本）
+## 架构演进历史
 
-**前提**：V2完成
+| 版本 | 时间 | 核心变化 | 一行描述 |
+|------|------|----------|----------|
+| V1 | 2026-04-19 | 七状态模型 + CLI + 流程调度 + TDD 验证 | 最小可用版本，验证核心调度可行性 |
+| V2.0 | 2026-04-19 | WebSocket/SSE 通信 + Agent 提炼 + Phase0 拆分 + 异步复盘 | 扩展通信与提炼能力 |
+| V2.2 | 2026-04-21 | Spring Boot + Vue Web Console | Web 控制台版本 |
+| V2.3 | 2026-04-22 | Haiku 异步复盘模块 + SSE 稳定性 | 310 测试通过，88% 覆盖率 |
+| V2.4 | 2026-04-22 | CLI 驱动模块 + 指令集注入整合 | 379 测试，96% 覆盖率 |
+| V3.0 | 2026-04-24 | Runtime 多会话内核 + task graph + dispatch + Hermes 全面清理 | 当前主线，runtime/api.py 接管全部端点 |
+| V3.1 | 2026-04-27 | Console 结构收口 + 动作确认链 + 审计 + schema校验 + Java消费契约 | Phase 3 验收完成，A31-A35 全部通过 |
+| V3.2 | 2026-04-27 | Testing harness 标准化 + parse/validate 错误路径 + Smoke 入口 + 文档同步 | Phase 4 验收完成，A41-A46 全部通过 |
+| V3.3 | 2026-04-28 | Release checklist + Quality gate 固化 + 统一交付口径 + 发布后验证 | Phase 5 已完成，release-readiness 分层与回滚契约落地 |
 
-- Spring Boot后端
-- Vue前端
-- WebSocket + SSE通信
-- Web控制台UI
-
----
-
-## 设计问题清单
-
-见 [07_V2设计问题清单.md](07_V2设计问题清单.md)
-
-已解决：P1模块边界、P8必要性、P9开源方案
-待解决：P2-P7（可在开发阶段逐步解决）
+V1/V2 的设计文档归档在 [archive/](archive/)，仅供参考。实现状态以 [runtime/changelog.md](runtime/changelog.md) 为准。
 
 ---
 
 ## 下一步
 
-1. **创建GitHub仓库**
-2. **V1开发**（TDD流程）
-3. **V1验收**
-4. **V2扩展**（基于V1）
-5. **Phase2开发**（Web版本）
+参见 [specs/2026-04-24-runtime-monthly-roadmap.md](specs/2026-04-24-runtime-monthly-roadmap.md)。

@@ -1,0 +1,38 @@
+id: T403
+phase_id: phase-4
+title: 收口 live data parse validate 错误路径与状态断言
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T401.yaml
+constraints:
+  - parse validate 失败路径必须可断言且无 lifecycle warning 噪音
+  - 不得把错误路径静默降级为默认空状态
+allowed_write_paths:
+  - console/tests/**
+  - console/src/composables/**
+  - console/src/services/**
+  - console/src/validators/**
+  - console/src/types/**
+acceptance_refs:
+  - A42
+  - A43
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只保 happy path
+  - 让 parse error 继续以不可控控制台输出形式出现
+done_definition:
+  - live_data_error_paths_stable
+  - validation_tests_harnessed
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

@@ -1,0 +1,37 @@
+id: T502
+phase_id: phase-5
+title: 建立统一发布门禁入口或统一命令组
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T501.yaml
+constraints:
+  - 入口必须调用现有真实命令，不得做无法复跑的伪封装
+  - 失败输出必须能定位到具体门禁侧别
+allowed_write_paths:
+  - scripts/**
+  - docs/**
+  - Makefile
+  - package.json
+  - console/package.json
+acceptance_refs:
+  - A52
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 跳过 Java 或 smoke 门禁
+  - 用注释代替实际可运行入口
+done_definition:
+  - release_gate_entry_added
+  - gate_execution_order_documented
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

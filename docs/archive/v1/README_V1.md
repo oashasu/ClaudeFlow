@@ -1,0 +1,164 @@
+# V1 分支 - 需求与设计
+
+> **分支**: `v1.0.0`
+> **目标**: 最小版本 - 验证核心功能 + TDD流程可行性
+
+---
+
+## 一、核心目标
+
+V1 是 ClaudeFlow 的最小版本，目标是：
+
+1. **验证 CLI + 流程调度核心功能**
+2. **验证 TDD 流程**（先写测试再写代码）
+3. **为 V2 提供稳定基础**
+
+---
+
+## 二、模块清单
+
+| 模块 | 职责 | 优先级 | 状态 |
+|------|------|--------|------|
+| state_machine | 七状态模型 | P0 | 待开发 |
+| task_manager | 任务 CRUD | P0 | 待开发 |
+| scheduler | 流程调度 | P0 | 待开发 |
+| cli_interface | CLI 命令 | P0 | 待开发 |
+| checkpoint | 状态快照 | P1 | **完成** |
+| employee_pool | 三层员工池 | P2 | 待开发 |
+| knowledge_retrieval | 三层检索 | P2 | 待开发 |
+
+---
+
+## 三、功能范围
+
+### ✅ 包含
+
+- CLI 交互式命令
+- 任务创建/查询/更新/删除
+- 状态流转（七状态模型）
+- 流程调度
+- Checkpoint 保存/恢复
+- 员工池管理
+- 知识检索
+
+### ❌ 不包含（V2/Phase2）
+
+- WebSocket 通信（V2）
+- Agent 提炼机制（V2）
+- 前置拆分流程（V2）
+- Web 控制台（Phase2）
+
+---
+
+## 四、验收标准
+
+| 标准 | 目标值 | 状态 |
+|------|--------|------|
+| 测试覆盖率 | ≥ 80% | **90%通过** ✓ |
+| 单元测试 | ≥150 | 80通过 |
+| 集成测试 | ≥30 | **30通过** ✓ |
+| E2E 测试 | ≥10 | **10通过** ✓ |
+| CLI 可用 | 基本命令可用 | **验证通过** ✓ |
+
+---
+
+## 五、设计文档
+
+| 文档 | 说明 |
+|------|------|
+| [状态机设计](../docs/设计/状态机设计.md) | 七状态模型详细设计 |
+| [任务管理设计](../docs/设计/任务管理设计.md) | 任务 CRUD 设计 |
+| [流程调度设计](../docs/设计/流程调度设计.md) | 调度器设计 |
+| [CLI接口设计](../docs/设计/CLI接口设计.md) | 命令行接口设计 |
+| [Checkpoint设计](../docs/设计/Checkpoint设计.md) | 状态快照设计 |
+| [员工池设计](../docs/设计/员工池设计.md) | 三层员工池设计 |
+| [知识检索设计](../docs/设计/知识检索设计.md) | 三层检索设计 |
+
+---
+
+## 六、开发进度
+
+### Sprint 1: P0 模块 ✅
+
+| 任务 | 状态 | 测试 | 备注 |
+|------|------|------|------|
+| state_machine | **GREEN完成** | 19个通过 | TDD - 状态机实现完成 |
+| task_manager | **GREEN完成** | 17个通过 | TDD - 任务CRUD实现完成 |
+| scheduler | **GREEN完成** | 15个通过 | TDD - 流程调度实现完成 |
+| cli_interface | **GREEN完成** | 15个通过 | TDD - CLI命令实现完成 |
+
+**P0合计**: 66个单元测试通过
+
+### Sprint 2: P1 模块 ✅
+
+| 任务 | 状态 | 测试 | 备注 |
+|------|------|------|------|
+| checkpoint | **GREEN完成** | 14个通过 | TDD - 快照保存/恢复/回退实现完成 |
+
+**P1合计**: 14个单元测试通过
+
+### Sprint 3: P2 模块
+
+| 任务 | 状态 | 测试 | 备注 |
+|------|------|------|------|
+| employee_pool | 待开始 | 待写 | TDD |
+| knowledge_retrieval | 待开始 | 待写 | TDD |
+
+### 集成测试
+
+| 测试类 | 测试数 | 状态 |
+|------|------|------|
+| TestTaskFlowIntegration | 7 | **通过** |
+| TestSchedulerCheckpointIntegration | 5 | **通过** |
+| TestCliIntegration | 9 | **通过** |
+| TestCheckpointPersistence | 2 | **通过** |
+| TestStateMachineIntegration | 7 | **通过** |
+
+**集成测试合计**: 30个通过
+
+### E2E测试
+
+| 测试类 | 测试数 | 状态 |
+|------|------|------|
+| TestE2eCliWorkflow | 3 | **通过** |
+| TestE2eTaskPersistence | 1 | **通过** |
+| TestE2eCheckpointPersistence | 1 | **通过** |
+| TestE2eCompleteWorkflow | 1 | **通过** |
+| TestE2eSchedulerFlow | 4 | **通过** |
+
+**E2E测试合计**: 10个通过
+
+---
+
+## 七、技术栈
+
+- **语言**: Python 3.10+
+- **测试**: pytest + pytest-cov
+- **CLI**: argparse / click
+- **配置**: YAML
+- **存储**: JSON / SQLite（待定）
+
+---
+
+## 八、运行测试
+
+```bash
+# 设置PYTHONPATH后运行测试
+PYTHONPATH=src python3 -m pytest --cov=src/claudeflow --cov-report=term-missing
+
+# 或安装模块后运行（需要pip>=22.0）
+pip install -e .
+pytest --cov=src/claudeflow
+```
+
+---
+
+## 九、下一步
+
+1. ~~创建设计文档目录结构~~ ✅
+2. ~~编写各模块详细设计~~ ✅
+3. ~~按 TDD 流程开发：先写测试 → 写实现 → 重构~~ ✅ (P0+P1)
+4. ~~E2E 测试开发（≥10个）~~ ✅
+5. ~~测试覆盖率验证（≥80%）~~ ✅
+6. P2 模块开发（可选）
+7. 补充单元测试至 ≥150个

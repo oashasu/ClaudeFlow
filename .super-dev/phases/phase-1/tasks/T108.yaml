@@ -1,0 +1,38 @@
+id: T108
+phase_id: phase-1
+title: 返工默认 runtime 主链以完成宿主化
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ../task-plan.md
+constraints:
+  - dispatch_runnable_tasks/start_worker/explain_task 必须进入宿主感知主链
+  - 不得继续保留写死 claude 的默认派发主路径
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A02
+  - A03
+  - A05
+  - A06
+  - A08
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 仅保留 dispatch_from_governance 旁路来规避主链返工
+  - 用日志字段替代结构化宿主字段
+done_definition:
+  - runtime_mainline_hostified
+  - explain_path_host_aware
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

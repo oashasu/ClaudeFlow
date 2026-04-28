@@ -1,0 +1,22 @@
+{
+  "session_id": "sess-auth-001",
+  "events_count": 3,
+  "parsed_events": [
+    {
+      "type": "thinking",
+      "text": "先确认认证接口的边界条件，再设计 service 骨架"
+    },
+    {
+      "type": "tool_use",
+      "tool_name": "Read",
+      "tool_input": {
+        "path": "src/auth/service.py"
+      }
+    },
+    {
+      "type": "text",
+      "text": "认证模块骨架已完成，准备进入测试补充阶段"
+    }
+  ],
+  "raw_events": []
+}

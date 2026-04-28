@@ -1,0 +1,38 @@
+id: T305
+phase_id: phase-3
+title: 同步 runtime 文档样例与操作说明
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../prd.md
+  - ../spec.md
+  - ../uiux.md
+  - ./T301.yaml
+  - ./T302.yaml
+  - ./T303.yaml
+  - ./T304.yaml
+constraints:
+  - 文档必须反映真实实现，不得写成聊天结论
+  - schema/sample 变化必须同步实现记录
+allowed_write_paths:
+  - docs/**
+  - examples/**
+  - output/**
+acceptance_refs:
+  - A36
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只改代码不更新文档
+  - 用过期 sample 充当实现证据
+done_definition:
+  - runtime_docs_synced
+  - operation_guide_updated
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

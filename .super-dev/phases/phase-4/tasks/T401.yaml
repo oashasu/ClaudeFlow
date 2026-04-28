@@ -1,0 +1,36 @@
+id: T401
+phase_id: phase-4
+title: 收口 Runtime Console 共享测试 harness 与 runtime API mock 基座
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ../uiux.md
+constraints:
+  - composable 测试不得继续裸调用绕过 Vue setup 生命周期
+  - 共享 harness 必须服务 Runtime Console 与 composable 测试，而不是只为单个 spec 定制
+allowed_write_paths:
+  - console/tests/**
+  - console/src/composables/**
+  - console/src/services/**
+  - console/src/types/**
+acceptance_refs:
+  - A42
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 在每个 spec 内部复制新的 mount/mock 包装
+  - 通过关闭 Vue warning 机制伪装问题不存在
+done_definition:
+  - shared_test_harness_added
+  - composable_setup_mainline_fixed
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

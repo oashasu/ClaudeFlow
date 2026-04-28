@@ -1,0 +1,35 @@
+id: T304
+phase_id: phase-3
+title: 收口 Java HTTP 控制面对 runtime 的消费契约
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T303.yaml
+constraints:
+  - Java 控制层不得复制 Python runtime 状态机
+  - 旧任务流接口与 runtime 消费接口边界必须清晰
+allowed_write_paths:
+  - src/main/java/**
+  - src/main/resources/**
+  - tests/**
+acceptance_refs:
+  - A35
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 在 Java 层发明新的 runtime 字段约定
+  - 为了省事把 Python 逻辑整段复制到 Java
+done_definition:
+  - java_runtime_boundary_clarified
+  - http_contract_aligned
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

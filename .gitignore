@@ -1,0 +1,33 @@
+.coverage
+.coverage.*
+.pytest_cache/
+.venv/
+__pycache__/
+*.py[cod]
+
+.claudeflow/
+.worktrees/
+.audit/
+console/.audit/
+
+node_modules/
+dist/
+
+target/
+*.jar
+*.class
+
+src/claudeflow.egg-info/
+
+# Runtime/task review noise
+tasks/*/reviews/task_review.json
+
+# Local test and runtime archives
+archives/
+
+# Common local DB / cache noise
+*.sqlite3
+*.db
+
+# Local archive directory (not part of release baseline)
+task_archive/

@@ -1,0 +1,32 @@
+id: T101
+phase_id: phase-1
+title: 建立 RuntimeDriver 抽象与统一返回对象
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+constraints:
+  - 不得在 RuntimeManager 中直接分支硬编码宿主逻辑
+  - 抽象接口必须同时覆盖 ClaudeDriver 与 CodexDriver
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+acceptance_refs:
+  - A01
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 修改治理文档边界
+  - 引入 review/rework/advance 自动逻辑
+done_definition:
+  - driver_interface_added
+  - shared_result_models_added
+  - review_ready
+rework_policy:
+  max_rounds: 3
+  inherit_previous_findings: true
+gate_on_complete: review_required

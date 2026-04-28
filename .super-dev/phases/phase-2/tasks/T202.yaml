@@ -1,0 +1,31 @@
+id: T202
+phase_id: phase-2
+title: 集成结果回收到 review-ready 状态
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../acceptance.md
+  - ../tasks/T201.yaml
+constraints:
+  - 必须回写 pipeline-state.json
+  - 不得绕开现有 RuntimeManager 结果回收路径
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A22
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+done_definition:
+  - review_queue_integrated
+  - submitted_state_visible
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

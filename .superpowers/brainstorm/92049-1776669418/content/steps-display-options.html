@@ -1,0 +1,207 @@
+<h2>复杂任务步骤展示方案</h2>
+<p class="subtitle">每个Phase下可能有多步骤，如何展示？</p>
+
+<div class="options" style="margin-bottom:24px;">
+  <div class="option" data-choice="expand" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>点击Phase节点展开步骤</h3>
+      <p>工作流节点可点击，展开该阶段的所有步骤</p>
+    </div>
+  </div>
+  <div class="option" data-choice="inline" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>当前阶段步骤内联显示</h3>
+      <p>只展示当前正在执行阶段的步骤列表，其他阶段折叠</p>
+    </div>
+  </div>
+  <div class="option" data-choice="both" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合方案</h3>
+      <p>内联显示当前阶段，已完成阶段可点击回顾步骤</p>
+    </div>
+  </div>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">方案A示例：点击Phase节点展开步骤</div>
+  <div class="mockup-body">
+    <div class="placeholder" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span><strong>task_001</strong> - 复杂任务示例</span>
+        <span style="color:#4a4;">运行中</span>
+      </div>
+
+      <!-- 工作流 - Phase3展开状态 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;">0</div>
+          <div style="font-size:11px;margin-top:4px;">拆分</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;">1</div>
+          <div style="font-size:11px;margin-top:4px;">规划</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;">2</div>
+          <div style="font-size:11px;margin-top:4px;">准备</div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <!-- Phase3 当前展开 -->
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2196F3;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 8px #2196F3;cursor:pointer;">3</div>
+          <div style="font-size:11px;margin-top:4px;color:#2196F3;font-weight:bold;">开发 ▼</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer;">4</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">审查</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer;">5</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">测试</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer;">6</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">完成</div>
+        </div>
+      </div>
+
+      <!-- Phase3展开后的步骤列表 -->
+      <div style="margin-top:12px;padding:12px;background:#e3f2fd;border-radius:8px;border:1px solid #2196F3;">
+        <div style="font-weight:bold;color:#2196F3;margin-bottom:8px;">Phase3: 开发 · 步骤进度</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="padding:6px 12px;background:#4a4;color:#fff;border-radius:4px;">✓ 步骤1: 需求分析</div>
+          <div style="padding:6px 12px;background:#4a4;color:#fff;border-radius:4px;">✓ 步骤2: 架构设计</div>
+          <div style="padding:6px 12px;background:#4a4;color:#fff;border-radius:4px;">✓ 步骤3: 核心模块</div>
+          <div style="padding:6px 12px;background:#2196F3;color:#fff;border-radius:4px;box-shadow:0 0 4px #2196F3;">▶ 步骤4: API开发</div>
+          <div style="padding:6px 12px;background:#ddd;color:#888;border-radius:4px;">○ 步骤5: 集成测试</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:16px;">
+  <div class="mockup-header">方案B示例：内联显示当前阶段步骤</div>
+  <div class="mockup-body">
+    <div class="placeholder" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span><strong>task_001</strong></span>
+        <span style="color:#4a4;">运行中 · Phase3 步骤4/5</span>
+      </div>
+
+      <!-- 紧凑工作流 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:12px;">
+        <span style="color:#4a4;">●0拆分</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#4a4;">●1规划</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#4a4;">●2准备</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#2196F3;font-weight:bold;">●3开发</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○4审查</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○5测试</span>
+        <span style="color:#ddd;">→</span>
+        <span style="color:#888;">○6完成</span>
+      </div>
+
+      <!-- 步骤进度条 -->
+      <div style="margin-top:12px;">
+        <div style="font-size:12px;color:#666;margin-bottom:4px;">当前阶段步骤：API开发 (4/5)</div>
+        <div style="display:flex;gap:4px;">
+          <div style="width:20%;height:24px;background:#4a4;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;">1</div>
+          <div style="width:20%;height:24px;background:#4a4;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;">2</div>
+          <div style="width:20%;height:24px;background:#4a4;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;">3</div>
+          <div style="width:20%;height:24px;background:#2196F3;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;">4</div>
+          <div style="width:20%;height:24px;background:#ddd;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#888;font-size:10px;">5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:16px;">
+  <div class="mockup-header">方案C示例：混合方案（当前内联 + 历史可回顾）</div>
+  <div class="mockup-body">
+    <div class="placeholder" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span><strong>task_001</strong></span>
+        <span style="color:#4a4;">运行中</span>
+      </div>
+
+      <!-- 工作流 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;" title="点击查看历史步骤">0</div>
+          <div style="font-size:11px;margin-top:4px;">拆分 <span style="color:#4a4;">(2/2)</span></div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;">1</div>
+          <div style="font-size:11px;margin-top:4px;">规划 <span style="color:#4a4;">(3/3)</span></div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;cursor:pointer;">2</div>
+          <div style="font-size:11px;margin-top:4px;">准备 <span style="color:#4a4;">(1/1)</span></div>
+        </div>
+        <div style="height:2px;background:#4a4;width:20px;"></div>
+        <!-- 当前Phase展开 -->
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2196F3;box-shadow:0 0 8px #2196F3;">3</div>
+          <div style="font-size:11px;margin-top:4px;color:#2196F3;font-weight:bold;">开发 (4/5)</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">4</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">审查</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">5</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">测试</div>
+        </div>
+        <div style="height:2px;background:#ddd;width:20px;"></div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#ddd;">6</div>
+          <div style="font-size:11px;margin-top:4px;color:#888;">完成</div>
+        </div>
+      </div>
+
+      <!-- 当前阶段步骤内联 -->
+      <div style="margin-top:12px;padding:10px;background:#e3f2fd;border-radius:6px;">
+        <div style="font-size:12px;font-weight:bold;color:#2196F3;">Phase3 步骤进度</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <span style="padding:4px 8px;background:#4a4;color:#fff;border-radius:3px;font-size:10px;">✓1</span>
+          <span style="padding:4px 8px;background:#4a4;color:#fff;border-radius:3px;font-size:10px;">✓2</span>
+          <span style="padding:4px 8px;background:#4a4;color:#fff;border-radius:3px;font-size:10px;">✓3</span>
+          <span style="padding:4px 8px;background:#2196F3;color:#fff;border-radius:3px;font-size:10px;">▶4</span>
+          <span style="padding:4px 8px;background:#ddd;color:#888;border-radius:3px;font-size:10px;">○5</span>
+        </div>
+      </div>
+
+      <!-- 点击历史Phase后的弹出层示例 -->
+      <div style="margin-top:12px;padding:10px;background:#f0f0f0;border-radius:6px;border:1px dashed #4a4;">
+        <div style="font-size:12px;color:#666;">点击Phase0「拆分」后弹出：</div>
+        <div style="margin-top:6px;padding:8px;background:#e8f5e9;border-radius:4px;">
+          <div style="font-weight:bold;">Phase0: 拆分 · 已完成</div>
+          <div style="margin-top:4px;font-size:11px;">
+            <span style="color:#4a4;">✓ 步骤1: 分析需求文档</span><br>
+            <span style="color:#4a4;">✓ 步骤2: 拆分子任务清单</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:16px;color:#888;">请选择您偏好的展示方式，或描述其他需求。</p>

@@ -1,0 +1,9 @@
+{
+  "repo_path": "/Users/demo/workspace/my-project",
+  "active_agents": 2,
+  "queued_tasks": 5,
+  "completed_tasks": 12,
+  "failed_tasks": 1,
+  "intervention_required": true,
+  "running_tasks": ["impl_auth_module", "fix_payment_bug"]
+}

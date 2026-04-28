@@ -1,0 +1,34 @@
+id: T105
+phase_id: phase-1
+title: 改造 RuntimeManager 与 Session Index 以支持宿主感知回收
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+constraints:
+  - session index 必须包含 executor_type 与 driver_name
+  - 结果回收结构必须统一
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A06
+  - A07
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 把宿主信息只写日志不写结构化对象
+  - 破坏现有单宿主索引读写能力
+done_definition:
+  - session_index_host_fields_added
+  - result_collection_unified
+  - review_ready
+rework_policy:
+  max_rounds: 3
+  inherit_previous_findings: true
+gate_on_complete: review_required

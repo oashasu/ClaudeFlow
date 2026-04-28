@@ -1,0 +1,50 @@
+{
+  "tasks": [
+    {
+      "task_id": "impl_auth_controller",
+      "prompt": "实现 AuthController，严格按 auth_api@v2 和 architecture@v2 执行，只允许修改指定控制器文件。",
+      "owner_role": "backend-agent",
+      "task_type": "ImplementTask",
+      "priority": "high",
+      "depends_on": [],
+      "read_paths": [
+        "src/auth/**",
+        "docs/spec/auth.md"
+      ],
+      "write_paths": [
+        "src/controllers/AuthController.java"
+      ],
+      "shared_files": [],
+      "protocol_refs": [
+        "auth_api@v2"
+      ],
+      "design_refs": [
+        "architecture@v2"
+      ]
+    },
+    {
+      "task_id": "impl_auth_tests",
+      "prompt": "为 AuthController 编写测试，依赖 impl_auth_controller 完成后再启动。",
+      "owner_role": "qa-agent",
+      "task_type": "ImplementTask",
+      "priority": "medium",
+      "depends_on": [
+        "impl_auth_controller"
+      ],
+      "read_paths": [
+        "src/controllers/AuthController.java",
+        "src/test/**"
+      ],
+      "write_paths": [
+        "src/test/java/com/example/AuthControllerTest.java"
+      ],
+      "shared_files": [],
+      "protocol_refs": [
+        "auth_api@v2"
+      ],
+      "design_refs": [
+        "architecture@v2"
+      ]
+    }
+  ]
+}

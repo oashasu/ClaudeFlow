@@ -1,0 +1,35 @@
+id: T505
+phase_id: phase-5
+title: 固化回滚约定与交付摘要模板
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../prd.md
+  - ../spec.md
+  - ../acceptance.md
+  - ./T503.yaml
+  - ./T504.yaml
+constraints:
+  - 回滚条件必须可操作，不能写成抽象风险提示
+  - 交付摘要模板必须能直接承接 Python Console Java smoke 证据
+allowed_write_paths:
+  - docs/**
+  - output/**
+acceptance_refs:
+  - A55
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只写回滚原则不写触发条件与复验命令
+  - 交付摘要模板脱离当前仓库证据结构
+done_definition:
+  - rollback_contract_documented
+  - delivery_summary_template_added
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

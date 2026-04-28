@@ -1,0 +1,42 @@
+id: T306
+phase_id: phase-3
+title: 补齐 Phase 3 回归与阶段验收测试
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../acceptance.md
+  - ../task-plan.md
+  - ./T301.yaml
+  - ./T302.yaml
+  - ./T303.yaml
+  - ./T304.yaml
+  - ./T305.yaml
+constraints:
+  - 必须覆盖 Console 主链、动作失败路径和协议错误路径
+  - 不得回退 Phase 1 与 Phase 2 已验收能力
+allowed_write_paths:
+  - tests/**
+  - console/**
+acceptance_refs:
+  - A31
+  - A32
+  - A33
+  - A34
+  - A35
+  - A36
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 改测试规避协议或交互缺陷
+  - 只补 happy path 不补失败分支
+done_definition:
+  - phase3_acceptance_covered
+  - regression_green
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

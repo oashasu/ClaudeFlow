@@ -1,0 +1,37 @@
+id: T404
+phase_id: phase-4
+title: 建立 runtime smoke 最小主链入口
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T402.yaml
+  - ./T403.yaml
+constraints:
+  - smoke 必须是真实可运行入口，不得只停留在文档
+  - 至少覆盖 status sessions events 以及 explain|dispatch、action result|audit 中各一条
+allowed_write_paths:
+  - scripts/**
+  - tests/integration/**
+  - tests/**
+  - docs/runtime/**
+acceptance_refs:
+  - A44
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只验证 sample 静态文件
+  - 写一个无法在仓库内复跑的伪 smoke
+done_definition:
+  - runtime_smoke_entry_added
+  - minimal_mainline_covered
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required
