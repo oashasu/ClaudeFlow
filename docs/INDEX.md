@@ -1,13 +1,26 @@
 # ClaudeFlow 系统索引
 
-> 最后更新：2026-04-27
+> 最后更新：2026-04-28
 > 项目位置：`/Users/claw/sandbox/personal/claudeflow/`
+> **服务目录**: `~/services/claudeflow/` (纯运行场景)
 
 文档导航入口：[docs/README.md](README.md)
 
 ---
 
-## 当前版本：Runtime V3（v3.0.0）
+## 目录说明
+
+| 目录 | 用途 | 说明 |
+|------|------|------|
+| `~/sandbox/personal/claudeflow/` | 开发目录 | 用于开发、测试、迭代 |
+| `~/services/claudeflow/` | 服务目录 | 用于生产运行，与开发隔离 |
+
+**服务隔离原则**: 开发过程中的变更不会自动同步到服务目录。
+服务目录仅通过 `git pull` 更新稳定版本，确保运行稳定。
+
+---
+
+## 当前版本：Runtime V3（v3.3）
 
 ClaudeFlow 是一个任务调度管理系统，通过 Runtime 多会话内核调度 Claude Code CLI 执行具体任务。当前主线为 Runtime V3，V1/V2 的设计已沉淀到实现中或降级到 `legacy/`。
 
