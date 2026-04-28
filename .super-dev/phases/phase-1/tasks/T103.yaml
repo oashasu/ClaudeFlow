@@ -1,0 +1,35 @@
+id: T103
+phase_id: phase-1
+title: 新增 CodexDriver 最小可执行路径
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+constraints:
+  - Codex 宿主细节必须封装在 driver 内
+  - 不支持真实执行时可用 mock/adapter 覆盖测试路径
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A01
+  - A03
+  - A04
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 在 RuntimeManager 中硬编码 codex 命令实现
+  - 把占位类冒充可派发路径
+done_definition:
+  - codex_driver_registered
+  - codex_dispatch_path_testable
+  - review_ready
+rework_policy:
+  max_rounds: 3
+  inherit_previous_findings: true
+gate_on_complete: review_required

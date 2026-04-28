@@ -2,6 +2,7 @@ package com.claudeflow.service;
 
 import com.claudeflow.dto.TaskDTO;
 import com.claudeflow.dto.TaskStatsDTO;
+import com.claudeflow.dto.CreateTaskRequest;
 import com.claudeflow.entity.TaskEntity;
 import com.claudeflow.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -19,6 +21,25 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+
+    /**
+     * 创建任务
+     */
+    @Transactional
+    public TaskDTO createTask(CreateTaskRequest request) {
+        TaskEntity task = new TaskEntity();
+        task.setId(UUID.randomUUID().toString());
+        task.setName(request.getName());
+        task.setDomain(request.getDomain());
+        task.setDescription(request.getPrompt());
+        task.setPriority(request.getPriority());
+        task.setStatus("pending");
+        task.setPhase("init");
+        task.setProgress(0);
+
+        TaskEntity saved = taskRepository.save(task);
+        return toDTO(saved);
+    }
 
     /**
      * 获取任务列表
@@ -134,6 +155,43 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
 
         task.setStatus("cancelled");
+        taskRepository.save(task);
+        return toDTO(task);
+    }
+
+    /**
+     * 删除任务
+     */
+    @Transactional
+    public void deleteTask(String taskId) {
+        TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
+
+        // 如果任务正在运行，先取消Hermes会话
+        if ("running".equals(task.getStatus()) && task.getSessionId() != null) {
+            // 调用 Hermes 取消会话
+        }
+
+        taskRepository.delete(task);
+    }
+
+    /**
+     * 重新执行任务（重置为pending）
+     */
+    @Transactional
+    public TaskDTO retryTask(String taskId) {
+        TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
+
+        // 只有error状态的任务可以重试
+        if (!"error".equals(task.getStatus())) {
+            throw new RuntimeException("Only error tasks can be retried");
+        }
+
+        task.setStatus("pending");
+        task.setPhase("init");
+        task.setProgress(0);
+        task.setSessionId(null);
         taskRepository.save(task);
         return toDTO(task);
     }

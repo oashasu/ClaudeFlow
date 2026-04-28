@@ -19,7 +19,7 @@ class TestBaselineSchema:
 
     def test_baseline_required_fields(self):
         """测试：baseline必填字段验证"""
-        from claudeflow.governance.snapshot import SnapshotManager, BaselineSchema
+        from claudeflow.legacy.governance.snapshot import SnapshotManager, BaselineSchema
 
         # 最小有效baseline
         baseline = {
@@ -41,7 +41,7 @@ class TestBaselineSchema:
 
     def test_baseline_missing_snapshot_id(self):
         """测试：缺少snapshot_id验证失败"""
-        from claudeflow.governance.snapshot import BaselineSchema
+        from claudeflow.legacy.governance.snapshot import BaselineSchema
 
         baseline = {
             "snapshot_type": "baseline",
@@ -55,7 +55,7 @@ class TestBaselineSchema:
 
     def test_baseline_invalid_snapshot_type(self):
         """测试：snapshot_type必须是baseline"""
-        from claudeflow.governance.snapshot import BaselineSchema
+        from claudeflow.legacy.governance.snapshot import BaselineSchema
 
         baseline = {
             "snapshot_id": "snap_001",
@@ -73,7 +73,7 @@ class TestIncrementalSchema:
 
     def test_incremental_required_fields(self):
         """测试：incremental必填字段验证"""
-        from claudeflow.governance.snapshot import IncrementalSchema
+        from claudeflow.legacy.governance.snapshot import IncrementalSchema
 
         incremental = {
             "snapshot_id": "snap_002",
@@ -90,7 +90,7 @@ class TestIncrementalSchema:
 
     def test_incremental_missing_parent_id(self):
         """测试：incremental缺少parent_snapshot_id"""
-        from claudeflow.governance.snapshot import IncrementalSchema
+        from claudeflow.legacy.governance.snapshot import IncrementalSchema
 
         incremental = {
             "snapshot_id": "snap_002",
@@ -105,7 +105,7 @@ class TestIncrementalSchema:
 
     def test_incremental_change_types(self):
         """测试：changes变更类型枚举"""
-        from claudeflow.governance.snapshot import IncrementalSchema
+        from claudeflow.legacy.governance.snapshot import IncrementalSchema
 
         incremental = {
             "snapshot_id": "snap_002",
@@ -142,7 +142,7 @@ class TestSnapshotStorage:
 
     def test_save_snapshot_creates_file(self):
         """测试：保存快照创建JSON文件"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoints", "task_001")
@@ -172,7 +172,7 @@ class TestSnapshotStorage:
 
     def test_load_snapshot_success(self):
         """测试：加载快照成功"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -203,7 +203,7 @@ class TestSnapshotStorage:
 
     def test_load_snapshot_not_found(self):
         """测试：加载不存在的快照返回None"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -214,7 +214,7 @@ class TestSnapshotStorage:
 
     def test_get_latest_snapshot(self):
         """测试：获取最新快照"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -255,7 +255,7 @@ class TestSnapshotStorage:
 
     def test_get_latest_snapshot_empty(self):
         """测试：空任务返回None"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -270,7 +270,7 @@ class TestGitBinding:
 
     def test_get_current_git_hash(self):
         """测试：获取当前Git commit hash"""
-        from claudeflow.governance.snapshot import get_git_commit_hash
+        from claudeflow.legacy.governance.snapshot import get_git_commit_hash
 
         # 在claudeflow项目目录中测试（有git）
         git_hash = get_git_commit_hash("/Users/claw/sandbox/personal/claudeflow")
@@ -282,7 +282,7 @@ class TestGitBinding:
 
     def test_get_git_hash_no_git_repo(self):
         """测试：无git仓库返回None"""
-        from claudeflow.governance.snapshot import get_git_commit_hash
+        from claudeflow.legacy.governance.snapshot import get_git_commit_hash
 
         with tempfile.TemporaryDirectory() as tmpdir:
             git_hash = get_git_commit_hash(tmpdir)
@@ -291,7 +291,7 @@ class TestGitBinding:
 
     def test_snapshot_auto_git_binding(self):
         """测试：保存快照自动绑定git hash"""
-        from claudeflow.governance.snapshot import SnapshotManager, create_baseline_snapshot
+        from claudeflow.legacy.governance.snapshot import SnapshotManager, create_baseline_snapshot
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -314,7 +314,7 @@ class TestSnapshotChain:
 
     def test_create_incremental_from_baseline(self):
         """测试：从baseline创建incremental"""
-        from claudeflow.governance.snapshot import SnapshotManager, create_incremental_snapshot
+        from claudeflow.legacy.governance.snapshot import SnapshotManager, create_incremental_snapshot
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -357,7 +357,7 @@ class TestSnapshotChain:
 
     def test_snapshot_chain_traceability(self):
         """测试：快照链可追溯"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -417,7 +417,7 @@ class TestSnapshotManagerExtra:
 
     def test_list_snapshots(self):
         """测试：列出所有快照ID"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -460,7 +460,7 @@ class TestSnapshotManagerExtra:
 
     def test_list_snapshots_empty(self):
         """测试：空任务返回空列表"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -471,7 +471,7 @@ class TestSnapshotManagerExtra:
 
     def test_delete_snapshot(self):
         """测试：删除快照"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)
@@ -502,7 +502,7 @@ class TestSnapshotManagerExtra:
 
     def test_delete_snapshot_not_found(self):
         """测试：删除不存在的快照返回False"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = SnapshotManager(base_dir=tmpdir)

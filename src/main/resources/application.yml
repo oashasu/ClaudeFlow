@@ -30,4 +30,4 @@ cleanup:
 
 # CORS配置（前端分离开发）
 cors:
-  allowed-origins: "http://localhost:5173,http://localhost:3000"
+  allowed-origins: "http://localhost:5173,http://localhost:3000,http://192.168.100.181:5173"

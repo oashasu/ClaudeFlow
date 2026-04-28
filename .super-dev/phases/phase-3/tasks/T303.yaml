@@ -1,0 +1,38 @@
+id: T303
+phase_id: phase-3
+title: 固化 runtime schema/sample 并接入前端 parse validate
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T301.yaml
+constraints:
+  - 每类 runtime 对象都必须有 schema 或稳定类型定义
+  - parse 失败必须显式报错，不得静默吞掉
+allowed_write_paths:
+  - examples/**
+  - console/src/services/**
+  - console/src/types/**
+  - console/src/validators/**
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A34
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只补 sample 不补校验链
+  - 让 live payload 直接绕过 parse 进入 UI
+done_definition:
+  - runtime_schema_sample_synced
+  - parse_validate_mainline_connected
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

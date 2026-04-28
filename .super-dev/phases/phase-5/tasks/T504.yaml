@@ -1,0 +1,36 @@
+id: T504
+phase_id: phase-5
+title: 同步发布后验证说明与关键主链检查
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ./T501.yaml
+  - ./T502.yaml
+constraints:
+  - 发布后验证必须覆盖 runtime status sessions events 以及 dispatch|audit 中至少一条
+  - 必须引用仓库内现有脚本或真实 API 命令
+allowed_write_paths:
+  - docs/**
+  - scripts/**
+  - output/**
+acceptance_refs:
+  - A54
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只写概念性验证步骤
+  - 用 sample 静态数据替代运行态验证链
+done_definition:
+  - post_release_verification_documented
+  - key_mainline_checks_defined
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

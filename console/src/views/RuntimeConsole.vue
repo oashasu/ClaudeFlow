@@ -1,304 +1,49 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import {
-  runtimeApi,
-  runtimeDispatchSample,
-  runtimeExplainSample,
-  runtimeJson,
-  runtimePlanSample,
-  runtimeSessionEventsSample,
-  runtimeSessionsSample,
-  runtimeStatusSample,
-  type RuntimeDispatch,
-  type RuntimeExplain,
-  type RuntimeParsedEvent,
-  type RuntimePlan,
-  type RuntimeSession,
-  type RuntimeSessionEvents,
-  type RuntimeStatus,
-} from '../services/runtimeApi'
-import RuntimeExplainCard from '../components/runtime/RuntimeExplainCard.vue'
+import { computed } from 'vue'
+import { useRuntimeLiveData } from '../composables/useRuntimeLiveData'
+import { useRuntimeActions } from '../composables/useRuntimeActions'
+import type { RuntimeSession } from '../types/runtime'
 import RuntimeMetricGrid from '../components/runtime/RuntimeMetricGrid.vue'
 import RuntimeReasonList from '../components/runtime/RuntimeReasonList.vue'
-import RuntimeSessionInspector from '../components/runtime/RuntimeSessionInspector.vue'
+import RuntimeExplainCard from '../components/runtime/RuntimeExplainCard.vue'
 import RuntimeSessionTable from '../components/runtime/RuntimeSessionTable.vue'
+import RuntimeSessionInspector from '../components/runtime/RuntimeSessionInspector.vue'
+import RuntimeActionConfirm from '../components/runtime/RuntimeActionConfirm.vue'
+import RuntimeActionAudit from '../components/runtime/RuntimeActionAudit.vue'
+import { RefreshCw, AlertTriangle } from 'lucide-vue-next'
 
-const planInput = ref(JSON.stringify(runtimePlanSample, null, 2))
-const explainInput = ref(JSON.stringify(runtimeExplainSample, null, 2))
-const dispatchInput = ref(JSON.stringify(runtimeDispatchSample, null, 2))
-const runtimeStatus = ref<RuntimeStatus>(runtimeStatusSample)
-const runtimeSessions = ref<RuntimeSession[]>(runtimeSessionsSample)
-const selectedSession = ref<RuntimeSession | null>(runtimeSessionsSample[0] ?? null)
-const sessionEvents = ref<RuntimeParsedEvent[]>(runtimeSessionEventsSample.parsed_events)
-const sessionEventsSource = ref<'sample' | 'live'>('sample')
-const sessionEventsLoading = ref(false)
-const sessionEventsError = ref<string | null>(null)
-const sessionEventsLoadedAt = ref<string | null>(null)
-const actionLoading = ref(false)
-const actionError = ref<string | null>(null)
-const actionSuccess = ref<string | null>(null)
-const intervenePrompt = ref('请先总结当前阻塞点，再继续下一步实现。')
-const completeSummary = ref('已完成当前 task 的实现与必要验证。')
-const failReason = ref('当前 task 遇到阻塞，需人工介入或上游协议回流。')
-
-const parseError = ref<string | null>(null)
-const liveError = ref<string | null>(null)
-const explainTaskId = ref(runtimeExplainSample.task_id)
-const autoRefreshEnabled = ref(false)
-const autoRefreshSeconds = ref(5)
-const planSource = ref<'sample' | 'live'>('sample')
-const explainSource = ref<'sample' | 'live'>('sample')
-const dispatchSource = ref<'sample' | 'live'>('sample')
-const lastRefreshedAt = ref<string | null>(null)
-let refreshTimer: number | null = null
-
-const plan = computed<RuntimePlan | null>(() => {
-  try {
-    parseError.value = null
-    return runtimeJson.parsePlan(planInput.value)
-  } catch (error) {
-    parseError.value = `Plan JSON 解析失败: ${(error as Error).message}`
-    return null
-  }
-})
-
-const explain = computed<RuntimeExplain | null>(() => {
-  try {
-    if (parseError.value?.startsWith('Plan')) {
-      parseError.value = null
-    }
-    return runtimeJson.parseExplain(explainInput.value)
-  } catch (error) {
-    parseError.value = `Explain JSON 解析失败: ${(error as Error).message}`
-    return null
-  }
-})
-
-const dispatch = computed<RuntimeDispatch | null>(() => {
-  try {
-    if (parseError.value?.startsWith('Explain')) {
-      parseError.value = null
-    }
-    return runtimeJson.parseDispatch(dispatchInput.value)
-  } catch (error) {
-    parseError.value = `Dispatch JSON 解析失败: ${(error as Error).message}`
-    return null
-  }
-})
+const liveData = useRuntimeLiveData()
+const actions = useRuntimeActions(() => liveData.refreshAll())
 
 function loadSamples() {
-  planInput.value = JSON.stringify(runtimePlanSample, null, 2)
-  explainInput.value = JSON.stringify(runtimeExplainSample, null, 2)
-  dispatchInput.value = JSON.stringify(runtimeDispatchSample, null, 2)
-  planSource.value = 'sample'
-  explainSource.value = 'sample'
-  dispatchSource.value = 'sample'
-  runtimeStatus.value = runtimeStatusSample
-  runtimeSessions.value = runtimeSessionsSample
-  selectedSession.value = runtimeSessionsSample[0] ?? null
-  sessionEvents.value = runtimeSessionEventsSample.parsed_events
-  sessionEventsSource.value = 'sample'
-  sessionEventsLoadedAt.value = null
-  sessionEventsError.value = null
-  lastRefreshedAt.value = null
-  parseError.value = null
-  liveError.value = null
-  actionError.value = null
-  actionSuccess.value = null
+  liveData.loadSampleData()
+  actions.clearMessages()
 }
 
-async function loadLivePlan() {
-  try {
-    liveError.value = null
-    const payload = await runtimeApi.plan()
-    planInput.value = JSON.stringify(payload, null, 2)
-    planSource.value = 'live'
-    lastRefreshedAt.value = new Date().toLocaleTimeString()
-  } catch (error) {
-    liveError.value = `加载 Runtime Plan 失败: ${(error as Error).message}`
-  }
+function explainTask(taskId: string) {
+  liveData.setExplainTaskId(taskId)
+  liveData.loadLiveExplain(taskId)
 }
 
-async function loadLiveStatus() {
-  try {
-    liveError.value = null
-    runtimeStatus.value = await runtimeApi.status()
-    const payload = await runtimeApi.sessions()
-    runtimeSessions.value = payload.sessions
-    if (selectedSession.value) {
-      selectedSession.value =
-        payload.sessions.find((session) => session.session_id === selectedSession.value?.session_id) ??
-        payload.sessions.find((session) => session.task_id === selectedSession.value?.task_id) ??
-        selectedSession.value
-    }
-    lastRefreshedAt.value = new Date().toLocaleTimeString()
-  } catch (error) {
-    liveError.value = `加载 Runtime 总览失败: ${(error as Error).message}`
-  }
+function viewSessionEvents(session: RuntimeSession) {
+  liveData.loadLiveSessionEvents(session)
 }
 
-async function loadLiveExplain() {
-  try {
-    liveError.value = null
-    const payload = await runtimeApi.explain(explainTaskId.value)
-    explainInput.value = JSON.stringify(payload, null, 2)
-    explainSource.value = 'live'
-    lastRefreshedAt.value = new Date().toLocaleTimeString()
-  } catch (error) {
-    liveError.value = `加载 Runtime Explain 失败: ${(error as Error).message}`
-  }
+function handleInterveneRequest(session: RuntimeSession) {
+  actions.requestInterveneConfirm(session)
 }
 
-async function loadLiveSessionEvents(session: RuntimeSession) {
-  try {
-    sessionEventsLoading.value = true
-    sessionEventsError.value = null
-    selectedSession.value = session
-    const payload: RuntimeSessionEvents = await runtimeApi.sessionEvents(session.session_id)
-    sessionEvents.value = payload.parsed_events
-    sessionEventsSource.value = 'live'
-    sessionEventsLoadedAt.value = new Date().toLocaleTimeString()
-  } catch (error) {
-    sessionEventsError.value = `加载 Session 事件失败: ${(error as Error).message}`
-  } finally {
-    sessionEventsLoading.value = false
-  }
+function handleCompleteRequest(session: RuntimeSession) {
+  actions.requestCompleteConfirm(session)
 }
 
-async function runLiveDispatch() {
-  try {
-    liveError.value = null
-    actionError.value = null
-    actionSuccess.value = null
-    const payload = await runtimeApi.dispatch({ max_concurrent: 2 })
-    dispatchInput.value = JSON.stringify(payload, null, 2)
-    dispatchSource.value = 'live'
-    lastRefreshedAt.value = new Date().toLocaleTimeString()
-  } catch (error) {
-    liveError.value = `加载 Runtime Dispatch 失败: ${(error as Error).message}`
-  }
+function handleFailRequest(session: RuntimeSession) {
+  actions.requestFailConfirm(session)
 }
 
-async function explainTask(taskId: string) {
-  explainTaskId.value = taskId
-  await loadLiveExplain()
-}
-
-async function viewSessionEvents(session: RuntimeSession) {
-  await loadLiveSessionEvents(session)
-}
-
-function selectSession(session: RuntimeSession) {
-  selectedSession.value = session
-  actionError.value = null
-  actionSuccess.value = null
-}
-
-async function handleInterveneSession(session: RuntimeSession) {
-  if (!intervenePrompt.value.trim()) {
-    actionError.value = '干预内容不能为空。'
-    return
-  }
-  try {
-    actionLoading.value = true
-    actionError.value = null
-    actionSuccess.value = null
-    selectSession(session)
-    await runtimeApi.interveneSession(session.session_id, intervenePrompt.value.trim())
-    actionSuccess.value = `已向 ${session.task_id} 发送干预指令。`
-    await loadLiveSessionEvents(session)
-  } catch (error) {
-    actionError.value = `发送干预失败: ${(error as Error).message}`
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-async function handleCompleteTask(session: RuntimeSession) {
-  try {
-    actionLoading.value = true
-    actionError.value = null
-    actionSuccess.value = null
-    selectSession(session)
-    await runtimeApi.completeTask(session.task_id, {
-      summary: completeSummary.value.trim(),
-    })
-    actionSuccess.value = `已将 ${session.task_id} 标记为 completed。`
-    await retryLiveReads()
-  } catch (error) {
-    actionError.value = `标记完成失败: ${(error as Error).message}`
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-async function handleFailTask(session: RuntimeSession) {
-  if (!failReason.value.trim()) {
-    actionError.value = '失败原因不能为空。'
-    return
-  }
-  try {
-    actionLoading.value = true
-    actionError.value = null
-    actionSuccess.value = null
-    selectSession(session)
-    await runtimeApi.failTask(session.task_id, failReason.value.trim())
-    actionSuccess.value = `已将 ${session.task_id} 标记为 failed。`
-    await retryLiveReads()
-  } catch (error) {
-    actionError.value = `标记失败失败: ${(error as Error).message}`
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-async function retryLiveReads() {
-  liveError.value = null
-  await loadLiveStatus()
-  await loadLivePlan()
-  if (explainTaskId.value.trim()) {
-    await loadLiveExplain()
-  }
-  if (selectedSession.value?.session_id) {
-    await loadLiveSessionEvents(selectedSession.value)
-  }
-}
-
-function clearRefreshTimer() {
-  if (refreshTimer !== null) {
-    window.clearInterval(refreshTimer)
-    refreshTimer = null
-  }
-}
-
-function startRefreshTimer() {
-  clearRefreshTimer()
-  if (!autoRefreshEnabled.value) {
-    return
-  }
-  refreshTimer = window.setInterval(async () => {
-    await loadLiveStatus()
-    await loadLivePlan()
-    if (explainTaskId.value.trim()) {
-      await loadLiveExplain()
-    }
-    if (selectedSession.value?.session_id && selectedSession.value.status === 'running') {
-      await loadLiveSessionEvents(selectedSession.value)
-    }
-  }, autoRefreshSeconds.value * 1000)
-}
-
-watch([autoRefreshEnabled, autoRefreshSeconds], () => {
-  startRefreshTimer()
-})
-
-onMounted(() => {
-  startRefreshTimer()
-})
-
-onUnmounted(() => {
-  clearRefreshTimer()
-})
+const plan = computed(() => liveData.plan.value)
+const explain = computed(() => liveData.explain.value)
+const dispatch = computed(() => liveData.dispatch.value)
 </script>
 
 <template>
@@ -314,18 +59,18 @@ onUnmounted(() => {
       </div>
       <div class="hero-actions">
         <button class="sample-btn" @click="loadSamples">加载示例数据</button>
-        <button class="sample-btn secondary" @click="loadLivePlan">读取 Live Plan</button>
+        <button class="sample-btn secondary" @click="liveData.loadLivePlan">读取 Live Plan</button>
       </div>
     </section>
 
     <section class="polling-bar">
       <label class="toggle">
-        <input v-model="autoRefreshEnabled" type="checkbox" />
+        <input v-model="liveData.autoRefreshEnabled.value" type="checkbox" />
         <span>自动刷新</span>
       </label>
       <label class="interval">
         轮询间隔
-        <select v-model="autoRefreshSeconds">
+        <select v-model="liveData.autoRefreshSeconds.value">
           <option :value="3">3s</option>
           <option :value="5">5s</option>
           <option :value="10">10s</option>
@@ -337,13 +82,26 @@ onUnmounted(() => {
       </span>
       <span class="hint status">
         最近刷新:
-        <strong>{{ lastRefreshedAt || '未刷新' }}</strong>
+        <strong>{{ liveData.state.value.lastRefreshedAt || '未刷新' }}</strong>
       </span>
-      <button v-if="liveError" class="retry-btn" @click="retryLiveReads">重试 Live 读取</button>
+      <button
+        v-if="liveData.state.value.liveError"
+        class="retry-btn"
+        @click="liveData.refreshAll"
+      >
+        <RefreshCw :size="14" />
+        重试 Live 读取
+      </button>
     </section>
 
-    <div v-if="parseError" class="error-banner">{{ parseError }}</div>
-    <div v-if="liveError" class="error-banner live">{{ liveError }}</div>
+    <div v-if="liveData.state.value.parseError" class="error-banner parse">
+      <AlertTriangle :size="16" />
+      {{ liveData.state.value.parseError }}
+    </div>
+    <div v-if="liveData.state.value.liveError" class="error-banner live">
+      <AlertTriangle :size="16" />
+      {{ liveData.state.value.liveError }}
+    </div>
 
     <section class="overview">
       <div class="overview-head">
@@ -351,53 +109,59 @@ onUnmounted(() => {
           <p class="eyebrow">Runtime Overview</p>
           <h2>运行时总览</h2>
         </div>
-        <button class="sample-btn secondary" @click="loadLiveStatus">读取 Live 总览</button>
+        <button class="sample-btn secondary" @click="liveData.loadLiveStatus">读取 Live 总览</button>
       </div>
       <RuntimeMetricGrid
+        v-if="liveData.state.value.status"
         :items="[
-          { label: 'Active', value: runtimeStatus.active_agents },
-          { label: 'Queued', value: runtimeStatus.queued_tasks },
-          { label: 'Completed', value: runtimeStatus.completed_tasks }
+          { label: 'Active', value: liveData.state.value.status.active_agents },
+          { label: 'Queued', value: liveData.state.value.status.queued_tasks },
+          { label: 'Completed', value: liveData.state.value.status.completed_tasks }
         ]"
       />
       <RuntimeMetricGrid
+        v-if="liveData.state.value.status"
         :items="[
-          { label: 'Failed', value: runtimeStatus.failed_tasks },
-          { label: 'Intervention', value: runtimeStatus.intervention_required ? 'Yes' : 'No' },
-          { label: 'Running IDs', value: runtimeStatus.running_tasks.length }
+          { label: 'Failed', value: liveData.state.value.status.failed_tasks },
+          { label: 'Intervention', value: liveData.state.value.status.intervention_required ? 'Yes' : 'No' },
+          { label: 'Running IDs', value: liveData.state.value.status.running_tasks.length }
         ]"
       />
-      <div class="repo-line">
+      <div class="repo-line" v-if="liveData.state.value.status">
         <strong>Repo:</strong>
-        <code>{{ runtimeStatus.repo_path }}</code>
+        <code>{{ liveData.state.value.status.repo_path }}</code>
       </div>
       <RuntimeSessionTable
-        :sessions="runtimeSessions"
+        :sessions="liveData.state.value.sessions"
         @explain-task="explainTask"
         @view-events="viewSessionEvents"
-        @intervene-session="handleInterveneSession"
-        @complete-task="handleCompleteTask"
-        @fail-task="handleFailTask"
+        @intervene-session="handleInterveneRequest"
+        @complete-task="handleCompleteRequest"
+        @fail-task="handleFailRequest"
       />
       <RuntimeSessionInspector
-        :session="selectedSession"
-        :events="sessionEvents"
-        :loading="sessionEventsLoading"
-        :error="sessionEventsError"
-        :source="sessionEventsSource"
-        :last-loaded-at="sessionEventsLoadedAt"
-        :action-loading="actionLoading"
-        :action-error="actionError"
-        :action-success="actionSuccess"
-        :intervene-prompt="intervenePrompt"
-        :complete-summary="completeSummary"
-        :fail-reason="failReason"
-        @update:intervene-prompt="intervenePrompt = $event"
-        @update:complete-summary="completeSummary = $event"
-        @update:fail-reason="failReason = $event"
-        @intervene="selectedSession && handleInterveneSession(selectedSession)"
-        @complete="selectedSession && handleCompleteTask(selectedSession)"
-        @fail="selectedSession && handleFailTask(selectedSession)"
+        :session="liveData.state.value.selectedSession"
+        :events="liveData.state.value.sessionEvents"
+        :loading="liveData.state.value.sessionEventsLoading"
+        :error="liveData.state.value.sessionEventsError"
+        :source="liveData.state.value.sessionEventsSource"
+        :last-loaded-at="liveData.state.value.sessionEventsLoadedAt"
+        :action-loading="actions.state.value.loading"
+        :action-error="actions.state.value.error"
+        :action-success="actions.state.value.success"
+        :intervene-prompt="actions.confirmState.value.intervenePrompt"
+        :complete-summary="actions.confirmState.value.completeSummary"
+        :fail-reason="actions.confirmState.value.failReason"
+        @update:intervene-prompt="actions.setIntervenePrompt($event)"
+        @update:complete-summary="actions.setCompleteSummary($event)"
+        @update:fail-reason="actions.setFailReason($event)"
+        @intervene="liveData.state.value.selectedSession && handleInterveneRequest(liveData.state.value.selectedSession)"
+        @complete="liveData.state.value.selectedSession && handleCompleteRequest(liveData.state.value.selectedSession)"
+        @fail="liveData.state.value.selectedSession && handleFailRequest(liveData.state.value.selectedSession)"
+      />
+      <RuntimeActionAudit
+        :history="actions.state.value.actionHistory"
+        :last-result="actions.state.value.lastActionResult"
       />
     </section>
 
@@ -407,7 +171,7 @@ onUnmounted(() => {
           <h2>Plan</h2>
           <p>查看 runnable / blocked / running 三类任务。</p>
           <div class="panel-meta">
-            <span class="source-badge" :class="planSource">{{ planSource }}</span>
+            <span class="source-badge" :class="liveData.state.value.planSource">{{ liveData.state.value.planSource }}</span>
           </div>
         </header>
         <div v-if="plan" class="summary">
@@ -431,7 +195,7 @@ onUnmounted(() => {
           />
           <details class="json-details">
             <summary>查看原始 JSON</summary>
-            <textarea v-model="planInput" class="json-box" spellcheck="false" />
+            <textarea v-model="liveData.planInput.value" class="json-box" spellcheck="false" />
           </details>
         </div>
       </article>
@@ -441,18 +205,18 @@ onUnmounted(() => {
           <h2>Explain</h2>
           <p>单任务为什么能跑，或为什么被阻塞。</p>
           <div class="panel-meta">
-            <span class="source-badge" :class="explainSource">{{ explainSource }}</span>
+            <span class="source-badge" :class="liveData.state.value.explainSource">{{ liveData.state.value.explainSource }}</span>
           </div>
         </header>
         <div class="toolbar">
-          <input v-model="explainTaskId" class="task-input" placeholder="输入 task_id" />
-          <button class="toolbar-btn" @click="loadLiveExplain">读取 Live Explain</button>
+          <input v-model="liveData.explainTaskId.value" class="task-input" placeholder="输入 task_id" />
+          <button class="toolbar-btn" @click="liveData.loadLiveExplain()">读取 Live Explain</button>
         </div>
         <div v-if="explain" class="summary">
           <RuntimeExplainCard :explain="explain" />
           <details class="json-details">
             <summary>查看原始 JSON</summary>
-            <textarea v-model="explainInput" class="json-box" spellcheck="false" />
+            <textarea v-model="liveData.explainInput.value" class="json-box" spellcheck="false" />
           </details>
         </div>
       </article>
@@ -462,11 +226,11 @@ onUnmounted(() => {
           <h2>Dispatch</h2>
           <p>查看调度结果、槽位和 blocked/skip 明细。</p>
           <div class="panel-meta">
-            <span class="source-badge" :class="dispatchSource">{{ dispatchSource }}</span>
+            <span class="source-badge" :class="liveData.state.value.dispatchSource">{{ liveData.state.value.dispatchSource }}</span>
           </div>
         </header>
         <div class="toolbar">
-          <button class="toolbar-btn" @click="runLiveDispatch">执行 Live Dispatch</button>
+          <button class="toolbar-btn" @click="liveData.runLiveDispatch(2)">执行 Live Dispatch</button>
         </div>
         <div v-if="dispatch" class="summary">
           <RuntimeMetricGrid
@@ -489,11 +253,29 @@ onUnmounted(() => {
           />
           <details class="json-details">
             <summary>查看原始 JSON</summary>
-            <textarea v-model="dispatchInput" class="json-box" spellcheck="false" />
+            <textarea v-model="liveData.dispatchInput.value" class="json-box" spellcheck="false" />
           </details>
         </div>
       </article>
     </section>
+
+    <RuntimeActionConfirm
+      :show-intervene="actions.confirmState.value.showInterveneConfirm"
+      :show-complete="actions.confirmState.value.showCompleteConfirm"
+      :show-fail="actions.confirmState.value.showFailConfirm"
+      :session="actions.confirmState.value.pendingSession"
+      :intervene-prompt="actions.confirmState.value.intervenePrompt"
+      :complete-summary="actions.confirmState.value.completeSummary"
+      :fail-reason="actions.confirmState.value.failReason"
+      :loading="actions.state.value.loading"
+      @update:intervene-prompt="actions.setIntervenePrompt($event)"
+      @update:complete-summary="actions.setCompleteSummary($event)"
+      @update:fail-reason="actions.setFailReason($event)"
+      @confirm-intervene="actions.executeIntervene"
+      @confirm-complete="actions.executeComplete"
+      @confirm-fail="actions.executeFail"
+      @cancel="actions.cancelConfirm"
+    />
   </div>
 </template>
 
@@ -574,6 +356,9 @@ onUnmounted(() => {
 }
 
 .retry-btn {
+  display: flex;
+  gap: 6px;
+  align-items: center;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid #8eaedb;
@@ -634,9 +419,15 @@ onUnmounted(() => {
 }
 
 .error-banner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
   margin-bottom: 20px;
   padding: 14px 16px;
   border-radius: 12px;
+}
+
+.error-banner.parse {
   background: #ffe2de;
   color: #8c2d21;
   border: 1px solid #f0a295;

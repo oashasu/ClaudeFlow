@@ -21,19 +21,19 @@ from unittest.mock import Mock, patch, MagicMock, AsyncMock
 from typing import Dict, Any, List
 
 # Governance模块
-from claudeflow.governance.config import GovernanceConfig
-from claudeflow.governance.circuit_breaker import (
+from claudeflow.legacy.governance.config import GovernanceConfig
+from claudeflow.legacy.governance.circuit_breaker import (
     CircuitBreaker,
     CircuitState,
     CircuitBreakerTrigger,
     CircuitBreakerResult,
 )
-from claudeflow.governance.snapshot import (
+from claudeflow.legacy.governance.snapshot import (
     SnapshotManager,
     create_baseline_snapshot,
     create_incremental_snapshot,
 )
-from claudeflow.governance.recovery import (
+from claudeflow.legacy.governance.recovery import (
     RecoveryManager,
     RecoveryResult,
     rollback,
@@ -113,10 +113,10 @@ class TestScenario1NormalFlow:
         True,  # fastapi模块可能未安装，跳过此测试
         reason="FastAPI模块未安装或需要额外依赖"
     )
-    def test_hermes_service_endpoints_mock(self):
-        """Hermes服务端点可用"""
+    def test_runtime_api_endpoints_mock(self):
+        """Runtime API 端点可用（已由 runtime/api.py 接管）"""
         try:
-            from claudeflow.hermes_service import app, StartRequest
+            from claudeflow.runtime.api import app
 
             # 使用FastAPI TestClient风格验证端点存在
             assert hasattr(app, "routes")

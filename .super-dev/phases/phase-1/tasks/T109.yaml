@@ -1,0 +1,36 @@
+id: T109
+phase_id: phase-1
+title: 将 RuntimeTaskSpec 提升为主链任务模型并降级 WorkerTaskSpec 为兼容桥接
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ../task-plan.md
+constraints:
+  - RuntimeTaskSpec 必须进入默认 dispatch/explain/running 视图主链
+  - WorkerTaskSpec 只允许作为短期兼容输入适配层
+allowed_write_paths:
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A05
+  - A06
+  - A08
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 长期保留 WorkerTaskSpec 和 RuntimeTaskSpec 双主模型
+  - 仅在单元测试中接入 RuntimeTaskSpec 而不改默认主链
+done_definition:
+  - runtime_taskspec_main_model
+  - worker_taskspec_compat_only
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

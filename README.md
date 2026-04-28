@@ -151,10 +151,11 @@ claudeflow runtime fail \
 
 从 2026-04-24 起，凡是涉及 runtime、Hermes runtime API、Runtime Console 的功能更新，都必须同步更新实现文档：
 
-- [docs/09_Runtime实现与变更记录.md](docs/09_Runtime实现与变更记录.md)
+- [docs/runtime/changelog.md](docs/runtime/changelog.md)
+- [docs/README.md](docs/README.md) — 文档导航入口
 
 如果改动了输出结构或对象协议，还需要同步更新 `examples/*.schema.json`。
 
 ## 文档索引
 
-详见 [docs/INDEX.md](docs/INDEX.md)
+详见 [docs/INDEX.md](docs/INDEX.md) 或 [docs/README.md](docs/README.md)

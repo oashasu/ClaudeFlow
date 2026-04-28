@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaudeFlow Runtime Dispatch Result",
+  "type": "object",
+  "required": [
+    "runnable_count",
+    "blocked_count",
+    "active_agents",
+    "available_slots",
+    "started",
+    "skipped",
+    "blocked"
+  ],
+  "properties": {
+    "runnable_count": { "type": "integer", "minimum": 0 },
+    "blocked_count": { "type": "integer", "minimum": 0 },
+    "active_agents": { "type": "integer", "minimum": 0 },
+    "available_slots": { "type": "integer", "minimum": 0 },
+    "max_concurrent": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "null" }
+      ]
+    },
+    "started": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/startedTask" }
+    },
+    "skipped": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reasonItem" }
+    },
+    "blocked": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reasonItem" }
+    }
+  },
+  "$defs": {
+    "startedTask": {
+      "type": "object",
+      "required": ["task_id", "session_id", "priority"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "session_id": { "type": "string", "minLength": 1 },
+        "priority": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "reasonItem": {
+      "type": "object",
+      "required": ["task_id", "reason_code", "reason"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "priority": { "type": "string" },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

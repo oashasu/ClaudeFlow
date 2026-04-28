@@ -15,7 +15,7 @@ from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 
-from claudeflow.governance.recovery import (
+from claudeflow.legacy.governance.recovery import (
     RecoveryManager,
     RecoveryResult,
     RecoveryError,
@@ -39,9 +39,9 @@ def temp_dir():
 @pytest.fixture
 def recovery_manager(temp_dir):
     """恢复管理器实例"""
-    from claudeflow.governance.snapshot import SnapshotManager
-    from claudeflow.governance.circuit_breaker import CircuitBreaker, CircuitState
-    from claudeflow.governance.acceptance import AcceptanceManager
+    from claudeflow.legacy.governance.snapshot import SnapshotManager
+    from claudeflow.legacy.governance.circuit_breaker import CircuitBreaker, CircuitState
+    from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
     snapshot_mgr = SnapshotManager(base_dir=temp_dir)
 
@@ -336,7 +336,7 @@ class TestHandleAcceptanceFailure:
         assert "熔断" in result.message
 
         # 验证熔断器被触发
-        from claudeflow.governance.circuit_breaker import CircuitBreakerTrigger
+        from claudeflow.legacy.governance.circuit_breaker import CircuitBreakerTrigger
         recovery_manager.circuit_breaker.trigger_break.assert_called()
 
     def test_retry_count_tracking(self, recovery_manager):
@@ -378,7 +378,7 @@ class TestRecoveryManager:
 
     def test_init(self, temp_dir):
         """测试初始化"""
-        from claudeflow.governance.snapshot import SnapshotManager
+        from claudeflow.legacy.governance.snapshot import SnapshotManager
 
         snapshot_mgr = SnapshotManager(base_dir=temp_dir)
         manager = RecoveryManager(snapshot_manager=snapshot_mgr, base_dir=temp_dir)
@@ -446,7 +446,7 @@ class TestCircuitBreakTriggerRecovery:
         recovery_manager.snapshot_manager.save_snapshot(task_id, baseline_snapshot)
 
         # 模拟熔断触发
-        from claudeflow.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
+        from claudeflow.legacy.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
 
         break_result = CircuitBreakerResult(
             trigger=CircuitBreakerTrigger.MAX_CALLS,
@@ -464,7 +464,7 @@ class TestCircuitBreakTriggerRecovery:
         """测试熔断时无快照"""
         task_id = "test_task_015"
 
-        from claudeflow.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
+        from claudeflow.legacy.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
 
         break_result = CircuitBreakerResult(
             trigger=CircuitBreakerTrigger.SIMILARITY,
@@ -514,7 +514,7 @@ class TestDataConsistency:
         results.append(rollback(task_id, recovery_manager))
 
         # 2. 熔断恢复
-        from claudeflow.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
+        from claudeflow.legacy.governance.circuit_breaker import CircuitBreakerTrigger, CircuitBreakerResult, CircuitState
         break_result = CircuitBreakerResult(
             trigger=CircuitBreakerTrigger.MAX_TOKENS,
             state=CircuitState.OPEN,

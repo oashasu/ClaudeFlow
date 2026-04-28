@@ -1,0 +1,40 @@
+id: T106
+phase_id: phase-1
+title: 增强 runtime CLI/API 以支持治理入口和宿主信息输出
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+constraints:
+  - 至少打通一条治理入口闭环
+  - CLI/API 输出必须带 executor_type，派发后可带 driver_name
+allowed_write_paths:
+  - src/claudeflow/cli.py
+  - src/claudeflow/runtime/api.py
+  - src/claudeflow/runtime/**
+  - tests/**
+acceptance_refs:
+  - A08
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+implementation_targets:
+  - src/claudeflow/cli.py
+  - src/claudeflow/runtime/api.py
+  - src/claudeflow/runtime/manager.py
+forbidden_actions:
+  - 新增只有文档存在但代码不可调用的伪入口
+  - 通过手工参数回避治理任务包接入
+  - 仅增加平行接口而不接入现有 runtime 主链
+done_definition:
+  - runtime_cli_governance_entry_added
+  - runtime_api_host_fields_visible
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

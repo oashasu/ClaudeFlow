@@ -1,9 +1,9 @@
 {
   "workflow_version": "v1",
   "project": "claudeflow",
-  "current_phase": "phase-1",
-  "current_stage": "delivery",
-  "current_gate": "delivery_complete",
+  "current_phase": "phase-5",
+  "current_stage": "accepted",
+  "current_gate": "",
   "gate_status": "passed",
   "governor": {
     "host": "codex",
@@ -22,7 +22,17 @@
       "quality_gate_timestamp": "2026-04-26T21:00:00Z",
       "delivery_complete": true,
       "delivery_timestamp": "2026-04-26T21:15:00Z",
-      "completed_tasks": ["T101", "T102", "T103", "T104", "T105", "T106", "T107", "T108", "T109"],
+      "completed_tasks": [
+        "T101",
+        "T102",
+        "T103",
+        "T104",
+        "T105",
+        "T106",
+        "T107",
+        "T108",
+        "T109"
+      ],
       "pending_tasks": [],
       "blocker_fixes": {
         "timestamp": "2026-04-26T19:35:00Z",
@@ -49,14 +59,135 @@
           }
         ]
       }
+    },
+    "phase-2": {
+      "status": "accepted",
+      "docs_ready": true,
+      "docs_confirm_comment": "Phase 2 文档边界确认，可进入实现分发",
+      "docs_confirm_timestamp": "2026-04-26T22:15:00Z",
+      "tasks_ready": true,
+      "quality_gate_passed": true,
+      "quality_gate_timestamp": "2026-04-27T00:00:00Z",
+      "delivery_complete": true,
+      "delivery_timestamp": "2026-04-27T00:05:00Z",
+      "completed_tasks": [
+        "T201",
+        "T202",
+        "T203",
+        "T204",
+        "T205",
+        "T206"
+      ],
+      "pending_tasks": [],
+      "acceptance_summary": {
+        "A21": "Review Artifact 落盘 ✅ (29 tests)",
+        "A22": "结果进入待审查状态 ✅ (22 tests)",
+        "A23": "返工任务自动生成 ✅ (23 tests)",
+        "A24": "Accepted 路径 ✅ (25 tests)",
+        "A25": "Gate Report 落盘 ✅ (20 tests)",
+        "A26": "Phase Reopen/Advance ✅ (25 tests)",
+        "A27": "回归测试 ✅ (23 tests)"
+      },
+      "test_summary": "722 passed in 23.42s"
+    },
+    "phase-3": {
+      "status": "accepted",
+      "docs_ready": true,
+      "docs_confirm_comment": "Phase 3 文档确认，可进入 spec 与任务分发",
+      "docs_confirm_timestamp": "2026-04-27T12:30:00Z",
+      "tasks_ready": true,
+      "quality_gate_passed": true,
+      "quality_gate_timestamp": "2026-04-27T14:50:00Z",
+      "delivery_complete": true,
+      "delivery_timestamp": "2026-04-27T15:05:00Z",
+      "completed_tasks": [
+        "T301",
+        "T302",
+        "T303",
+        "T304",
+        "T305",
+        "T306"
+      ],
+      "pending_tasks": [],
+      "dispatch_comment": "Phase 3 任务已分配给 Claude 宿主，按前端优先顺序执行",
+      "dispatch_timestamp": "2026-04-27T12:45:00Z",
+      "scope_summary": {
+        "P31": "Runtime Console 结构重构与页面收口",
+        "P32": "高影响动作确认与审计链",
+        "P33": "runtime schema/sample/parse 校验",
+        "P34": "Java/HTTP 外部消费面契约收口"
+      }
+    },
+    "phase-4": {
+      "status": "accepted",
+      "docs_ready": true,
+      "docs_confirm_comment": "Phase 4 文档确认，可进入 spec 与任务分发",
+      "docs_confirm_timestamp": "2026-04-27T15:20:00Z",
+      "tasks_ready": true,
+      "quality_gate_passed": true,
+      "quality_gate_timestamp": "2026-04-27T21:14:40Z",
+      "delivery_complete": true,
+      "delivery_timestamp": "2026-04-27T21:14:40Z",
+      "completed_tasks": [
+        "T401",
+        "T402",
+        "T403",
+        "T404",
+        "T405",
+        "T406"
+      ],
+      "pending_tasks": [],
+      "scope_summary": {
+        "P41": "Runtime Console 测试 warning 清理与前端测试隔离",
+        "P42": "action audit / live data 测试基座与稳定性收口",
+        "P43": "runtime smoke 最小主链验证",
+        "P44": "testing / observability 文档同步"
+      }
+    },
+    "phase-5": {
+      "status": "accepted",
+      "docs_ready": true,
+      "docs_confirm_comment": "Phase 5 文档待确认，确认后进入 spec 与任务分发",
+      "docs_confirm_timestamp": "2026-04-28T00:00:00Z",
+      "tasks_ready": true,
+      "quality_gate_passed": true,
+      "quality_gate_timestamp": "2026-04-28T10:45:00Z",
+      "delivery_complete": true,
+      "delivery_timestamp": "2026-04-28T10:45:00Z",
+      "dispatch_comment": "Phase 5 任务已分配给 Claude 宿主，先收口 release gate，再推进验证、回滚与交付决策",
+      "dispatch_timestamp": "2026-04-27T21:29:26Z",
+      "completed_tasks": [
+        "T501",
+        "T502",
+        "T503",
+        "T504",
+        "T505",
+        "T506"
+      ],
+      "pending_tasks": [],
+      "acceptance_summary": {
+        "A51": "release checklist 覆盖 ✅",
+        "A52": "Gate 1-6 统一入口 ✅",
+        "A53": "release-readiness 分层 ✅",
+        "A54": "发布后验证命令 ✅",
+        "A55": "回滚契约与交付模板 ✅",
+        "A56": "回归验证 + acceptance summary ✅"
+      },
+      "test_summary": "637 unit tests passed + 7 smoke endpoints passed",
+      "scope_summary": {
+        "P51": "release checklist 与 quality gate 固化",
+        "P52": "Python / Console / Java / smoke 统一交付口径",
+        "P53": "release readiness / warning budget / blocker 分层",
+        "P54": "发布后验证与回滚说明"
+      }
     }
   },
   "tasks": {
     "T101": {
       "phase_id": "phase-1",
       "executor_type": "claude",
-      "status": "completed",
-      "review_status": "passed",
+      "status": "rework_required",
+      "review_status": "rework_required",
       "implementation": "src/claudeflow/runtime/driver_base.py",
       "tests": "tests/unit/test_phase1_multi_host.py::TestA01DriverAbstract"
     },
@@ -129,13 +260,437 @@
       "tests": "tests/unit/test_phase1_multi_host.py::TestT109RuntimeTaskSpecMainModel",
       "summary": "RuntimeTaskSpec 主模型：get_runnable_specs/get_dispatch_plan_specs 主链入口",
       "blocker_fix": "get_dispatch_plan 切到 RuntimeTaskSpec 主模型"
+    },
+    "T201": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/governance/review_artifact.py",
+      "tests": "tests/unit/test_review_artifact.py (29 tests)",
+      "summary": "Review Artifact 模型与写入器：标准化审查产物落盘"
+    },
+    "T202": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/governance/review_queue.py",
+      "tests": "tests/unit/test_review_queue.py (22 tests)",
+      "summary": "Review Queue：结果进入待审查状态"
+    },
+    "T203": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/governance/rework_generator.py",
+      "tests": "tests/unit/test_rework_generator.py (23 tests)",
+      "summary": "Rework Task Generator：返工任务自动生成"
+    },
+    "T204": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/governance/gate_report.py",
+      "tests": "tests/unit/test_gate_report.py (20 tests)",
+      "summary": "Gate Report Writer：phase 级质量门禁报告"
+    },
+    "T205": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "src/claudeflow/governance/phase_gate_service.py",
+      "tests": "tests/unit/test_phase_gate_service.py (25 tests)",
+      "summary": "Phase Gate Service：phase reopen/advance 状态服务",
+      "blocker_fixes": [
+        {
+          "issue": "VALID_TASK_REVIEW_STATUSES 缺少 accepted/rework_required",
+          "fix": "扩展枚举值支持新状态",
+          "test": "test_update_task_status_accepted"
+        },
+        {
+          "issue": "GateReport boolean parser 不兼容 Markdown 格式",
+          "fix": "去除 backtick 并转小写比较",
+          "test": "test_can_advance_phase_all_accepted"
+        },
+        {
+          "issue": "ReworkTaskGenerator 路径错误",
+          "fix": "使用 gate_service.governance_root 替代 relative path",
+          "test": "test_process_rework_review"
+        }
+      ]
+    },
+    "T206": {
+      "phase_id": "phase-2",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "passed",
+      "implementation": "tests/unit/test_phase1_regression.py",
+      "tests": "tests/unit/test_phase1_regression.py (23 tests)",
+      "summary": "回归与阶段验收测试：Phase 1 能力不被回退"
+    },
+    "T301": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 1,
+      "implementation": "console/src/types/runtime.ts, console/src/validators/runtime.ts, console/src/composables/useRuntimeLiveData.ts, console/src/composables/useRuntimeActions.ts, console/src/components/runtime/RuntimeActionConfirm.vue, console/src/components/runtime/RuntimeActionAudit.vue, console/src/views/RuntimeConsole.vue",
+      "tests": "console vitest: 41 passed",
+      "summary": "Runtime Console 结构拆分完成（A31）；A32/A33 待 T302",
+      "done_definition": {
+        "runtime_console_structure_split": true,
+        "composables_mainline_connected": true,
+        "review_ready": true
+      },
+      "acceptance_coverage": {
+        "A31": "结构收口 ✅",
+        "A32": "确认对话框组件已实现，完整链路待 T302",
+        "A33": "审计展示组件已实现，可查询记录待 T302"
+      },
+      "review_artifact": ".super-dev/phases/phase-3/reviews/T301-review.md",
+      "rework_round": 1,
+      "rework_fixed": [
+        "测试回归修复",
+        "A32/A33 宣称剥离"
+      ]
+    },
+    "T302": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 2,
+      "implementation": "src/claudeflow/runtime/action_audit.py, src/claudeflow/runtime/api.py, console/src/types/runtime.ts, console/src/services/runtimeApi.ts, console/src/composables/useRuntimeActions.ts",
+      "tests": "tests/unit/test_action_audit.py (10 tests) + test_runtime_api.py (40 passed), console vitest (41 passed)",
+      "summary": "高影响动作确认链(A32) + 审计记录可查询(A33) 完成实现",
+      "acceptance_coverage": {
+        "A32": "intervene/complete/fail 端点审计写入 ✅",
+        "A33": "审计记录查询 API + 前端从后端加载 ✅"
+      }
+    },
+    "T303": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 3,
+      "implementation": "examples/runtime-status.schema.json, examples/runtime-sessions.schema.json, examples/runtime-events.schema.json, console/src/validators/runtime.ts, console/src/composables/useRuntimeLiveData.ts, console/tests/runtimeValidator.spec.ts, console/tests/runtimeLiveDataValidation.spec.ts, tests/unit/test_runtime_schema.py",
+      "tests": "console vitest: 68 passed (含 21 validator tests + 6 live validation tests), test_runtime_schema.py: 20 passed",
+      "summary": "Runtime 协议校验闭环(A34)：schema/sample 固化 + validator 增强 + parse 错误显示 + live payload 接入主链",
+      "acceptance_coverage": {
+        "A34": "status/sessions/events schema + validator 增强 + parseError 显示 + live payload 必经 parse ✅"
+      },
+      "rework_round": 1,
+      "rework_fixed": [
+        "parseStatus/parseSessions/parseSessionEvents 接入 loadLiveStatus/loadLiveSessionEvents",
+        "校验失败时清除 state 字段避免残留初始值"
+      ],
+      "review_artifact": ".super-dev/phases/phase-3/reviews/T303-review.md"
+    },
+    "T304": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 4,
+      "implementation": "src/main/java/com/claudeflow/client/RuntimeClient.java, src/main/java/com/claudeflow/controller/RuntimeController.java, src/main/java/com/claudeflow/config/AppConfig.java, src/test/java/com/claudeflow/client/RuntimeClientTest.java, src/test/java/com/claudeflow/controller/RuntimeControllerTest.java, docs/runtime/java-http-boundary.md",
+      "tests": "mvn test: 15 passed (RuntimeClientTest: 8, RuntimeControllerTest: 7)",
+      "summary": "Java HTTP 控制层对 runtime 的消费契约(A35)：RuntimeClient/RuntimeController 边界 + DTO 与 Python schema 对齐 + Java 8 兼容",
+      "acceptance_coverage": {
+        "A35": "TaskController vs RuntimeController 边界 ✅ RuntimeClient vs HermesClient 区分 ✅ DTO 字段契约对齐 ✅"
+      }
+    },
+    "T305": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 5,
+      "implementation": "docs/runtime/changelog.md (Phase 3 section), docs/INDEX.md (V3.1 entry + Console capabilities + Java HTTP section)",
+      "tests": "docs sync verification",
+      "summary": "文档、sample 与运行说明同步(A36)：changelog + INDEX + examples 对齐",
+      "acceptance_coverage": {
+        "A36": "docs/runtime/changelog.md Phase 3 section ✅ docs/INDEX.md V3.1 entry ✅ examples/* 与实现同步 ✅"
+      }
+    },
+    "T306": {
+      "phase_id": "phase-3",
+      "executor_type": "claude",
+      "status": "completed",
+      "review_status": "accepted",
+      "assignee_host": "claude",
+      "dispatch_order": 6,
+      "implementation": "tests/unit/test_phase1_regression.py + all tests run",
+      "tests": "Python: 327 passed (Phase 1/2: 199 + Phase 3: 128), Console: 68 passed, Java: 41 passed, Total: 436 passed",
+      "summary": "Phase 3 回归与阶段验收测试(A31-A36)：无回退，全部验收通过",
+      "acceptance_coverage": {
+        "A31": "Console 结构收口 ✅",
+        "A32": "高影响动作确认 ✅",
+        "A33": "审计记录可见 ✅",
+        "A34": "协议校验闭环 ✅",
+        "A35": "Java 消费契约 ✅",
+        "A36": "文档同步 + 无回退 ✅"
+      }
+    },
+    "T401": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "console/tests/helpers/runtimeMockSamples.ts, console/tests/helpers/runtimeHarness.ts, console/tests/runtimeLiveDataValidation.spec.ts, console/tests/RuntimeConsole.spec.ts",
+      "tests": "console vitest: 70 passed, no lifecycle/audit warnings; Node localstorage warning still present",
+      "summary": "前端测试 harness 与 mock 基座收口(A42)：RuntimeConsole.spec.ts 真正使用共享 flushPromises/mountRuntimeConsole + runtimeMockSamples 数据导入 + 无本地 helper 定义",
+      "acceptance_coverage": {
+        "A42": "RuntimeConsole.spec.ts 导入共享 flushPromises/mountRuntimeConsole ✅ 动态 import 获取 mock 实例 ✅ beforeEach 配置 runtimeMockSamples 数据 ✅ 无本地 helper 函数定义 ✅"
+      },
+      "rework_round": 2,
+      "rework_fixed": [
+        "创建 runtimeMockSamples.ts 作为独立 sample 数据模块",
+        "RuntimeConsole.spec.ts 导入 flushPromises/mountRuntimeConsole 并删除本地定义",
+        "vi.mock factory 内联 sample 数据 + beforeEach 配置导入 samples",
+        "动态 import 获取 mock 实例（解决 vitest hoisting 路径问题）",
+        "修正 handoff 口径（Node localstorage warning 存在但非 blocker）"
+      ],
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T401-review.md"
+    },
+    "T402": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "console/tests/runtimeActionAudit.spec.ts (新增 10 tests)",
+      "tests": "console vitest: 80 passed (新增 runtimeActionAudit.spec.ts 10 tests)",
+      "summary": "Action Audit 测试隔离与错误路径稳定(A41/A43)：成功/空数据/失败路径断言 + useRuntimeActions loadActionHistory 隔离",
+      "acceptance_coverage": {
+        "A41": "RuntimeConsole.spec.ts 正确 mock listActionAudit 不产生 warning ✅",
+        "A43": "runtimeActionAudit.spec.ts 覆盖成功/空数据/失败路径 ✅"
+      },
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T402-review.md"
+    },
+    "T403": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "console/tests/runtimeLiveDataValidation.spec.ts (30 tests)",
+      "tests": "console vitest: 104 passed (新增 24 parse/validate error-path tests)",
+      "summary": "Live data parse validate 错误路径收口(A42/A43)：parsePlan/parseExplain/parseDispatch computed 错误路径 + loadLivePlan/loadLiveExplain/runLiveDispatch API+parse 失败 + 状态断言完整性",
+      "acceptance_coverage": {
+        "A42": "runtimeLiveDataValidation.spec.ts 全部使用 withComposable() ✅",
+        "A43": "parse/validate 失败路径可断言 + 不静默降级 ✅"
+      },
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T403-review.md"
+    },
+    "T404": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "scripts/runtime_smoke.py",
+      "tests": "PYTHONPATH=src python3 scripts/runtime_smoke.py: 7 endpoints passed (status/sessions/events-list/plan/dispatch/action-audit/health)",
+      "summary": "Runtime API 最小主链 Smoke 入口(A44)：FastAPI TestClient 验证 7 端点真实可运行（含 events-list）",
+      "acceptance_coverage": {
+        "A44": "status/sessions/events-list 端点（最小主链）✅ dispatch 端点 ✅ action-audit 端点 ✅ 真实可运行脚本 ✅"
+      },
+      "rework_round": 1,
+      "rework_fixed": [
+        "添加 events-list 端点测试",
+        "使用 mock CliSession 验证真实 API 响应结构",
+        "端点编号调整（7 端点全覆盖）"
+      ],
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T404-review.md"
+    },
+    "T405": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "docs/runtime/testing-observability.md + docs/INDEX.md + docs/runtime/changelog.md",
+      "tests": "文档存在且命令可执行验证",
+      "summary": "Testing/Observability 文档同步(A45)：测试入口总览 + mock 约定 + 排障顺序 + Phase 3/4 已收口 warning",
+      "acceptance_coverage": {
+        "A45": "testing-observability.md 测试入口说明 ✅ mock 约定说明 ✅ smoke 入口说明 ✅ 排障顺序说明 ✅ Phase 3/4 warning 收口说明 ✅"
+      },
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T405-review.md"
+    },
+    "T406": {
+      "phase_id": "phase-4",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "phase-4 regression and acceptance coverage",
+      "tests": "console/104 tests + python/201 tests + smoke/7 endpoints",
+      "summary": "Phase 4 回归(A46)：前端 104 passed + Python 201 passed + Smoke 7 passed；无 lifecycle/audit fetch warning，Phase 3 主功能未回退",
+      "acceptance_coverage": {
+        "A41": "frontend test 无 lifecycle warning / audit fetch warning ✅ Node localstorage warning 仍存在但非 blocker",
+        "A42": "harness 标准化 (runtimeHarness.ts) ✅",
+        "A43": "error path assertions stable (30+10 tests) ✅",
+        "A44": "smoke 入口可运行 (7 passed) ✅",
+        "A45": "testing-observability 文档同步 ✅",
+        "A46": "Phase 3 主功能未回退 ✅ 测试干净度通过新增而非删除 ✅"
+      },
+      "review_artifact": ".super-dev/phases/phase-4/reviews/T406-review.md",
+      "handoff_artifact": ".super-dev/phases/phase-4/handoffs/T406-review-request.md"
+    },
+    "T501": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "docs/operations/release-checklist.md, docs/operations/release-gate-matrix.md, scripts/verify-doc-consistency.sh",
+      "tests": "release checklist coverage evidence",
+      "assignee_host": "claude",
+      "dispatch_order": 1,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T501-review-request.md",
+      "acceptance_coverage": {
+        "A51": "release-checklist.md 7阶段覆盖 Python/Console/Java/smoke/文档一致性 + Gate 1-6 口径闭环 ✅",
+        "A52": "release-gate-matrix.md 6门禁 + 稳定三方一致性校验 + governor引用约定 ✅"
+      },
+      "summary": "Release Checklist 固化(A51) + Quality Gate 矩阵(A52)：7阶段检查清单 + 6门禁顺序 + Java + 稳定changelog匹配 + blocker分层",
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T501-review.md",
+      "rework_round": 3,
+      "rework_fixed": [
+        "新增 Java Gate (Gate 3): mvn test",
+        "新增 scripts/verify-doc-consistency.sh 校验 INDEX.md/changelog.md/pipeline-state.json 三者一致性",
+        "更新 Governor 引用约定为 6 门禁",
+        "修复 verify-doc-consistency.sh 真正比较 CHANGELOG_STATUS",
+        "修复 release-checklist.md 发布决策标准为 Gate 1-6",
+        "修复 changelog 匹配策略：限定到阶段总记录标题格式 ^## YYYY-MM-DD Phase X:，使用 tail -1 取最新"
+      ]
+    },
+    "T502": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "scripts/run-release-gates.sh, docs/operations/release-gate-matrix.md, docs/operations/release-checklist.md",
+      "tests": "Gate 1-6 unified entry",
+      "assignee_host": "claude",
+      "dispatch_order": 2,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T502-review-request.md",
+      "rework_round": 1,
+      "rework_fixed": [
+        "Gate 3 判断逻辑改为 BUILD SUCCESS + Failures: 0, Errors: 0，不误判业务日志级 ERROR"
+      ],
+      "acceptance_coverage": {
+        "A52": "统一门禁入口 ✅ 顺序固定 ✅ 可复跑 ✅ 失败定位 ✅ governor引用 ✅"
+      },
+      "summary": "统一发布门禁入口: scripts/run-release-gates.sh 按顺序执行 Gate 1-6，失败时输出具体门禁编号与排查建议",
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T502-review.md"
+    },
+    "T503": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "docs/operations/release-readiness.md, docs/operations/release-checklist.md, docs/operations/release-gate-matrix.md",
+      "tests": "release readiness classification",
+      "assignee_host": "claude",
+      "dispatch_order": 3,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T503-review-request.md",
+      "acceptance_coverage": {
+        "A53": "blocker/non-blocker/warning budget/test log output 四级分层 ✅ 环境级 warning 边界清晰 ✅ 功能级 blocker 边界清晰 ✅ Gate 6 口径对齐 ✅"
+      },
+      "summary": "Release Readiness 分层标准: 四级分层定义 + 决策流程 + Governor 引用约定 (Round 2: Gate 6 口径对齐)",
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T503-review.md"
+    },
+    "T504": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "docs/operations/post-release-verification.md",
+      "tests": "PYTHONPATH=src python3 -c \"from claudeflow.cli import main...\": JSON output",
+      "assignee_host": "claude",
+      "dispatch_order": 4,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T504-review-request.md",
+      "acceptance_coverage": {
+        "A54": "发布后最小验证链 ✅ 7 端点覆盖 ✅ 文档命令与证据一致 ✅"
+      },
+      "summary": "Post-Release Verification Guide (Round 3: 文档命令与证据一致)",
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T504-review.md"
+    },
+    "T505": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "docs/operations/rollback-contract.md, docs/operations/delivery-summary-template.md",
+      "tests": "git revert HEAD + /tmp/gate5.log + PYTHONPATH 口径",
+      "assignee_host": "claude",
+      "dispatch_order": 5,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T505-review-request.md",
+      "acceptance_coverage": {
+        "A55": "回滚触发条件 ✅ 重验命令 ✅ PYTHONPATH 口径一致 ✅"
+      },
+      "summary": "Rollback Contract + Delivery Summary Template (Round 2: 真实回滚路径 + PYTHONPATH 口径)",
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T505-review.md"
+    },
+    "T506": {
+      "phase_id": "phase-5",
+      "executor_type": "claude",
+      "status": "accepted",
+      "review_status": "accepted",
+      "implementation": "Phase 5 regression verification + acceptance coverage summary",
+      "tests": "637 unit tests passed + 7 smoke endpoints passed",
+      "assignee_host": "claude",
+      "dispatch_order": 6,
+      "handoff_artifact": ".super-dev/phases/phase-5/handoffs/T506-review-request.md",
+      "acceptance_coverage": {
+        "A51": "Release Checklist 固化 ✅",
+        "A52": "Quality Gate 统一入口 ✅",
+        "A53": "Release Readiness 分层 ✅",
+        "A54": "发布后验证说明 ✅",
+        "A55": "回滚约定 ✅",
+        "A56": "Phase 5 不回退 Phase 1-4 主链 ✅ 637 passed + 7 smoke passed ✅ Gate 1-6 全部通过，release-ready ✅"
+      },
+      "review_artifact": ".super-dev/phases/phase-5/reviews/T506-review.md",
+      "summary": "Phase 5 Regression & Delivery Decision (Round 3): Gate 1-6 全部通过，文档一致性收口，release-ready",
+      "rework_round": 2,
+      "rework_fixed": [
+        "决策结论改成 not-ready，明确 blocker 是 Gate 6 文档一致性未收口",
+        "回归命令统一改成 PYTHONPATH=src python3 -m pytest 和 PYTHONPATH=src python3 scripts/runtime_smoke.py",
+        "INDEX.md / changelog.md / pipeline-state.json 三方口径收口，Gate 6 通过"
+      ]
     }
   },
   "commits": {
     "phase-1-core": "c5eb314 feat(runtime): Phase 1 多宿主执行层完成",
-    "phase-1-cli": "2a813f1 feat(cli): T106 治理入口 + 宿主字段输出 + 契约修复"
+    "phase-1-cli": "2a813f1 feat(cli): T106 治理入口 + 宿主字段输出 + 契约修复",
+    "phase-2-governance": "05b3f71 feat(governance): Phase A 治理模型落地 — 5模块+39项验收测试全部通过"
   },
   "timestamps": {
-    "updated_at": "2026-04-26T21:15:00Z"
+    "T401_rework_completed": "2026-04-27T17:44:00Z",
+    "T401_accepted": "2026-04-27T17:52:00Z",
+    "T402_completed": "2026-04-27T18:02:00Z",
+    "T402_accepted": "2026-04-27T18:15:00Z",
+    "T403_completed": "2026-04-27T18:35:00Z",
+    "T403_accepted": "2026-04-27T18:42:00Z",
+    "T404_completed": "2026-04-27T18:55:00Z",
+    "T404_reviewed": "2026-04-27T18:48:00Z",
+    "T404_rework_completed": "2026-04-27T19:05:00Z",
+    "T404_accepted": "2026-04-27T19:15:00Z",
+    "T405_completed": "2026-04-27T19:25:00Z",
+    "T405_rework_completed": "2026-04-27T19:35:00Z",
+    "T405_accepted": "2026-04-27T19:35:00Z",
+    "T406_completed": "2026-04-27T19:45:00Z",
+    "T406_accepted": "2026-04-27T21:14:40Z",
+    "T501_submitted": "2026-04-28T06:30:00Z",
+    "T501_rework_completed": "2026-04-28T07:00:00Z",
+    "T501_rework2_completed": "2026-04-28T07:15:00Z",
+    "T501_rework3_completed": "2026-04-28T07:30:00Z",
+    "phase_5_docs_ready": "2026-04-28T00:00:00Z",
+    "phase_5_tasks_ready": "2026-04-28T00:10:00Z",
+    "phase_5_dispatched": "2026-04-27T21:29:26Z",
+    "updated_at": "2026-04-27T21:29:26Z"
   }
 }

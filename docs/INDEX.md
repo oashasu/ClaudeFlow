@@ -1,248 +1,138 @@
-# ClaudeFlow系统设计
+# ClaudeFlow 系统索引
 
-> **日期**: 2026-04-19
-> **项目位置**: `/Users/claw/sandbox/personal/claudeflow/`
+> 最后更新：2026-04-27
+> 项目位置：`/Users/claw/sandbox/personal/claudeflow/`
 
----
-
-## 分阶段开发策略
-
-**核心原则**：不一次性做全，分阶段实现
-
-```
-V1（最小版本）→ 验证核心功能 + TDD流程可行性
-    ↓
-V2（扩展版本）→ 在V1基础上添加通信层/提炼机制等
-    ↓
-Phase2（Web版本）→ Spring Boot + Vue控制台
-```
-
-**V1不可取代的原因**：
-1. 验证CLI + 流程调度核心功能
-2. 验证TDD流程（先写测试再写代码）
-3. 为V2提供稳定基础
+文档导航入口：[docs/README.md](README.md)
 
 ---
 
-## V1设计（最小版本）
+## 当前版本：Runtime V3（v3.0.0）
 
-**目标**：核心功能 + TDD验证
+ClaudeFlow 是一个任务调度管理系统，通过 Runtime 多会话内核调度 Claude Code CLI 执行具体任务。当前主线为 Runtime V3，V1/V2 的设计已沉淀到实现中或降级到 `legacy/`。
 
-### V1模块清单
+### 核心模块
 
-| 模块 | 职责 | 优先级 |
-|------|------|--------|
-| state_machine | 七状态模型 | P0 |
-| task_manager | 任务CRUD | P0 |
-| scheduler | 流程调度 | P0 |
-| cli_interface | CLI命令 | P0 |
-| checkpoint | 状态快照 | P1 |
-| employee_pool | 三层员工池 | P2 |
-| knowledge_retrieval | 三层检索 | P2 |
-
-### V1范围
-
-- ✅ CLI交互
-- ✅ 任务创建/查询/更新
-- ✅ 状态流转（七状态模型）
-- ✅ 流程调度
-- ✅ Checkpoint保存/恢复
-- ❌ WebSocket通信（V2）
-- ❌ Agent提炼（V2）
-- ❌ 前置拆分（V2）
-- ❌ Web控制台（Phase2）
-
-### V1验收标准
-
-- 271测试通过（单元+集成+E2E）
-- TDD流程验证可行
-- CLI可用
-
----
-
-## V2设计（扩展版本）
-
-**前提**：V1完成并通过验收
-
-### V2追加内容
-
-| 设计文档 | 问题 | 方案 |
-|----------|------|------|
-| 01_通信层设计 | HTTP延迟 | WebSocket+SSE |
-| 02_Agent提炼机制 | 死循环刷屏 | 分层提炼 |
-| 03_前置拆分流程 | 上下文膨胀 | Phase0拆分 |
-| 04_强制checkpoint | 被动不可靠 | 阻塞式注入 |
-| 05_子Agent异步总结 | 阻塞主任务 | Haiku异步 |
-| 06_Claude_Code输出格式 | 提取困难 | 解析规范 |
-| 08_V3_Checkpoint版本快照优化 | 无法回退代码 | Git绑定+文件边界 |
-
-### V2新增模块
-
-| 模块 | 职责 | 基于V1 |
-|------|------|--------|
-| websocket_client | WebSocket通信 | 新增 |
-| session_parser | 解析.jsonl | 新增 |
-| thinking_filter | 死循环检测 | 新增 |
-| phase_reviewer | 阶段复盘 | 新增 |
-| task_reviewer | 任务复盘 | 新增 |
-| progress_reporter | 进度推送 | 新增 |
-| alert_handler | 告警处理 | 新增 |
-| checkpoint | LangGraph接口 | 修改V1 |
-
----
-
-## Phase2设计（Web版本）
-
-**前提**：V2完成
-
-- Spring Boot后端
-- Vue前端
-- WebSocket + SSE通信
-- Web控制台UI
-
----
-
-## V2.2.0 Web控制台
-
-| 模块 | 职责 | 文件 |
+| 模块 | 职责 | 路径 |
 |------|------|------|
-| TaskController | REST API | controller/TaskController.java |
-| CheckpointController | Checkpoint API | controller/CheckpointController.java |
-| SseController | SSE推送 | sse/SseController.java |
-| PythonWebSocketHandler | WebSocket处理 | websocket/PythonWebSocketHandler.java |
-| TaskService | 任务业务 | service/TaskService.java |
-| CheckpointService | Checkpoint业务 | service/CheckpointService.java |
-| CleanupScheduler | 定时清理 | scheduler/CleanupScheduler.java |
-| Dashboard | 主页面 | views/Dashboard.vue |
-| TaskDetail | 详情页 | views/TaskDetail.vue |
-| StatsCard | 统计卡片 | components/StatsCard.vue |
-| TaskCard | 任务卡片 | components/TaskCard.vue |
-| WorkflowProgress | 工作流进度 | components/WorkflowProgress.vue |
-| StepScroller | 步骤滚动 | components/StepScroller.vue |
-| CheckpointTimeline | 时间线 | components/CheckpointTimeline.vue |
-| TaskIdBox | 任务ID | components/TaskIdBox.vue |
-| InterventionModal | 介入弹窗 | components/InterventionModal.vue |
-| TaskStore | 状态管理 | stores/taskStore.ts |
-| api.ts | API服务 | services/api.ts |
-| sse.ts | SSE服务 | services/sse.ts |
+| Runtime Manager | 多会话生命周期管理 | `src/claudeflow/runtime/manager.py` |
+| Runtime CLI Driver | CLI 进程驱动与会话追踪 | `src/claudeflow/runtime/cli_driver.py` |
+| Runtime API | FastAPI 路由层（18 条端点） | `src/claudeflow/runtime/api.py` |
+| CLI 入口 | 命令行工具 | `src/claudeflow/cli.py` |
+| Workflow Engine | 状态机 / 调度器 / 任务管理 | `src/claudeflow/workflow/` |
+| Runtime Console | Vue 前端控制台 | `console/src/views/RuntimeConsole.vue` |
 
----
+### Runtime 能力
 
----
+- `runtime start / complete / fail / status / show`
+- `runtime dispatch / plan / explain`
+- `priority` 排序、`max_concurrent` 并发槽位
+- `reason_code + reason` 稳定阻塞原因输出
+- `--json` 输出供脚本和前端消费
+- task graph 加载、schema 校验、依赖判断
+- 独立 git worktree 隔离
+- `write_paths` 逻辑锁防并发写冲突
+- SSE 实时事件推送
 
-## Agent Token治理架构
+### Runtime API 端点
 
-> 设计文档: [2026-04-21-agent-token-governance-design.md](superpowers/specs/2026-04-21-agent-token-governance-design.md)
-
-五层治理体系：熔断层 + 快照层 + 验收层 + 工具层 + 恢复层
-
-核心模块：
-| 模块 | 职责 | 实现方式 |
-|------|------|----------|
-| 熔断机制 | 探索阶段硬阈值拦截 | 10轮上限 + 50K累计Token + 相似度检测(bge-small-zh) |
-| 快照体系 | 基线+增量双轨快照 | JSON模板 + Git绑定 |
-| 验收分层 | 三级自动化验收 | L1强制量化 + L2半量化 + L3纯人工 |
-| 工具治理 | Hook文件读取限流 | PostToolUse拦截 + Prompt兜底 |
-| 异常恢复 | 熔断后自动回滚 | 快照回滚 + 增量记录 |
-
----
-
-## V2.3.0 异步复盘模块
-
-| 模块 | 职责 | 文件 |
+| 端点 | 方法 | 说明 |
 |------|------|------|
-| HaikuClient | Haiku API调用 | claudeflow/haiku_client.py |
-| PhaseReviewer | Phase级复盘 | claudeflow/phase_reviewer.py |
-| TaskReviewer | Task级复盘+知识提取 | claudeflow/task_reviewer.py |
+| `/api/runtime/status` | GET | 全局状态 |
+| `/api/runtime/sessions` | GET | 会话列表 |
+| `/api/runtime/plan` | GET | 执行计划 |
+| `/api/runtime/explain/{task_id}` | GET | 任务解释 |
+| `/api/runtime/dispatch` | POST | 调度任务 |
+| `/api/runtime/task/{task_id}/complete` | POST | 标记完成 |
+| `/api/runtime/task/{task_id}/fail` | POST | 标记失败 |
+| `/api/session/start` | POST | 启动会话 |
+| `/api/session/{id}/events` | GET (SSE) | 事件流 |
+| `/api/session/{id}/events-list` | GET | 事件列表 |
+| `/api/session/{id}/intervene` | POST | 注入干预 |
+| `/api/session/{id}/cancel` | POST | 取消会话 |
+| `/api/session/{id}/status` | GET | 会话状态 |
+| `/health` | GET | 健康检查 |
 
-**测试覆盖**：
-- 30个单元测试（Mock模式）
-- WebSocket集成测试（Python→Java）
-- SSE稳定性测试
-- 总覆盖率 88%（310测试通过）
+### Runtime Console
 
-**待验证**（需Java 17+环境）：
-- 真实后端集成测试
-- Python→WebSocket实时通信
-- 大量步骤滚动性能
+独立 `/runtime` 路由，sample / live 双模式，支持：
 
----
+- 总览栏：runnable / blocked / running / started 统计
+- session 列表：解释任务 / 查看事件 / 发送干预 / 标记完成 / 标记失败
+- session inspector：当前摘要 / 事件列表 / 直接操作
+- 自动刷新与轮询间隔控制
+- Dashboard 首页 Runtime 入口卡片、TaskDetail Runtime 跳转入口
+- **Phase 3 新增**:
+  - 结构拆分：types / validators / composables / components
+  - 高影响动作确认对话框（intervene/complete/fail）
+  - 审计记录查询与展示
+  - 协议校验与 parseError 显示
+- **Phase 4 新增**:
+  - 测试 harness 标准化（withComposable, flushPromises, mock 基座）
+  - parse/validate 错误路径稳定断言
+  - Smoke 入口真实可运行（status/sessions/events/dispatch/audit）
 
-## V2.4.0 CLI驱动模块
+### 测试与可观测性
 
-| 模块 | 职责 | 文件 |
+测试入口、mock 约定、smoke 入口、排障顺序详见 [runtime/testing-observability.md](runtime/testing-observability.md)。
+
+| 层级 | 入口 | 命令 |
 |------|------|------|
-| CliDriver | CLI进程驱动 | claudeflow/cli_driver.py |
-| CliSession | 会话信息管理 | claudeflow/cli_driver.py |
+| 前端单元 | Vitest | `cd console && npm test` |
+| Python 单元 | pytest | `PYTHONPATH=src python3 -m pytest tests/unit/` |
+| Smoke 入口 | Python | `PYTHONPATH=src python3 scripts/runtime_smoke.py` |
 
-**核心机制**（基于验证报告）：
-- 启动：`claude -p "prompt" --output-format stream-json --verbose`
-- session追踪：从首事件提取session_id
-- 干预：`claude -p --resume session_id "新prompt"`
-- 解析：assistant事件包含thinking/tool_use/text
+### Java HTTP 消费层
 
-**测试覆盖**：
-- 40个单元测试（Mock模式）
-- 覆盖率96%
-- 会话生命周期测试
-- 干预恢复测试
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/runtime-consume/status` | GET | Runtime 状态代理 |
+| `/api/runtime-consume/sessions` | GET | Runtime sessions 代理 |
+| `/api/runtime-consume/plan` | GET | Runtime plan 代理 |
+| `/api/runtime-consume/explain/{taskId}` | GET | 任务解释代理 |
+| `/api/runtime-consume/audit` | GET | 审计记录代理 |
 
----
-
-## V2.4.0 指令集注入整合
-
-| 文件 | 职责 |
-|------|------|
-| CLAUDE.md | Hermes管理者指令段 |
-| test_hermes_cli_integration.py | Hermes CLI集成测试 |
-
-**注入内容**：
-- 核心身份定义：ClaudeFlow是任务调度管理系统，不是直接执行者
-- 启动命令模板：subprocess启动CLI
-- 干预命令模板：--resume恢复会话
-- 事件解析规则：tool_use→进度追踪，text→阶段完成，result→任务完成
-- 干预时机：质量检查、人工介入、异常检测
-
-**测试覆盖**：
-- 19个集成测试
-- Hermes启动CLI并捕获session_id
-- Hermes监控事件流并报告进度
-- Hermes创建checkpoint
-- Hermes干预会话（质量检查）
-- Hermes检测任务完成
-
-**总测试覆盖**：
-- 379个测试通过
-- 总覆盖率88%
+边界约定见 [runtime/java-http-boundary.md](runtime/java-http-boundary.md)。
 
 ---
 
-## Runtime实现记录
+## 文档导航
 
-> 实现文档: [09_Runtime实现与变更记录.md](09_Runtime实现与变更记录.md)
->
-> 月度路线图: [specs/2026-04-24-runtime-monthly-roadmap.md](specs/2026-04-24-runtime-monthly-roadmap.md)
->
-> 清理分析: [specs/2026-04-24-hermes-legacy-cleanup-analysis.md](specs/2026-04-24-hermes-legacy-cleanup-analysis.md)
->
-> 清理规格: [specs/2026-04-24-hermes-legacy-cleanup-spec.md](specs/2026-04-24-hermes-legacy-cleanup-spec.md)
+| 分类 | 目录 | 说明 |
+|------|------|------|
+| 核心 | [runtime/](runtime/) | 变更记录 + 测试与可观测性 |
+| 运维 | [operations/](operations/) | 操作手册、部署指南 |
+| 历史 | [archive/](archive/) | V1/V2 早期设计文档 |
+| 规格 | [specs/](specs/) | 功能规格与路线图 |
+| 扩展 | [superpowers/](superpowers/) | Token 治理、Console 等专题设计 |
 
-当前仓库已经额外落地了一个面向多会话 runtime 的 PoC，和旧的 V1/V2 设计并行存在：
+核心文档：
+- [runtime/changelog.md](runtime/changelog.md) - 实现变更记录
+- [runtime/testing-observability.md](runtime/testing-observability.md) - 测试入口、mock 约定、排障顺序
+- [runtime/java-http-boundary.md](runtime/java-http-boundary.md) - Java HTTP 消费层契约
 
-- Python 侧拆分出 `runtime/` 与 `workflow/`
-- 支持 `runtime start / complete / fail / dispatch / plan / explain`
-- Hermes 已暴露 `runtime status / sessions / plan / explain / dispatch`
-- Vue console 已新增独立 `/runtime` 工作台
-- 后续 runtime / console 相关改动必须同步更新实现文档
-- 下一阶段优化需求已拆分为 4 份独立 spec，统一由月度路线图管理
-- Hermes 遗留清理已补充专项分析和专项规格，供后续独立执行
+完整索引见 [docs/README.md](README.md)。
+
+---
+
+## 架构演进历史
+
+| 版本 | 时间 | 核心变化 | 一行描述 |
+|------|------|----------|----------|
+| V1 | 2026-04-19 | 七状态模型 + CLI + 流程调度 + TDD 验证 | 最小可用版本，验证核心调度可行性 |
+| V2.0 | 2026-04-19 | WebSocket/SSE 通信 + Agent 提炼 + Phase0 拆分 + 异步复盘 | 扩展通信与提炼能力 |
+| V2.2 | 2026-04-21 | Spring Boot + Vue Web Console | Web 控制台版本 |
+| V2.3 | 2026-04-22 | Haiku 异步复盘模块 + SSE 稳定性 | 310 测试通过，88% 覆盖率 |
+| V2.4 | 2026-04-22 | CLI 驱动模块 + 指令集注入整合 | 379 测试，96% 覆盖率 |
+| V3.0 | 2026-04-24 | Runtime 多会话内核 + task graph + dispatch + Hermes 全面清理 | 当前主线，runtime/api.py 接管全部端点 |
+| V3.1 | 2026-04-27 | Console 结构收口 + 动作确认链 + 审计 + schema校验 + Java消费契约 | Phase 3 验收完成，A31-A35 全部通过 |
+| V3.2 | 2026-04-27 | Testing harness 标准化 + parse/validate 错误路径 + Smoke 入口 + 文档同步 | Phase 4 验收完成，A41-A46 全部通过 |
+| V3.3 | 2026-04-28 | Release checklist + Quality gate 固化 + 统一交付口径 + 发布后验证 | Phase 5 已完成，release-readiness 分层与回滚契约落地 |
+
+V1/V2 的设计文档归档在 [archive/](archive/)，仅供参考。实现状态以 [runtime/changelog.md](runtime/changelog.md) 为准。
 
 ---
 
 ## 下一步
 
-1. **创建GitHub仓库**
-2. **V1开发**（TDD流程）
-3. **V1验收**
-4. **V2扩展**（基于V1）
-5. **Phase2开发**（Web版本）
+参见 [specs/2026-04-24-runtime-monthly-roadmap.md](specs/2026-04-24-runtime-monthly-roadmap.md)。

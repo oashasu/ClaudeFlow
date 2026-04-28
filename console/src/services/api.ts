@@ -1,5 +1,6 @@
 // API服务层
-const API_BASE = 'http://localhost:21000/api'
+const API_BASE = '/api'
+const RUNTIME_SESSION_BASE = '/runtime-api/session'
 
 interface Task {
   id: string
@@ -62,6 +63,18 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
 
 // 任务API
 export const taskApi = {
+  // 创建任务
+  create: (data: {
+    name: string
+    domain: string
+    prompt: string
+    priority?: string
+  }) =>
+    fetchApi<Task>('/tasks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   // 获取任务列表
   list: (status?: string) =>
     fetchApi<Task[]>(`/tasks${status ? `?status=${status}` : ''}`),
@@ -90,6 +103,14 @@ export const taskApi = {
   // 取消任务
   cancel: (id: string) =>
     fetchApi<Task>(`/tasks/cancel/${id}`, { method: 'POST' }),
+
+  // 删除任务
+  delete: (id: string) =>
+    fetchApi<void>(`/tasks/${id}`, { method: 'DELETE' }),
+
+  // 重新执行任务（重置为pending）
+  retry: (id: string) =>
+    fetchApi<Task>(`/tasks/retry/${id}`, { method: 'POST' }),
 }
 
 // Checkpoint API
@@ -110,4 +131,42 @@ export const stepApi = {
     fetchApi<PhaseStep[]>(`/steps/${taskId}/${phase}`),
 }
 
-export type { Task, TaskStats, Checkpoint, PhaseStep }
+// Session API（通过 Vite /runtime-api 代理到 Python runtime 服务）
+// Runtime Console 使用 runtimeApi.ts，此路径仅供旧任务流页面使用
+export const sessionApi = {
+  // 获取session状态
+  status: async (sessionId: string): Promise<SessionStatus> => {
+    const response = await fetch(`${RUNTIME_SESSION_BASE}/${sessionId}/status`)
+    if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`)
+    return response.json()
+  },
+
+  // 获取session事件列表
+  events: async (sessionId: string): Promise<SessionEvents> => {
+    const response = await fetch(`${RUNTIME_SESSION_BASE}/${sessionId}/events-list`)
+    if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`)
+    return response.json()
+  },
+}
+
+interface SessionStatus {
+  session_id: string
+  status: string
+  events_count: number
+}
+
+interface SessionEvents {
+  session_id: string
+  events_count: number
+  parsed_events: ParsedEvent[]
+  raw_events: any[]
+}
+
+interface ParsedEvent {
+  type: 'thinking' | 'tool_use' | 'text'
+  text?: string
+  tool_name?: string
+  tool_input?: any
+}
+
+export type { Task, TaskStats, Checkpoint, PhaseStep, SessionStatus, SessionEvents, ParsedEvent }

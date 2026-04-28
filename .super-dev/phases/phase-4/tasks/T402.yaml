@@ -1,0 +1,38 @@
+id: T402
+phase_id: phase-4
+title: 清理 Runtime Console warning 并稳定 action audit 测试隔离
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../uiux.md
+  - ../acceptance.md
+  - ./T401.yaml
+constraints:
+  - 不得保留默认 audit fetch warning 作为测试常态
+  - 不得通过删除 audit 错误路径断言来消音
+allowed_write_paths:
+  - console/tests/**
+  - console/src/views/**
+  - console/src/components/**
+  - console/src/composables/**
+  - console/src/services/**
+acceptance_refs:
+  - A41
+  - A43
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 仅 suppress console.warn/error 而不修正隔离逻辑
+  - 移除最近动作结果或审计面板
+done_definition:
+  - console_warning_cleanup_complete
+  - audit_test_isolation_stable
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

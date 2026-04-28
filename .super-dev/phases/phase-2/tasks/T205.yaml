@@ -1,0 +1,32 @@
+id: T205
+phase_id: phase-2
+title: 实现 phase reopen 与 advance 状态服务
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../acceptance.md
+  - ../tasks/T203.yaml
+  - ../tasks/T204.yaml
+constraints:
+  - 不得在无 gate report 的情况下推进 phase
+  - 不得让 review fail 仍然保持 advance_allowed=true
+allowed_write_paths:
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A24
+  - A26
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+done_definition:
+  - phase_gate_service_added
+  - reopen_advance_logic_testable
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

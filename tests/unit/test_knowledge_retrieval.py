@@ -11,14 +11,14 @@ class TestKnowledgeRetrievalBasics:
 
     def test_create_knowledge_retriever(self):
         """测试：创建知识检索器"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         assert retriever is not None
 
     def test_add_knowledge_entry(self):
         """测试：添加知识条目"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         entry_id = retriever.add_knowledge(
@@ -32,7 +32,7 @@ class TestKnowledgeRetrievalBasics:
 
     def test_knowledge_entry_has_attributes(self):
         """测试：知识条目具有属性"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         entry_id = retriever.add_knowledge(
@@ -52,7 +52,7 @@ class TestDomainRetrieval:
 
     def test_retrieve_by_domain(self):
         """测试：按领域检索知识"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="支付知识1", tags=["支付"])
@@ -65,7 +65,7 @@ class TestDomainRetrieval:
 
     def test_retrieve_by_tag(self):
         """测试：按标签检索知识"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="支付回调", tags=["回调", "支付"])
@@ -78,7 +78,7 @@ class TestDomainRetrieval:
 
     def test_retrieve_by_domain_and_tag(self):
         """测试：按领域和标签联合检索"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="支付回调", tags=["回调"])
@@ -91,7 +91,7 @@ class TestDomainRetrieval:
 
     def test_no_match_returns_empty_list(self):
         """测试：无匹配返回空列表"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="支付知识", tags=["支付"])
@@ -105,7 +105,7 @@ class TestSimilarityMatching:
 
     def test_search_by_keywords(self):
         """测试：关键词搜索"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="支付回调处理流程详解", tags=["回调"])
@@ -118,7 +118,7 @@ class TestSimilarityMatching:
 
     def test_search_with_limit(self):
         """测试：限制搜索结果数量"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         for i in range(10):
@@ -137,7 +137,7 @@ class TestKnowledgeContext:
 
     def test_build_context_for_task(self):
         """测试：为任务构建上下文"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(
@@ -157,7 +157,7 @@ class TestKnowledgeContext:
 
     def test_empty_context_when_no_knowledge(self):
         """测试：无知识时返回空上下文"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         context = retriever.build_context(domain="FM_会员域")
@@ -169,7 +169,7 @@ class TestKnowledgeStatistics:
 
     def test_get_total_count(self):
         """测试：获取知识总数"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="知识1", tags=["a"])
@@ -180,7 +180,7 @@ class TestKnowledgeStatistics:
 
     def test_get_domain_count(self):
         """测试：获取领域知识数量"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="知识1", tags=["a"])
@@ -192,7 +192,7 @@ class TestKnowledgeStatistics:
 
     def test_list_all_domains(self):
         """测试：列出所有领域"""
-        from claudeflow.knowledge_retrieval import KnowledgeRetriever
+        from claudeflow.legacy.knowledge_retrieval import KnowledgeRetriever
 
         retriever = KnowledgeRetriever()
         retriever.add_knowledge(domain="AT_支付域", content="知识1", tags=["a"])

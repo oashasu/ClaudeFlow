@@ -129,7 +129,7 @@ class TestCliIntegration:
     def test_cli_list_with_status_filter(self):
         """测试：CLI按状态过滤列表"""
         from claudeflow.cli import CliApp
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)
@@ -192,7 +192,7 @@ class TestCliFullWorkflow:
     def test_cli_complete_task_workflow(self):
         """测试：CLI完整任务工作流"""
         from claudeflow.cli import CliApp
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CliApp(tasks_dir=tmpdir)

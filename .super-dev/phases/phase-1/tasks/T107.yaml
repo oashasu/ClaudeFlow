@@ -1,0 +1,44 @@
+id: T107
+phase_id: phase-1
+title: 补齐多宿主执行层测试与回归验证
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../acceptance.md
+  - ../task-plan.md
+constraints:
+  - 必须覆盖 claude/codex/unsupported 三类路径
+  - 不得只补 mock 测试而无主链覆盖
+allowed_write_paths:
+  - tests/**
+acceptance_refs:
+  - A01
+  - A02
+  - A03
+  - A04
+  - A05
+  - A06
+  - A07
+  - A08
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+implementation_targets:
+  - tests/unit/test_phase1_multi_host.py
+  - tests/unit/test_cli.py
+  - tests/unit/test_runtime_api.py
+forbidden_actions:
+  - 改测试规避主链缺陷
+  - 伪造通过证据
+  - 只补 mock 断言而不覆盖治理入口和宿主字段输出
+done_definition:
+  - b01_b08_covered
+  - regression_green
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

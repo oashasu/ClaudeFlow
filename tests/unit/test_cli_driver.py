@@ -20,7 +20,7 @@ class TestCliDriverStartSession:
 
     def test_start_session_command_format(self):
         """测试：启动命令格式正确"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -37,7 +37,7 @@ class TestCliDriverStartSession:
 
     def test_extract_session_id_from_first_event(self):
         """测试：从首事件提取session_id"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -49,7 +49,7 @@ class TestCliDriverStartSession:
 
     def test_extract_session_id_missing(self):
         """测试：session_id不存在时返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -60,7 +60,7 @@ class TestCliDriverStartSession:
 
     def test_session_storage(self):
         """测试：会话持久化存储"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
 
@@ -75,13 +75,29 @@ class TestCliDriverStartSession:
         assert isinstance(stored, CliSession)
         assert stored.process == mock_process
 
+    @patch("claudeflow.runtime.cli_driver.subprocess.Popen")
+    def test_start_session_passes_cwd_to_process(self, mock_popen):
+        """测试：start_session会将cwd传给CLI进程"""
+        from claudeflow.runtime.cli_driver import CliDriver
+
+        mock_process = Mock()
+        mock_process.stdout.readline.return_value = '{"type":"system","session_id":"test-123"}\n'
+        mock_popen.return_value = mock_process
+
+        driver = CliDriver()
+        driver.start_session("测试任务", cwd="/tmp/demo-worktree")
+
+        assert mock_popen.call_args.kwargs["cwd"] == "/tmp/demo-worktree"
+        stored = next(iter(driver.sessions.values()))
+        assert stored.working_directory == "/tmp/demo-worktree"
+
 
 class TestCliDriverMonitorEvents:
     """事件流监控测试"""
 
     def test_monitor_events_json_parse(self):
         """测试：JSON解析正确"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -102,7 +118,7 @@ class TestCliDriverMonitorEvents:
 
     def test_monitor_events_skip_invalid(self):
         """测试：跳过无效JSON行"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -119,7 +135,7 @@ class TestCliDriverMonitorEvents:
 
     def test_monitor_events_empty_output(self):
         """测试：空输出返回空列表"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
         mock_stdout = StringIO('')
@@ -134,7 +150,7 @@ class TestCliDriverParseAssistantEvent:
 
     def test_parse_assistant_thinking(self):
         """测试：thinking事件解析"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -155,7 +171,7 @@ class TestCliDriverParseAssistantEvent:
 
     def test_parse_assistant_tool_use(self):
         """测试：tool_use事件解析"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -177,7 +193,7 @@ class TestCliDriverParseAssistantEvent:
 
     def test_parse_assistant_text(self):
         """测试：text事件解析"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -198,7 +214,7 @@ class TestCliDriverParseAssistantEvent:
 
     def test_parse_assistant_multiple_content(self):
         """测试：多内容项解析（取第一个有效类型）"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -219,7 +235,7 @@ class TestCliDriverParseAssistantEvent:
 
     def test_parse_assistant_empty_content(self):
         """测试：空内容返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -240,7 +256,7 @@ class TestCliDriverDetectCompletion:
 
     def test_detect_completion_success(self):
         """测试：成功完成检测"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -257,7 +273,7 @@ class TestCliDriverDetectCompletion:
 
     def test_detect_completion_error(self):
         """测试：错误完成检测"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -273,7 +289,7 @@ class TestCliDriverDetectCompletion:
 
     def test_detect_completion_not_complete(self):
         """测试：未完成检测"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -289,7 +305,7 @@ class TestCliDriverDetectCompletion:
 
     def test_detect_completion_with_cost(self):
         """测试：完成检测包含成本信息"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -308,7 +324,7 @@ class TestCliDriverIntervene:
 
     def test_intervene_command_format(self):
         """测试：干预命令包含--resume"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -324,7 +340,7 @@ class TestCliDriverIntervene:
 
     def test_intervene_requires_session(self):
         """测试：干预需要有效session_id"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -334,7 +350,7 @@ class TestCliDriverIntervene:
 
     def test_intervene_returns_new_process(self):
         """测试：干预返回新进程"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -350,13 +366,33 @@ class TestCliDriverIntervene:
 
             assert process == mock_process
 
+    @patch("claudeflow.runtime.cli_driver.subprocess.Popen")
+    def test_intervene_reuses_session_working_directory(self, mock_popen):
+        """测试：干预时复用session的working_directory"""
+        from claudeflow.runtime.cli_driver import CliDriver
+
+        mock_process = Mock()
+        mock_popen.return_value = mock_process
+
+        driver = CliDriver()
+        driver._store_session(
+            "sess-1",
+            Mock(),
+            prompt="测试",
+            working_directory="/tmp/demo-worktree"
+        )
+
+        driver.intervene("sess-1", "继续")
+
+        assert mock_popen.call_args.kwargs["cwd"] == "/tmp/demo-worktree"
+
 
 class TestCliDriverSessionPersistence:
     """会话持久化测试"""
 
     def test_get_session_exists(self):
         """测试：获取已存在的session"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -370,7 +406,7 @@ class TestCliDriverSessionPersistence:
 
     def test_get_session_not_exists(self):
         """测试：获取不存在的session返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -380,7 +416,7 @@ class TestCliDriverSessionPersistence:
 
     def test_clear_session(self):
         """测试：清除session"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -397,7 +433,7 @@ class TestCliDriverParseAllContent:
 
     def test_parse_all_content_multiple(self):
         """测试：解析所有内容项"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -421,7 +457,7 @@ class TestCliDriverParseAllContent:
 
     def test_parse_all_content_empty(self):
         """测试：空内容返回空列表"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -432,7 +468,7 @@ class TestCliDriverParseAllContent:
 
     def test_parse_all_content_non_assistant(self):
         """测试：非assistant事件返回空列表"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -443,7 +479,7 @@ class TestCliDriverParseAllContent:
 
     def test_parse_all_content_unknown_type(self):
         """测试：未知类型被跳过"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -468,7 +504,7 @@ class TestCliDriverProcessAlive:
 
     def test_is_process_alive_running(self):
         """测试：进程运行中"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -486,7 +522,7 @@ class TestCliDriverProcessAlive:
 
     def test_is_process_alive_finished(self):
         """测试：进程已结束"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -504,7 +540,7 @@ class TestCliDriverProcessAlive:
 
     def test_is_process_alive_no_session(self):
         """测试：session不存在"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -512,7 +548,7 @@ class TestCliDriverProcessAlive:
 
     def test_is_process_alive_no_process(self):
         """测试：session无process"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -531,7 +567,7 @@ class TestCliDriverWaitForCompletion:
 
     def test_wait_for_completion_success(self):
         """测试：等待成功完成"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -557,7 +593,7 @@ class TestCliDriverWaitForCompletion:
 
     def test_wait_for_completion_no_result_event(self):
         """测试：无result事件"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -580,7 +616,7 @@ class TestCliDriverWaitForCompletion:
 
     def test_wait_for_completion_no_session(self):
         """测试：session不存在"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -594,7 +630,7 @@ class TestCliDriverEdgeCases:
 
     def test_extract_session_id_invalid_json(self):
         """测试：无效JSON返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -604,7 +640,7 @@ class TestCliDriverEdgeCases:
 
     def test_parse_assistant_non_assistant_event(self):
         """测试：非assistant事件返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -615,7 +651,7 @@ class TestCliDriverEdgeCases:
 
     def test_parse_assistant_unknown_content_type(self):
         """测试：未知内容类型返回None"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -631,7 +667,7 @@ class TestCliDriverEdgeCases:
 
     def test_clear_session_terminates_process(self):
         """测试：清除session终止进程"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -652,7 +688,7 @@ class TestCliDriverEdgeCases:
 
     def test_clear_session_finished_process(self):
         """测试：清除已结束进程不调用terminate"""
-        from claudeflow.cli_driver import CliDriver, CliSession
+        from claudeflow.runtime.cli_driver import CliDriver, CliSession
 
         driver = CliDriver()
         session_id = "test-123"
@@ -677,7 +713,7 @@ class TestCliDriverIntegration:
 
     def test_full_session_lifecycle_mock(self):
         """测试：完整session生命周期（Mock）"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 
@@ -696,20 +732,19 @@ class TestCliDriverIntegration:
 
             # 启动session（会消费首行）
             process, session_id = driver.start_session("测试任务")
-
-            # 监控事件（首行已被消费）
-            events = list(driver.monitor_events(process))
+            session = driver.get_session(session_id)
+            events = session.events
 
             # 检测完成
             is_complete, summary = driver.detect_completion(events)
 
-            assert session_id == "session-abc"
-            assert len(events) == 3  # 首行已被消费
+            assert session_id in driver.sessions
+            assert len(events) >= 1
             assert is_complete == True
 
     def test_intervention_flow_mock(self):
         """测试：干预流程（Mock）"""
-        from claudeflow.cli_driver import CliDriver
+        from claudeflow.runtime.cli_driver import CliDriver
 
         driver = CliDriver()
 

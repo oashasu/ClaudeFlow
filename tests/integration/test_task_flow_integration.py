@@ -13,9 +13,9 @@ class TestTaskFlowIntegration:
 
     def test_task_full_lifecycle(self):
         """测试：任务完整生命周期"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -48,9 +48,9 @@ class TestTaskFlowIntegration:
 
     def test_task_failure_and_retry_flow(self):
         """测试：任务失败重试流程"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -75,9 +75,9 @@ class TestTaskFlowIntegration:
 
     def test_task_max_retry_to_human_intervention(self):
         """测试：超过重试上限进入人工介入"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -103,9 +103,9 @@ class TestTaskFlowIntegration:
 
     def test_task_non_retriable_to_human_intervention(self):
         """测试：不可重试错误直接人工介入"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -125,9 +125,9 @@ class TestTaskFlowIntegration:
 
     def test_multiple_tasks_concurrent_execution(self):
         """测试：多个任务并发执行"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -166,8 +166,8 @@ class TestTaskProgressIntegration:
 
     def test_phase_progress_tracking(self):
         """测试：阶段进度追踪"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -190,9 +190,9 @@ class TestTaskProgressIntegration:
 
     def test_phase_history_recording(self):
         """测试：阶段历史记录"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -217,9 +217,9 @@ class TestTaskCancelIntegration:
 
     def test_cancel_running_task(self):
         """测试：取消执行中任务"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)

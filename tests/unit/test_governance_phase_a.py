@@ -1,6 +1,17 @@
 """Phase A 验收测试 — 覆盖 A01-A08 全部场景。
 
-对应文档: 05_PhaseA_验收标准.md
+对应文档:
+- 05_PhaseA_验收标准.md
+- 09_Governor编排对象Schema设计.md
+
+Schema 关键:
+- current_phase 是 phase ID（如 "phase-1"），不是 phase status
+- phase status 放在 phases.<id>.status 中
+- tasks 是按任务 ID 索引的对象，不是数组
+- executor_type: claude|codex|future
+- reviewer_type: governor|external-reviewer
+- done_definition: 数组
+- gate_on_complete: review_required|acceptance_required
 """
 
 from __future__ import annotations
@@ -18,7 +29,7 @@ from claudeflow.governance.pipeline_state import (
     PipelineState,
     PipelineStateError,
     PipelineStateStore,
-    VALID_PHASES,
+    VALID_PHASE_STATUSES,
     VALID_GATE_STATUSES,
 )
 from claudeflow.governance.poller import ChangeRecord, GovernancePoller
@@ -52,15 +63,24 @@ def workspace(tmp_project):
 
 def _valid_pipeline_state():
     return {
-        "workflow_version": "1",
-        "current_phase": "drafting",
+        "workflow_version": "v1",
+        "project": "test-project",
+        "current_phase": "phase-1",
         "current_stage": "research",
-        "current_gate": "docs",
+        "current_gate": "docs_confirm",
         "gate_status": "open",
-        "governor": {"host": "codex"},
+        "governor": {"host": "codex", "mode": "governor"},
         "advance_allowed": False,
         "reopen_required": False,
-        "tasks": [],
+        "phases": {
+            "phase-1": {
+                "status": "drafting",
+                "docs_ready": False,
+                "tasks_ready": False,
+                "quality_gate_passed": False,
+            },
+        },
+        "tasks": {},
         "timestamps": {"updated_at": "2026-04-26T00:00:00+00:00"},
     }
 
@@ -68,16 +88,16 @@ def _valid_pipeline_state():
 def _valid_task_yaml():
     return {
         "id": "T001",
-        "phase_id": "P1",
+        "phase_id": "phase-1",
         "title": "实现 GovernanceWorkspace",
-        "executor_type": "worker-agent",
-        "reviewer_type": "governor-agent",
+        "executor_type": "claude",
+        "reviewer_type": "governor",
         "inputs": ["设计文档"],
         "constraints": ["幂等"],
         "allowed_write_paths": ["src/governance/"],
         "acceptance_refs": ["A01"],
-        "done_definition": "目录创建成功，重复执行幂等",
-        "gate_on_complete": "docs_confirm",
+        "done_definition": ["build_pass", "acceptance_ready"],
+        "gate_on_complete": "review_required",
     }
 
 
@@ -96,6 +116,14 @@ class TestA01WorkspaceInit:
         assert paths.pipeline_state.exists()
         assert paths.roles_yaml.exists()
         assert paths.phases_dir.is_dir()
+
+    def test_init_creates_valid_default_state(self, workspace):
+        paths = workspace.initialize()
+        store = PipelineStateStore(paths.pipeline_state)
+        state, errors = store.load()
+        assert not errors, f"默认状态校验失败: {[e.reason for e in errors]}"
+        assert state.current_phase == "phase-1"
+        assert state.get_phase_status("phase-1") == "drafting"
 
     def test_init_idempotent(self, workspace):
         paths1 = workspace.initialize()
@@ -135,8 +163,9 @@ class TestA02PipelineStateReadWrite:
         store = PipelineStateStore(state_file)
         state, errors = store.load()
         assert not errors
-        assert state.current_phase == "drafting"
+        assert state.current_phase == "phase-1"
         assert state.gate_status == "open"
+        assert state.get_phase_status("phase-1") == "drafting"
 
     def test_save_and_reload(self, tmp_project):
         state_file = tmp_project / "pipeline-state.json"
@@ -144,13 +173,13 @@ class TestA02PipelineStateReadWrite:
 
         store = PipelineStateStore(state_file)
         state, _ = store.load()
-        state.current_gate = "implementation"
+        state.current_gate = "implementation_review"
         state.gate_status = "passed"
         store.save(state)
 
         reloaded, errors = store.load()
         assert not errors
-        assert reloaded.current_gate == "implementation"
+        assert reloaded.current_gate == "implementation_review"
         assert reloaded.gate_status == "passed"
 
     def test_updated_at_refreshed_on_save(self, tmp_project):
@@ -171,12 +200,18 @@ class TestA02PipelineStateReadWrite:
         state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
 
         store = PipelineStateStore(state_file)
-        new_state, errors = store.update_and_save({"current_phase": "docs_confirm"})
+        new_state, errors = store.update_and_save({
+            "phases": {
+                "phase-1": {
+                    "status": "docs_confirm",
+                    "docs_ready": True,
+                    "tasks_ready": False,
+                    "quality_gate_passed": False,
+                },
+            },
+        })
         assert not errors
-        assert new_state.current_phase == "docs_confirm"
-
-        reloaded, _ = store.load()
-        assert reloaded.current_phase == "docs_confirm"
+        assert new_state.get_phase_status("phase-1") == "docs_confirm"
 
 
 # ============================================================
@@ -190,24 +225,26 @@ class TestA03PipelineStateInvalid:
     def test_missing_required_field(self, tmp_project):
         state_file = tmp_project / "pipeline-state.json"
         payload = _valid_pipeline_state()
-        del payload["current_phase"]
+        del payload["phases"]
         state_file.write_text(json.dumps(payload), encoding="utf-8")
 
         store = PipelineStateStore(state_file)
         _, errors = store.load()
         assert len(errors) >= 1
-        assert errors[0].field_name == "current_phase"
-        assert errors[0].error_type == "missing_field"
+        assert any(e.field_name == "phases" for e in errors)
 
-    def test_invalid_phase_enum(self, tmp_project):
+    def test_invalid_phase_status(self, tmp_project):
         state_file = tmp_project / "pipeline-state.json"
         payload = _valid_pipeline_state()
-        payload["current_phase"] = "nonexistent_phase"
+        payload["phases"]["phase-1"]["status"] = "nonexistent_status"
         state_file.write_text(json.dumps(payload), encoding="utf-8")
 
         store = PipelineStateStore(state_file)
         _, errors = store.load()
-        assert any(e.field_name == "current_phase" and e.error_type == "enum_error" for e in errors)
+        assert any(
+            e.field_name == "phases.phase-1.status" and e.error_type == "enum_error"
+            for e in errors
+        )
 
     def test_invalid_gate_enum(self, tmp_project):
         state_file = tmp_project / "pipeline-state.json"
@@ -218,6 +255,40 @@ class TestA03PipelineStateInvalid:
         store = PipelineStateStore(state_file)
         _, errors = store.load()
         assert any(e.field_name == "gate_status" and e.error_type == "enum_error" for e in errors)
+
+    def test_invalid_current_gate_enum(self, tmp_project):
+        """current_gate 枚举值非法时应报错。"""
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["current_gate"] = "invalid_gate"
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(e.field_name == "current_gate" and e.error_type == "enum_error" for e in errors)
+
+    def test_tasks_as_array_rejected(self, tmp_project):
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["tasks"] = []
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(e.field_name == "tasks" for e in errors)
+
+    def test_current_phase_not_in_phases(self, tmp_project):
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["current_phase"] = "phase-999"
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(
+            e.field_name == "current_phase" and e.error_type == "reference_error"
+            for e in errors
+        )
 
     def test_invalid_json(self, tmp_project):
         state_file = tmp_project / "pipeline-state.json"
@@ -237,12 +308,64 @@ class TestA03PipelineStateInvalid:
         state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
 
         store = PipelineStateStore(state_file)
-        _, errors = store.update_and_save({"current_phase": "bad_phase"})
+        _, errors = store.update_and_save({"current_phase": "phase-999"})
         assert errors
 
         reloaded, reloaded_errors = store.load()
         assert not reloaded_errors
-        assert reloaded.current_phase == "drafting"
+        assert reloaded.current_phase == "phase-1"
+
+    def test_missing_governor_host(self, tmp_project):
+        """governor.host 必填字段缺失时应报错。"""
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["governor"] = {"mode": "governor"}  # 缺少 host
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(e.field_name == "governor.host" and e.error_type == "missing_field" for e in errors)
+
+    def test_missing_timestamps_updated_at(self, tmp_project):
+        """timestamps.updated_at 必填字段缺失时应报错。"""
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["timestamps"] = {}  # 缺少 updated_at
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(
+            e.field_name == "timestamps.updated_at" and e.error_type == "missing_field"
+            for e in errors
+        )
+
+    def test_task_missing_required_field(self, tmp_project):
+        """task 结构字段缺失时应报错。"""
+        state_file = tmp_project / "pipeline-state.json"
+        payload = _valid_pipeline_state()
+        payload["tasks"] = {
+            "T001": {
+                "phase_id": "phase-1",
+                # 缺少 executor_type, status, review_status
+            },
+        }
+        state_file.write_text(json.dumps(payload), encoding="utf-8")
+
+        store = PipelineStateStore(state_file)
+        _, errors = store.load()
+        assert any(
+            e.field_name == "tasks.T001.executor_type" and e.error_type == "missing_field"
+            for e in errors
+        )
+        assert any(
+            e.field_name == "tasks.T001.status" and e.error_type == "missing_field"
+            for e in errors
+        )
+        assert any(
+            e.field_name == "tasks.T001.review_status" and e.error_type == "missing_field"
+            for e in errors
+        )
 
 
 # ============================================================
@@ -265,7 +388,10 @@ class TestA04TaskPackageValid:
         assert not errors
         assert pkg is not None
         assert pkg.id == "T001"
-        assert pkg.executor_type == "worker-agent"
+        assert pkg.executor_type == "claude"
+        assert pkg.reviewer_type == "governor"
+        assert pkg.done_definition == ["build_pass", "acceptance_ready"]
+        assert pkg.gate_on_complete == "review_required"
         assert pkg.allowed_write_paths == ["src/governance/"]
         assert pkg.acceptance_refs == ["A01"]
 
@@ -327,13 +453,43 @@ class TestA05TaskPackageInvalid:
 
     def test_invalid_executor_type_enum(self, tmp_project):
         task = _valid_task_yaml()
-        task["executor_type"] = "unknown-agent"
+        task["executor_type"] = "worker-agent"
         yaml_file = tmp_project / "bad.yaml"
         yaml_file.write_text(yaml.dump(task, allow_unicode=True), encoding="utf-8")
 
         loader = TaskPackageLoader()
         _, errors = loader.load_file(yaml_file)
         assert any(e.field_name == "executor_type" and e.error_type == "enum_error" for e in errors)
+
+    def test_invalid_reviewer_type_enum(self, tmp_project):
+        task = _valid_task_yaml()
+        task["reviewer_type"] = "peer-review"
+        yaml_file = tmp_project / "bad.yaml"
+        yaml_file.write_text(yaml.dump(task, allow_unicode=True), encoding="utf-8")
+
+        loader = TaskPackageLoader()
+        _, errors = loader.load_file(yaml_file)
+        assert any(e.field_name == "reviewer_type" and e.error_type == "enum_error" for e in errors)
+
+    def test_invalid_gate_on_complete_enum(self, tmp_project):
+        task = _valid_task_yaml()
+        task["gate_on_complete"] = "unknown"
+        yaml_file = tmp_project / "bad.yaml"
+        yaml_file.write_text(yaml.dump(task, allow_unicode=True), encoding="utf-8")
+
+        loader = TaskPackageLoader()
+        _, errors = loader.load_file(yaml_file)
+        assert any(e.field_name == "gate_on_complete" and e.error_type == "enum_error" for e in errors)
+
+    def test_done_definition_not_array(self, tmp_project):
+        task = _valid_task_yaml()
+        task["done_definition"] = "single string"
+        yaml_file = tmp_project / "bad.yaml"
+        yaml_file.write_text(yaml.dump(task, allow_unicode=True), encoding="utf-8")
+
+        loader = TaskPackageLoader()
+        _, errors = loader.load_file(yaml_file)
+        assert any(e.field_name == "done_definition" and e.error_type == "type_error" for e in errors)
 
     def test_non_map_yaml(self, tmp_project):
         yaml_file = tmp_project / "bad.yaml"
@@ -458,10 +614,10 @@ class TestA08PollerDetectsChanges:
         state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
 
         poller = GovernancePoller(super_dev)
-        poller.scan_once()  # initial snapshot
+        poller.scan_once()
 
         state_data = _valid_pipeline_state()
-        state_data["current_phase"] = "docs_confirm"
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
         state_file.write_text(json.dumps(state_data), encoding="utf-8")
 
         changes = poller.scan_once()
@@ -470,14 +626,14 @@ class TestA08PollerDetectsChanges:
 
     def test_detect_new_task_yaml(self, tmp_project):
         super_dev = tmp_project / ".super-dev"
-        tasks_dir = super_dev / "phases" / "P1" / "tasks"
+        tasks_dir = super_dev / "phases" / "phase-1" / "tasks"
         tasks_dir.mkdir(parents=True)
         (super_dev / "pipeline-state.json").write_text(
             json.dumps(_valid_pipeline_state()), encoding="utf-8",
         )
 
         poller = GovernancePoller(super_dev)
-        poller.scan_once()  # initial
+        poller.scan_once()
 
         task_file = tasks_dir / "T001.yaml"
         task_file.write_text(
@@ -511,11 +667,143 @@ class TestA08PollerDetectsChanges:
         poller.scan_once()
 
         state_data = _valid_pipeline_state()
-        state_data["current_phase"] = "docs_confirm"
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
         state_file.write_text(json.dumps(state_data), encoding="utf-8")
 
         poller.scan_once()
         assert len(poller.change_log) >= 1
+
+    def test_reload_success_with_reloader(self, tmp_project):
+        """注册 reloader 后，变更文件应触发真实 reload，reload_result 为 success，缓存为实际对象。"""
+        super_dev = tmp_project / ".super-dev"
+        super_dev.mkdir()
+        state_file = super_dev / "pipeline-state.json"
+        state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
+
+        reload_log: list[Path] = []
+
+        def reloader(path: Path) -> tuple[PipelineState, bool]:
+            reload_log.append(path)
+            store = PipelineStateStore(path)
+            state, errors = store.load()
+            return (state, len(errors) == 0)
+
+        poller = GovernancePoller(
+            super_dev,
+            reloaders={"pipeline-state.json": reloader},
+        )
+        poller.scan_once()
+
+        state_data = _valid_pipeline_state()
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
+        state_file.write_text(json.dumps(state_data), encoding="utf-8")
+
+        changes = poller.scan_once()
+        modified = [c for c in changes if c.change_type == "modified"]
+        assert len(modified) >= 1
+        assert modified[0].reload_result == "success"
+        assert len(reload_log) >= 1
+        # 验证缓存中是实际对象
+        cached = poller.get_cache(str(state_file))
+        assert cached is not None
+        assert isinstance(cached, PipelineState)
+        assert cached.get_phase_status("phase-1") == "docs_confirm"
+
+    def test_reload_failure_preserves_old_cache(self, tmp_project):
+        """reload 失败时，应记录 reload_result=failed 并保留旧缓存对象。"""
+        super_dev = tmp_project / ".super-dev"
+        super_dev.mkdir()
+        state_file = super_dev / "pipeline-state.json"
+        state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
+
+        call_count = 0
+        first_state: PipelineState | None = None
+
+        def failing_reloader(path: Path) -> tuple[PipelineState, bool]:
+            nonlocal call_count, first_state
+            call_count += 1
+            store = PipelineStateStore(path)
+            state, errors = store.load()
+            if call_count == 1:
+                first_state = state
+                return (state, True)
+            return (state, False)  # 第二次返回失败
+
+        poller = GovernancePoller(
+            super_dev,
+            reloaders={"pipeline-state.json": failing_reloader},
+        )
+        poller.scan_once()
+        cached_after_first = poller.get_cache(str(state_file))
+        assert cached_after_first is not None
+        assert isinstance(cached_after_first, PipelineState)
+        assert cached_after_first.get_phase_status("phase-1") == "drafting"
+
+        state_data = _valid_pipeline_state()
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
+        state_file.write_text(json.dumps(state_data), encoding="utf-8")
+
+        changes = poller.scan_once()
+        modified = [c for c in changes if c.change_type == "modified"]
+        assert len(modified) >= 1
+        assert modified[0].reload_result == "failed"
+        assert modified[0].error_reason != ""
+        # 验证缓存仍然是旧对象
+        cached_after_fail = poller.get_cache(str(state_file))
+        assert cached_after_fail is not None
+        assert isinstance(cached_after_fail, PipelineState)
+        assert cached_after_fail.get_phase_status("phase-1") == "drafting"  # 未更新
+
+    def test_reload_exception_preserves_old_cache(self, tmp_project):
+        """reloader 抛异常时，应记录 reload_result=failed 并保留旧缓存对象。"""
+        super_dev = tmp_project / ".super-dev"
+        super_dev.mkdir()
+        state_file = super_dev / "pipeline-state.json"
+        state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
+
+        call_count = 0
+
+        def exception_reloader(path: Path) -> tuple[PipelineState, bool]:
+            nonlocal call_count
+            call_count += 1
+            if call_count > 1:
+                raise RuntimeError("disk error")
+            store = PipelineStateStore(path)
+            state, errors = store.load()
+            return (state, len(errors) == 0)
+
+        poller = GovernancePoller(
+            super_dev,
+            reloaders={"pipeline-state.json": exception_reloader},
+        )
+        poller.scan_once()
+        cached_after_first = poller.get_cache(str(state_file))
+        assert cached_after_first is not None
+        assert isinstance(cached_after_first, PipelineState)
+
+        state_data = _valid_pipeline_state()
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
+        state_file.write_text(json.dumps(state_data), encoding="utf-8")
+
+        changes = poller.scan_once()
+        modified = [c for c in changes if c.change_type == "modified"]
+        assert modified[0].reload_result == "failed"
+        assert "disk error" in modified[0].error_reason
+        # 验证缓存仍然是旧对象
+        cached_after_fail = poller.get_cache(str(state_file))
+        assert cached_after_fail is not None
+        assert cached_after_fail.get_phase_status("phase-1") == "drafting"
+
+    def test_no_reloader_records_skipped(self, tmp_project):
+        """未注册 reloader 时，reload_result 应为 skipped。"""
+        super_dev = tmp_project / ".super-dev"
+        super_dev.mkdir()
+        state_file = super_dev / "pipeline-state.json"
+        state_file.write_text(json.dumps(_valid_pipeline_state()), encoding="utf-8")
+
+        poller = GovernancePoller(super_dev)
+        changes = poller.scan_once()
+        assert any(c.reload_result == "skipped" for c in changes)
 
     def test_background_polling(self, tmp_project):
         super_dev = tmp_project / ".super-dev"
@@ -526,9 +814,9 @@ class TestA08PollerDetectsChanges:
         poller = GovernancePoller(super_dev, interval=0.2)
         poller.start()
         try:
-            poller.scan_once()  # initial snapshot
+            poller.scan_once()
             state_data = _valid_pipeline_state()
-            state_data["current_phase"] = "docs_confirm"
+            state_data["phases"]["phase-1"]["status"] = "docs_confirm"
             state_file.write_text(json.dumps(state_data), encoding="utf-8")
             time.sleep(0.5)
             assert len(poller.change_log) >= 1
@@ -546,7 +834,7 @@ class TestA08PollerDetectsChanges:
         poller.scan_once()
 
         state_data = _valid_pipeline_state()
-        state_data["current_phase"] = "docs_confirm"
+        state_data["phases"]["phase-1"]["status"] = "docs_confirm"
         state_file.write_text(json.dumps(state_data), encoding="utf-8")
 
         poller.scan_once()

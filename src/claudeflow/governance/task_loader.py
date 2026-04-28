@@ -6,10 +6,13 @@
 - 严格校验必填字段和枚举值
 - 输出校验错误
 
+Schema 来源: 09_Governor编排对象Schema设计.md
+
 约束:
 - 严格字段校验，禁止宽松解析
 - allowed_write_paths 不能为空
 - acceptance_refs 至少一个
+- done_definition 必须是数组
 """
 
 from __future__ import annotations
@@ -34,8 +37,10 @@ REQUIRED_TASK_FIELDS = (
     "gate_on_complete",
 )
 
-VALID_EXECUTOR_TYPES = ("worker-agent", "governor-agent", "hybrid")
-VALID_REVIEWER_TYPES = ("governor-agent", "peer-review", "auto", "manual")
+VALID_EXECUTOR_TYPES = ("claude", "codex", "future")
+VALID_REVIEWER_TYPES = ("governor", "external-reviewer")
+VALID_PRIORITIES = ("critical", "high", "medium", "low")
+VALID_GATE_ON_COMPLETE = ("review_required", "acceptance_required")
 
 
 @dataclass
@@ -69,7 +74,7 @@ class TaskPackage:
     constraints: List[str]
     allowed_write_paths: List[str]
     acceptance_refs: List[str]
-    done_definition: str
+    done_definition: List[str]
     gate_on_complete: str
     raw: Dict[str, Any] = field(default_factory=dict)
 
@@ -84,7 +89,7 @@ class TaskPackage:
             "constraints": list(self.constraints),
             "allowed_write_paths": list(self.allowed_write_paths),
             "acceptance_refs": list(self.acceptance_refs),
-            "done_definition": self.done_definition,
+            "done_definition": list(self.done_definition),
             "gate_on_complete": self.gate_on_complete,
         }
 
@@ -145,7 +150,7 @@ class TaskPackageLoader:
             constraints=list(raw["constraints"]),
             allowed_write_paths=list(raw["allowed_write_paths"]),
             acceptance_refs=list(raw["acceptance_refs"]),
-            done_definition=raw["done_definition"],
+            done_definition=list(raw["done_definition"]),
             gate_on_complete=raw["gate_on_complete"],
             raw=raw,
         )
@@ -207,6 +212,25 @@ class TaskPackageLoader:
                 reason=f"非法枚举值: {reviewer}，合法值: {VALID_REVIEWER_TYPES}",
             ))
 
+        gate = raw.get("gate_on_complete")
+        if gate and gate not in VALID_GATE_ON_COMPLETE:
+            errors.append(TaskPackageError(
+                error_type="enum_error",
+                file_path=file_path,
+                field_name="gate_on_complete",
+                reason=f"非法枚举值: {gate}，合法值: {VALID_GATE_ON_COMPLETE}",
+            ))
+
+        for list_field in ("inputs", "constraints", "allowed_write_paths", "acceptance_refs", "done_definition"):
+            val = raw.get(list_field)
+            if val is not None and not isinstance(val, list):
+                errors.append(TaskPackageError(
+                    error_type="type_error",
+                    file_path=file_path,
+                    field_name=list_field,
+                    reason=f"{list_field} 必须是数组",
+                ))
+
         write_paths = raw.get("allowed_write_paths")
         if isinstance(write_paths, list) and len(write_paths) == 0:
             errors.append(TaskPackageError(
@@ -224,15 +248,5 @@ class TaskPackageLoader:
                 field_name="acceptance_refs",
                 reason="acceptance_refs 至少需要一个引用",
             ))
-
-        for list_field in ("inputs", "constraints", "allowed_write_paths", "acceptance_refs"):
-            val = raw.get(list_field)
-            if val is not None and not isinstance(val, list):
-                errors.append(TaskPackageError(
-                    error_type="type_error",
-                    file_path=file_path,
-                    field_name=list_field,
-                    reason=f"{list_field} 必须是数组",
-                ))
 
         return errors

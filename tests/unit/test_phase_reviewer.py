@@ -7,8 +7,8 @@ import tempfile
 import os
 from pathlib import Path
 
-from claudeflow.phase_reviewer import PhaseReviewer
-from claudeflow.haiku_client import HaikuClient
+from claudeflow.legacy.phase_reviewer import PhaseReviewer
+from claudeflow.legacy.haiku_client import HaikuClient
 
 
 class TestPhaseReviewer:

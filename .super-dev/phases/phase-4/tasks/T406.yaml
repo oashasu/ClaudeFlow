@@ -1,0 +1,43 @@
+id: T406
+phase_id: phase-4
+title: 补齐 Phase 4 回归与阶段验收测试
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../acceptance.md
+  - ../task-plan.md
+  - ./T401.yaml
+  - ./T402.yaml
+  - ./T403.yaml
+  - ./T404.yaml
+  - ./T405.yaml
+constraints:
+  - 必须覆盖 warning 清理后的主链、错误路径和 smoke 入口
+  - 不得回退 Phase 3 已验收的 Runtime Console 主功能
+allowed_write_paths:
+  - console/**
+  - tests/**
+  - scripts/**
+acceptance_refs:
+  - A41
+  - A42
+  - A43
+  - A44
+  - A45
+  - A46
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 通过删断言换取更绿的结果
+  - 只补 happy path 不补 warning/error 分支
+done_definition:
+  - phase4_acceptance_covered
+  - regression_green
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

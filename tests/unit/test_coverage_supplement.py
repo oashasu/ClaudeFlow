@@ -74,7 +74,7 @@ class TestCheckpointErrorBranches:
 
     def test_checkpoint_invalid_json_file(self):
         """测试：无效JSON文件处理"""
-        from claudeflow.checkpoint import CheckpointManager
+        from claudeflow.workflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -91,7 +91,7 @@ class TestCheckpointErrorBranches:
 
     def test_checkpoint_missing_fields_json(self):
         """测试：缺失字段的JSON文件处理"""
-        from claudeflow.checkpoint import CheckpointManager
+        from claudeflow.workflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -112,7 +112,7 @@ class TestTaskManagerDuplicateName:
 
     def test_task_manager_duplicate_name_branch(self):
         """测试：任务目录名重复分支"""
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)

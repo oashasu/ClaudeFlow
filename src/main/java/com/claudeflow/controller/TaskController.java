@@ -2,6 +2,7 @@ package com.claudeflow.controller;
 
 import com.claudeflow.dto.TaskDTO;
 import com.claudeflow.dto.TaskStatsDTO;
+import com.claudeflow.dto.CreateTaskRequest;
 import com.claudeflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,14 @@ import java.util.Map;
 public class TaskController {
 
     private final TaskService taskService;
+
+    /**
+     * 创建任务
+     */
+    @PostMapping
+    public TaskDTO createTask(@RequestBody CreateTaskRequest request) {
+        return taskService.createTask(request);
+    }
 
     /**
      * 任务列表
@@ -77,5 +86,22 @@ public class TaskController {
     @PostMapping("/cancel/{id}")
     public TaskDTO cancelTask(@PathVariable String id) {
         return taskService.cancelTask(id);
+    }
+
+    /**
+     * 删除任务
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable String id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 重新执行任务
+     */
+    @PostMapping("/retry/{id}")
+    public TaskDTO retryTask(@PathVariable String id) {
+        return taskService.retryTask(id);
     }
 }

@@ -1,11 +1,15 @@
-"""T004: GovernanceStateMachine — phase / gate 状态机骨架。
+"""T004: GovernanceStateMachine — phase status / gate 状态机骨架。
 
 职责:
-- 定义 phase 和 gate 状态枚举
+- 定义 phase status 和 gate status 枚举
 - 定义合法流转
 - 拒绝非法流转
 
-Phase 流转链:
+注意: GovernancePhase 是 phase STATUS（如 drafting, in_execution），
+不是 phase ID（如 phase-1）。phase ID 存在 pipeline-state.json 的
+current_phase 字段，phase status 存在 phases.<id>.status 字段。
+
+Phase status 流转链:
   drafting -> docs_confirm -> ready_for_dispatch -> in_execution
   in_execution -> implementation_review
   implementation_review -> quality_gate

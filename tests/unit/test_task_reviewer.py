@@ -7,8 +7,8 @@ import tempfile
 import shutil
 from pathlib import Path
 
-from claudeflow.task_reviewer import TaskReviewer
-from claudeflow.haiku_client import HaikuClient
+from claudeflow.legacy.task_reviewer import TaskReviewer
+from claudeflow.legacy.haiku_client import HaikuClient
 
 
 class TestTaskReviewer:

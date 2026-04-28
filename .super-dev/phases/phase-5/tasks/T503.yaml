@@ -1,0 +1,35 @@
+id: T503
+phase_id: phase-5
+title: 固化 release readiness 与 warning budget 分层
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../prd.md
+  - ../acceptance.md
+  - ./T501.yaml
+  - ./T502.yaml
+constraints:
+  - blocker non-blocker warning budget 必须清晰分层
+  - 必须反映当前仓库已知环境级 warning 与功能级 blocker 的真实边界
+allowed_write_paths:
+  - docs/**
+  - output/**
+acceptance_refs:
+  - A53
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 把环境噪音和功能回归混成同级
+  - 写出与 governor review 历史口径冲突的发布标准
+done_definition:
+  - release_readiness_defined
+  - warning_budget_documented
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

@@ -28,30 +28,32 @@ const emit = defineEmits<{
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+  user-select: none;
 }
 
 .stats-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .stats-card.green {
-  background: #4caf50;
+  background: linear-gradient(135deg, #4caf50, #43a047);
   color: white;
 }
 
 .stats-card.gray {
-  background: #9e9e9e;
+  background: linear-gradient(135deg, #757575, #616161);
   color: white;
 }
 
 .stats-card.orange {
-  background: #ff9800;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
   color: white;
 }
 
 .stats-card.red {
-  background: #f44336;
+  background: linear-gradient(135deg, #f44336, #e53935);
   color: white;
 }
 
@@ -67,10 +69,12 @@ const emit = defineEmits<{
 .title {
   font-size: 14px;
   margin-bottom: 8px;
+  opacity: 0.9;
 }
 
 .count {
   font-size: 32px;
-  font-weight: bold;
+  font-weight: 700;
+  line-height: 1;
 }
 </style>

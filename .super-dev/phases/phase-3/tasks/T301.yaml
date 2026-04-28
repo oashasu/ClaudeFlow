@@ -1,0 +1,39 @@
+id: T301
+phase_id: phase-3
+title: 重构 Runtime Console 为 composable + validator + component assembly 结构
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../uiux.md
+  - ../acceptance.md
+constraints:
+  - RuntimeConsole.vue 不得继续承载主要拉数和动作实现逻辑
+  - 必须保持现有 runtime 页面入口与主功能不倒退
+allowed_write_paths:
+  - console/src/views/**
+  - console/src/components/**
+  - console/src/composables/**
+  - console/src/types/**
+  - console/src/validators/**
+  - console/src/services/**
+  - tests/**
+acceptance_refs:
+  - A31
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 新增第二套 Runtime Console 页面
+  - 只改样式不处理主逻辑拆分
+done_definition:
+  - runtime_console_structure_split
+  - composables_mainline_connected
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

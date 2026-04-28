@@ -1,0 +1,36 @@
+id: T405
+phase_id: phase-4
+title: 同步 testing observability 文档与排障说明
+executor_type: claude
+reviewer_type: governor
+priority: medium
+inputs:
+  - ../prd.md
+  - ../spec.md
+  - ./T401.yaml
+  - ./T402.yaml
+  - ./T403.yaml
+  - ./T404.yaml
+constraints:
+  - 文档必须反映真实实现与真实测试入口
+  - warning 和排障说明必须可执行，不得写成泛泛结论
+allowed_write_paths:
+  - docs/**
+  - output/**
+acceptance_refs:
+  - A45
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只改文档不对应真实测试基座
+  - 用过期命令或已失效 warning 口径充当说明
+done_definition:
+  - testing_docs_synced
+  - observability_guide_updated
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

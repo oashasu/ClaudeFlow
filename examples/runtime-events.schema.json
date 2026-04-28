@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaudeFlow Runtime Session Events",
+  "type": "object",
+  "required": ["session_id", "events_count", "parsed_events", "raw_events"],
+  "properties": {
+    "session_id": { "type": "string", "minLength": 1 },
+    "events_count": { "type": "integer", "minimum": 0 },
+    "parsed_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["thinking", "tool_use", "text"]
+          },
+          "text": { "type": "string" },
+          "tool_name": { "type": "string" },
+          "tool_input": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "raw_events": {
+      "type": "array"
+    }
+  },
+  "additionalProperties": false
+}

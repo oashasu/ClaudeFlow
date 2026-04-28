@@ -1,7 +1,8 @@
 // SSE服务层
 import type { ProgressUpdateEvent, ToolCallEvent, InterventionPromptEvent } from './eventBus'
 
-const SSE_URL = 'http://localhost:21000/api/events/stream'
+// 直连 Runtime API SSE
+const RUNTIME_URL = 'http://localhost:8000'
 
 type EventCallback<T> = (event: T) => void
 
@@ -13,71 +14,82 @@ interface SseHandlers {
   onError?: (error: Event) => void
 }
 
-let eventSource: EventSource | null = null
-let reconnectAttempts = 0
-const MAX_RECONNECT_DELAY = 30000
-const BASE_RECONNECT_DELAY = 1000
+let eventSources: Map<string, EventSource> = new Map()
 
-// 计算重连延迟（指数退避）
-function getReconnectDelay(): number {
-  const delay = BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts)
-  return Math.min(delay, MAX_RECONNECT_DELAY)
-}
+// 连接指定任务的SSE
+export function connectTaskSSE(sessionId: string, handlers: SseHandlers): void {
+  const url = `${RUNTIME_URL}/api/session/${sessionId}/events`
 
-// 连接SSE
-export function connectSSE(handlers: SseHandlers): void {
-  if (eventSource) {
-    disconnectSSE()
-  }
-
-  eventSource = new EventSource(SSE_URL)
+  const eventSource = new EventSource(url)
 
   eventSource.onopen = () => {
-    console.log('SSE connected')
-    reconnectAttempts = 0
+    console.log(`SSE connected for session: ${sessionId}`)
   }
 
-  eventSource.addEventListener('progress_update', (e: MessageEvent) => {
-    const data = JSON.parse(e.data) as ProgressUpdateEvent
-    handlers.onProgress?.(data)
-  })
+  eventSource.onmessage = (e: MessageEvent) => {
+    try {
+      const data = JSON.parse(e.data)
 
-  eventSource.addEventListener('tool_call', (e: MessageEvent) => {
-    const data = JSON.parse(e.data) as ToolCallEvent
-    handlers.onToolCall?.(data)
-  })
-
-  eventSource.addEventListener('intervention_prompt', (e: MessageEvent) => {
-    const data = JSON.parse(e.data) as InterventionPromptEvent
-    handlers.onIntervention?.(data)
-  })
-
-  eventSource.addEventListener('heartbeat', () => {
-    handlers.onHeartbeat?.()
-  })
+      // Runtime API 返回的事件格式：{ type, ... }
+      if (data.type === 'assistant') {
+        // 工具调用或文本
+        if (data.content?.type === 'tool_use') {
+          handlers.onToolCall?.({
+            taskId: sessionId,
+            tool: data.content.name,
+            input: data.content.input
+          })
+        } else if (data.content?.type === 'text') {
+          handlers.onProgress?.({
+            taskId: sessionId,
+            phase: 'executing',
+            progress: 50
+          })
+        }
+      } else if (data.type === 'result') {
+        handlers.onProgress?.({
+          taskId: sessionId,
+          phase: 'completed',
+          progress: 100
+        })
+        // 任务完成，关闭连接
+        eventSource.close()
+        eventSources.delete(sessionId)
+      } else if (data.type === 'error') {
+        handlers.onError?.(new Event('error'))
+      }
+    } catch (err) {
+      console.error('Failed to parse SSE event:', err)
+    }
+  }
 
   eventSource.onerror = (e: Event) => {
-    console.error('SSE error', e)
+    console.error('SSE error:', e)
     handlers.onError?.(e)
-
-    // 断线重连
-    disconnectSSE()
-    reconnectAttempts++
-    const delay = getReconnectDelay()
-    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts})`)
-    setTimeout(() => connectSSE(handlers), delay)
-  }
-}
-
-// 断开SSE
-export function disconnectSSE(): void {
-  if (eventSource) {
     eventSource.close()
-    eventSource = null
+    eventSources.delete(sessionId)
   }
+
+  eventSources.set(sessionId, eventSource)
 }
 
-// 重置重连计数
-export function resetReconnect(): void {
-  reconnectAttempts = 0
+// 连接所有运行中任务的SSE
+export function connectSSE(handlers: SseHandlers): void {
+  // 这个函数保留兼容性，但实际需要知道 sessionId
+  console.log('SSE connection requires sessionId - use connectTaskSSE instead')
+}
+
+// 断开所有SSE
+export function disconnectSSE(): void {
+  eventSources.forEach(es => es.close())
+  eventSources.clear()
+}
+
+// 断开指定任务的SSE
+export function disconnectTaskSSE(sessionId: string): void {
+  const es = eventSources.get(sessionId)
+  if (es) {
+    es.close()
+    eventSources.delete(sessionId)
+  }
 }

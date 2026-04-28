@@ -1,0 +1,78 @@
+{
+  "targets": {
+    "claude": {
+      "family": "claude",
+      "host": "claude",
+      "installed_at": "2026-04-27T07:16:32.841898+00:00",
+      "paths": [],
+      "scopes": {
+        "global": false,
+        "project": false,
+        "runtime": false
+      }
+    },
+    "claude-code": {
+      "family": "claude",
+      "host": "claude-code",
+      "installed_at": "2026-04-27T07:16:32.822949+00:00",
+      "paths": [
+        "/Users/claw/sandbox/personal/claudeflow/.claude/CLAUDE.md",
+        "/Users/claw/sandbox/personal/claudeflow/.claude/settings.local.json",
+        "/Users/claw/sandbox/personal/claudeflow/CLAUDE.md"
+      ],
+      "scopes": {
+        "global": false,
+        "project": true,
+        "runtime": true
+      }
+    },
+    "codex": {
+      "family": "codex",
+      "host": "codex",
+      "installed_at": "2026-04-27T07:16:32.847660+00:00",
+      "paths": [
+        "/Users/claw/sandbox/personal/claudeflow/AGENTS.md"
+      ],
+      "scopes": {
+        "global": false,
+        "project": true,
+        "runtime": false
+      }
+    },
+    "codex-cli": {
+      "family": "codex",
+      "host": "codex-cli",
+      "installed_at": "2026-04-27T07:16:32.832064+00:00",
+      "paths": [
+        "/Users/claw/sandbox/personal/claudeflow/AGENTS.md"
+      ],
+      "scopes": {
+        "global": false,
+        "project": true,
+        "runtime": false
+      }
+    },
+    "qwen-code": {
+      "family": "qwen",
+      "host": "qwen-code",
+      "installed_at": "2026-04-27T07:16:32.839326+00:00",
+      "paths": [
+        "/Users/claw/.qwen/skills/super-dev-seeai/SKILL.md",
+        "/Users/claw/.qwen/skills/super-dev/SKILL.md",
+        "/Users/claw/sandbox/personal/claudeflow/.qwen/agents/super-dev.md",
+        "/Users/claw/sandbox/personal/claudeflow/.qwen/commands/super-dev-seeai.md",
+        "/Users/claw/sandbox/personal/claudeflow/.qwen/commands/super-dev.md",
+        "/Users/claw/sandbox/personal/claudeflow/.qwen/skills/super-dev-seeai/SKILL.md",
+        "/Users/claw/sandbox/personal/claudeflow/.qwen/skills/super-dev/SKILL.md",
+        "/Users/claw/sandbox/personal/claudeflow/QWEN.md"
+      ],
+      "scopes": {
+        "global": true,
+        "project": false,
+        "runtime": false
+      }
+    }
+  },
+  "updated_at": "2026-04-27T07:16:32.847693+00:00",
+  "version": 1
+}

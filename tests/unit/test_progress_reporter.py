@@ -5,7 +5,7 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock
 from datetime import datetime
 
-from claudeflow.progress_reporter import (
+from claudeflow.legacy.progress_reporter import (
     ProgressReporter,
     ProgressMessage,
     ToolCallMessage

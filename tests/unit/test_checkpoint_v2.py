@@ -7,7 +7,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import MagicMock, AsyncMock
 
-from claudeflow.checkpoint import (
+from claudeflow.workflow.checkpoint import (
     Checkpoint,
     CheckpointManager,
     CheckpointNotFoundError

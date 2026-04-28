@@ -4,7 +4,7 @@ import pytest
 import asyncio
 from unittest.mock import Mock, patch, MagicMock
 
-from claudeflow.haiku_client import HaikuClient, HaikuConfig
+from claudeflow.legacy.haiku_client import HaikuClient, HaikuConfig
 
 
 class TestHaikuClient:
@@ -32,7 +32,7 @@ class TestHaikuClient:
     def test_mock_mode_without_anthropic(self):
         """测试无anthropic库时的Mock模式"""
         # 当anthropic为None时，client._mock_mode应为True
-        with patch('claudeflow.haiku_client.anthropic', None):
+        with patch('claudeflow.legacy.haiku_client.anthropic', None):
             client = HaikuClient()
             assert client._mock_mode == True
 

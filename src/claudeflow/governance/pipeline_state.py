@@ -6,9 +6,12 @@
 - 原子写回（先写临时文件再重命名）
 - 提供结构化错误
 
-约束:
-- 非法输入不得污染旧状态
-- 写回必须原子化
+Schema 来源: 09_Governor编排对象Schema设计.md
+
+关键区分:
+- current_phase 是 phase ID（如 "phase-1"），不是 phase status
+- phase status 放在 phases.<id>.status 中
+- tasks 是按任务 ID 建索引的对象，不是数组
 """
 
 from __future__ import annotations
@@ -21,8 +24,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+TASK_REQUIRED_FIELDS = ("phase_id", "executor_type", "status", "review_status")
+
 REQUIRED_FIELDS = (
     "workflow_version",
+    "project",
     "current_phase",
     "current_stage",
     "current_gate",
@@ -30,11 +36,12 @@ REQUIRED_FIELDS = (
     "governor",
     "advance_allowed",
     "reopen_required",
+    "phases",
     "tasks",
     "timestamps",
 )
 
-VALID_PHASES = (
+VALID_PHASE_STATUSES = (
     "drafting",
     "docs_confirm",
     "ready_for_dispatch",
@@ -46,6 +53,21 @@ VALID_PHASES = (
 )
 
 VALID_GATE_STATUSES = ("open", "blocked", "passed", "failed", "closed")
+
+VALID_CURRENT_GATES = ("docs_confirm", "implementation_review", "quality_gate", "advance_gate", "")
+
+VALID_TASK_STATUSES = (
+    "planned",
+    "dispatched",
+    "implementing",
+    "submitted",
+    "under_review",
+    "accepted",
+    "rework_required",
+    "rejected",
+)
+
+VALID_TASK_REVIEW_STATUSES = ("pending", "in_review", "passed", "failed", "accepted", "rework_required")
 
 
 @dataclass
@@ -81,6 +103,14 @@ class PipelineState:
         self.raw["current_phase"] = value
 
     @property
+    def current_stage(self) -> str:
+        return self.raw.get("current_stage", "")
+
+    @current_stage.setter
+    def current_stage(self, value: str) -> None:
+        self.raw["current_stage"] = value
+
+    @property
     def current_gate(self) -> str:
         return self.raw.get("current_gate", "")
 
@@ -99,6 +129,13 @@ class PipelineState:
     @property
     def updated_at(self) -> str:
         return self.raw.get("timestamps", {}).get("updated_at", "")
+
+    @property
+    def phases(self) -> Dict[str, Any]:
+        return self.raw.get("phases", {})
+
+    def get_phase_status(self, phase_id: str) -> str:
+        return self.raw.get("phases", {}).get(phase_id, {}).get("status", "")
 
 
 class PipelineStateStore:
@@ -201,59 +238,172 @@ class PipelineStateStore:
 
     def _validate(self, raw: Dict[str, Any]) -> List[PipelineStateError]:
         errors: List[PipelineStateError] = []
+        file_path = str(self.path)
 
         for field_name in REQUIRED_FIELDS:
             if field_name not in raw:
                 errors.append(PipelineStateError(
                     error_type="missing_field",
-                    file_path=str(self.path),
+                    file_path=file_path,
                     field_name=field_name,
                     reason=f"必填字段缺失: {field_name}",
                 ))
-
-        phase = raw.get("current_phase")
-        if phase is not None and phase not in VALID_PHASES:
-            errors.append(PipelineStateError(
-                error_type="enum_error",
-                file_path=str(self.path),
-                field_name="current_phase",
-                reason=f"非法枚举值: {phase}，合法值: {VALID_PHASES}",
-            ))
 
         gate = raw.get("gate_status")
         if gate is not None and gate not in VALID_GATE_STATUSES:
             errors.append(PipelineStateError(
                 error_type="enum_error",
-                file_path=str(self.path),
+                file_path=file_path,
                 field_name="gate_status",
                 reason=f"非法枚举值: {gate}，合法值: {VALID_GATE_STATUSES}",
             ))
 
-        governor = raw.get("governor")
-        if governor is not None and not isinstance(governor, dict):
+        current_gate = raw.get("current_gate")
+        if current_gate is not None and current_gate not in VALID_CURRENT_GATES:
             errors.append(PipelineStateError(
-                error_type="schema_error",
-                file_path=str(self.path),
-                field_name="governor",
-                reason="governor 必须是对象",
+                error_type="enum_error",
+                file_path=file_path,
+                field_name="current_gate",
+                reason=f"非法枚举值: {current_gate}，合法值: {VALID_CURRENT_GATES}",
             ))
+
+        governor = raw.get("governor")
+        if governor is not None:
+            if not isinstance(governor, dict):
+                errors.append(PipelineStateError(
+                    error_type="schema_error",
+                    file_path=file_path,
+                    field_name="governor",
+                    reason="governor 必须是对象",
+                ))
+            elif "host" not in governor:
+                errors.append(PipelineStateError(
+                    error_type="missing_field",
+                    file_path=file_path,
+                    field_name="governor.host",
+                    reason="governor.host 必填字段缺失",
+                ))
+        else:
+            if "governor" not in raw:
+                errors.append(PipelineStateError(
+                    error_type="missing_field",
+                    file_path=file_path,
+                    field_name="governor",
+                    reason="必填字段缺失: governor",
+                ))
+
+        phases = raw.get("phases")
+        if phases is not None:
+            if not isinstance(phases, dict):
+                errors.append(PipelineStateError(
+                    error_type="schema_error",
+                    file_path=file_path,
+                    field_name="phases",
+                    reason="phases 必须是对象",
+                ))
+            else:
+                current_phase = raw.get("current_phase", "")
+                if current_phase and current_phase not in phases:
+                    errors.append(PipelineStateError(
+                        error_type="reference_error",
+                        file_path=file_path,
+                        field_name="current_phase",
+                        reason=f"current_phase '{current_phase}' 在 phases 中不存在",
+                    ))
+                for phase_id, phase_data in phases.items():
+                    if not isinstance(phase_data, dict):
+                        errors.append(PipelineStateError(
+                            error_type="schema_error",
+                            file_path=file_path,
+                            field_name=f"phases.{phase_id}",
+                            reason=f"phase 数据必须是对象",
+                        ))
+                        continue
+                    status = phase_data.get("status")
+                    if status is not None and status not in VALID_PHASE_STATUSES:
+                        errors.append(PipelineStateError(
+                            error_type="enum_error",
+                            file_path=file_path,
+                            field_name=f"phases.{phase_id}.status",
+                            reason=f"非法 phase status: {status}，合法值: {VALID_PHASE_STATUSES}",
+                        ))
+        else:
+            if "phases" not in raw:
+                errors.append(PipelineStateError(
+                    error_type="missing_field",
+                    file_path=file_path,
+                    field_name="phases",
+                    reason="必填字段缺失: phases",
+                ))
 
         tasks = raw.get("tasks")
-        if tasks is not None and not isinstance(tasks, list):
-            errors.append(PipelineStateError(
-                error_type="schema_error",
-                file_path=str(self.path),
-                field_name="tasks",
-                reason="tasks 必须是数组",
-            ))
+        if tasks is not None:
+            if not isinstance(tasks, dict):
+                errors.append(PipelineStateError(
+                    error_type="schema_error",
+                    file_path=file_path,
+                    field_name="tasks",
+                    reason="tasks 必须是对象（按任务 ID 索引）",
+                ))
+            else:
+                for task_id, task_data in tasks.items():
+                    if not isinstance(task_data, dict):
+                        errors.append(PipelineStateError(
+                            error_type="schema_error",
+                            file_path=file_path,
+                            field_name=f"tasks.{task_id}",
+                            reason="task 数据必须是对象",
+                        ))
+                        continue
+                    # 校验 task 必填字段
+                    for req_field in TASK_REQUIRED_FIELDS:
+                        if req_field not in task_data:
+                            errors.append(PipelineStateError(
+                                error_type="missing_field",
+                                file_path=file_path,
+                                field_name=f"tasks.{task_id}.{req_field}",
+                                reason=f"task 必填字段缺失: {req_field}",
+                            ))
+                    status = task_data.get("status")
+                    if status is not None and status not in VALID_TASK_STATUSES:
+                        errors.append(PipelineStateError(
+                            error_type="enum_error",
+                            file_path=file_path,
+                            field_name=f"tasks.{task_id}.status",
+                            reason=f"非法 task status: {status}，合法值: {VALID_TASK_STATUSES}",
+                        ))
+                    review_status = task_data.get("review_status")
+                    if review_status is not None and review_status not in VALID_TASK_REVIEW_STATUSES:
+                        errors.append(PipelineStateError(
+                            error_type="enum_error",
+                            file_path=file_path,
+                            field_name=f"tasks.{task_id}.review_status",
+                            reason=f"非法 review_status: {review_status}，合法值: {VALID_TASK_REVIEW_STATUSES}",
+                        ))
 
         timestamps = raw.get("timestamps")
-        if timestamps is not None and not isinstance(timestamps, dict):
-            errors.append(PipelineStateError(
-                error_type="schema_error",
-                file_path=str(self.path),
-                field_name="timestamps",
-                reason="timestamps 必须是对象",
-            ))
+        if timestamps is not None:
+            if not isinstance(timestamps, dict):
+                errors.append(PipelineStateError(
+                    error_type="schema_error",
+                    file_path=file_path,
+                    field_name="timestamps",
+                    reason="timestamps 必须是对象",
+                ))
+            elif "updated_at" not in timestamps:
+                errors.append(PipelineStateError(
+                    error_type="missing_field",
+                    file_path=file_path,
+                    field_name="timestamps.updated_at",
+                    reason="timestamps.updated_at 必填字段缺失",
+                ))
+        else:
+            if "timestamps" not in raw:
+                errors.append(PipelineStateError(
+                    error_type="missing_field",
+                    file_path=file_path,
+                    field_name="timestamps",
+                    reason="必填字段缺失: timestamps",
+                ))
 
         return errors

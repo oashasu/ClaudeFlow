@@ -1,0 +1,31 @@
+id: T203
+phase_id: phase-2
+title: 实现 rework task 自动生成
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../acceptance.md
+  - ../tasks/T201.yaml
+  - ../tasks/T202.yaml
+constraints:
+  - 返工任务必须继承原 allowed_write_paths 与 acceptance_refs
+  - 不得发明新 schema 替代 task package
+allowed_write_paths:
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A23
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+done_definition:
+  - rework_task_generator_added
+  - findings_ref_preserved
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

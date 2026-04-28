@@ -1,0 +1,36 @@
+id: T501
+phase_id: phase-5
+title: 固化 release checklist 与 quality gate 矩阵
+executor_type: claude
+reviewer_type: governor
+priority: critical
+inputs:
+  - ../spec.md
+  - ../architecture.md
+  - ../acceptance.md
+  - ../prd.md
+constraints:
+  - checklist 必须覆盖 Python Console Java smoke 和文档状态一致性
+  - 不得写成抽象建议，必须引用仓库内真实命令
+allowed_write_paths:
+  - docs/**
+  - output/**
+  - scripts/**
+acceptance_refs:
+  - A51
+  - A52
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 只补文字说明不对应真实门禁命令
+  - 把单侧测试通过写成整体可发布
+done_definition:
+  - release_checklist_added
+  - quality_gate_matrix_defined
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

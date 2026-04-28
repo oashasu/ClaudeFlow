@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaudeFlow Runtime Explain",
+  "type": "object",
+  "required": ["task_id", "state", "priority", "reason_code", "reason", "dependencies"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string", "minLength": 1 },
+    "reason_code": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

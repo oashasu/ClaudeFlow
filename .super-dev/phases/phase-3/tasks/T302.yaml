@@ -1,0 +1,41 @@
+id: T302
+phase_id: phase-3
+title: 建立 Runtime 高影响动作确认与审计反馈链
+executor_type: claude
+reviewer_type: governor
+priority: high
+inputs:
+  - ../spec.md
+  - ../uiux.md
+  - ../acceptance.md
+  - ./T301.yaml
+constraints:
+  - complete 和 fail 必须有确认步骤
+  - intervene 提交前必须显示目标摘要
+  - 动作结果必须可回看
+allowed_write_paths:
+  - console/src/views/**
+  - console/src/components/**
+  - console/src/composables/**
+  - console/src/services/**
+  - src/claudeflow/runtime/**
+  - src/claudeflow/governance/**
+  - tests/**
+acceptance_refs:
+  - A32
+  - A33
+outputs:
+  - changed_files
+  - test_evidence
+  - summary
+forbidden_actions:
+  - 无确认直接发 complete/fail 请求
+  - 把 audit 仅保存在瞬时 toast
+done_definition:
+  - action_confirmation_added
+  - audit_feedback_visible
+  - review_ready
+rework_policy:
+  max_rounds: 2
+  inherit_previous_findings: true
+gate_on_complete: review_required

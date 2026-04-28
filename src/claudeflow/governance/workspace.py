@@ -20,15 +20,24 @@ Governor hosts write governance decisions here; ClaudeFlow reads them.
 """
 
 DEFAULT_PIPELINE_STATE = {
-    "workflow_version": "1",
-    "current_phase": "drafting",
+    "workflow_version": "v1",
+    "project": "",
+    "current_phase": "phase-1",
     "current_stage": "",
     "current_gate": "",
     "gate_status": "open",
-    "governor": {"host": ""},
+    "governor": {"host": "", "mode": "governor"},
     "advance_allowed": False,
     "reopen_required": False,
-    "tasks": [],
+    "phases": {
+        "phase-1": {
+            "status": "drafting",
+            "docs_ready": False,
+            "tasks_ready": False,
+            "quality_gate_passed": False,
+        },
+    },
+    "tasks": {},
     "timestamps": {"updated_at": ""},
 }
 

@@ -20,7 +20,7 @@ class TestL1CoverageValidator:
 
     def test_parse_coverage_output_valid(self):
         """测试：解析有效覆盖率输出"""
-        from claudeflow.governance.acceptance import parse_coverage_output
+        from claudeflow.legacy.governance.acceptance import parse_coverage_output
 
         # 模拟 pytest --cov 输出
         mock_output = """
@@ -43,7 +43,7 @@ TOTAL                      20      4    80%
 
     def test_parse_coverage_output_multiple_files(self):
         """测试：解析多文件覆盖率输出"""
-        from claudeflow.governance.acceptance import parse_coverage_output
+        from claudeflow.legacy.governance.acceptance import parse_coverage_output
 
         mock_output = """
 ---------- coverage: platform ----------
@@ -61,7 +61,7 @@ TOTAL                      30      7    77%
 
     def test_parse_coverage_output_no_coverage(self):
         """测试：无覆盖率信息返回None"""
-        from claudeflow.governance.acceptance import parse_coverage_output
+        from claudeflow.legacy.governance.acceptance import parse_coverage_output
 
         mock_output = "10 passed in 0.5s"
         coverage = parse_coverage_output(mock_output)
@@ -69,7 +69,7 @@ TOTAL                      30      7    77%
 
     def test_check_l1_coverage_pass(self):
         """测试：覆盖率达标通过"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator(coverage_threshold=80)
 
@@ -81,7 +81,7 @@ TOTAL                      30      7    77%
 
     def test_check_l1_coverage_fail(self):
         """测试：覆盖率不达标阻断"""
-        from claudeflow.governance.acceptance import L1Validator, AcceptanceError
+        from claudeflow.legacy.governance.acceptance import L1Validator, AcceptanceError
 
         validator = L1Validator(coverage_threshold=80)
 
@@ -96,7 +96,7 @@ class TestL1CompileValidator:
 
     def test_check_compile_pass(self):
         """测试：编译通过"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -106,7 +106,7 @@ class TestL1CompileValidator:
 
     def test_check_compile_fail(self):
         """测试：编译失败阻断"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -117,7 +117,7 @@ class TestL1CompileValidator:
 
     def test_check_compile_pytest_execution(self):
         """测试：pytest执行作为编译校验"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -137,7 +137,7 @@ class TestL1FullValidation:
 
     def test_l1_full_pass(self):
         """测试：L1全部通过"""
-        from claudeflow.governance.acceptance import L1Validator, AcceptanceResult
+        from claudeflow.legacy.governance.acceptance import L1Validator, AcceptanceResult
 
         validator = L1Validator(coverage_threshold=80)
 
@@ -148,7 +148,7 @@ class TestL1FullValidation:
 
     def test_l1_coverage_fail_blocks_flow(self):
         """测试：覆盖率失败阻断流程"""
-        from claudeflow.governance.acceptance import L1Validator, AcceptanceError, AcceptanceResult
+        from claudeflow.legacy.governance.acceptance import L1Validator, AcceptanceError, AcceptanceResult
 
         validator = L1Validator(coverage_threshold=80)
 
@@ -160,7 +160,7 @@ class TestL1FullValidation:
 
     def test_l1_compile_fail_blocks_flow(self):
         """测试：编译失败阻断流程"""
-        from claudeflow.governance.acceptance import L1Validator, AcceptanceResult
+        from claudeflow.legacy.governance.acceptance import L1Validator, AcceptanceResult
 
         validator = L1Validator(coverage_threshold=80)
 
@@ -175,7 +175,7 @@ class TestL2NamingValidator:
 
     def test_check_camel_case_function_pass(self):
         """测试：驼峰命名函数通过"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
         violations = validator.check_naming("def get_user_info(): pass")
@@ -183,7 +183,7 @@ class TestL2NamingValidator:
 
     def test_check_camel_case_function_fail(self):
         """测试：驼峰命名函数违规（Python应使用snake_case）"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
         # 驼峰命名 getUserInfo 在Python中应改为 snake_case get_user_info
@@ -193,7 +193,7 @@ class TestL2NamingValidator:
 
     def test_check_snake_case_variable_pass(self):
         """测试：蛇形命名变量通过"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
         violations = validator.check_naming("user_name = 'test'")
@@ -201,7 +201,7 @@ class TestL2NamingValidator:
 
     def test_check_class_prefix_pass(self):
         """测试：类前缀检测通过"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator(required_prefix="Test")
         violations = validator.check_naming("class TestExample: pass")
@@ -209,7 +209,7 @@ class TestL2NamingValidator:
 
     def test_check_class_prefix_fail(self):
         """测试：缺少类前缀违规"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator(required_prefix="Test")
         violations = validator.check_naming("class Example: pass")
@@ -217,7 +217,7 @@ class TestL2NamingValidator:
 
     def test_l2_non_blocking(self):
         """测试：L2违规不阻断流程"""
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
         violations = validator.check_naming("def badname(): pass")
@@ -227,7 +227,7 @@ class TestL2NamingValidator:
 
     def test_l2_violation_list_format(self):
         """测试：违规清单格式正确"""
-        from claudeflow.governance.acceptance import L2Validator, ViolationRecord
+        from claudeflow.legacy.governance.acceptance import L2Validator, ViolationRecord
 
         validator = L2Validator()
         # 使用驼峰命名触发违规
@@ -245,7 +245,7 @@ class TestL3ManualValidator:
 
     def test_l3_manual_trigger_interface(self):
         """测试：L3手动触发接口"""
-        from claudeflow.governance.acceptance import L3Validator
+        from claudeflow.legacy.governance.acceptance import L3Validator
 
         validator = L3Validator()
         result = validator.request_manual_review(task_id="task_001")
@@ -256,7 +256,7 @@ class TestL3ManualValidator:
 
     def test_l3_only_archive(self):
         """测试：L3仅归档不自动化"""
-        from claudeflow.governance.acceptance import L3Validator
+        from claudeflow.legacy.governance.acceptance import L3Validator
 
         validator = L3Validator()
 
@@ -267,7 +267,7 @@ class TestL3ManualValidator:
 
     def test_l3_confirmation_id_unique(self):
         """测试：人工确认ID唯一"""
-        from claudeflow.governance.acceptance import L3Validator
+        from claudeflow.legacy.governance.acceptance import L3Validator
 
         validator = L3Validator()
 
@@ -282,7 +282,7 @@ class TestAcceptanceManager:
 
     def test_manager_run_l1_l2(self):
         """测试：验收管理器执行L1+L2"""
-        from claudeflow.governance.acceptance import AcceptanceManager
+        from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
         manager = AcceptanceManager()
 
@@ -303,7 +303,7 @@ class TestAcceptanceManager:
 
     def test_manager_l1_fail_skip_l2(self):
         """测试：L1失败跳过L2"""
-        from claudeflow.governance.acceptance import AcceptanceManager
+        from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
         manager = AcceptanceManager()
 
@@ -322,7 +322,7 @@ class TestAcceptanceManager:
 
     def test_manager_summary_report(self):
         """测试：验收管理器生成报告"""
-        from claudeflow.governance.acceptance import AcceptanceManager
+        from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
         manager = AcceptanceManager()
 
@@ -349,7 +349,7 @@ class TestAcceptanceResult:
 
     def test_result_creation(self):
         """测试：验收结果创建"""
-        from claudeflow.governance.acceptance import AcceptanceResult
+        from claudeflow.legacy.governance.acceptance import AcceptanceResult
 
         result = AcceptanceResult(passed=True, coverage=85, message="通过")
 
@@ -359,7 +359,7 @@ class TestAcceptanceResult:
 
     def test_result_with_violations(self):
         """测试：带违规清单的结果"""
-        from claudeflow.governance.acceptance import AcceptanceResult, ViolationRecord
+        from claudeflow.legacy.governance.acceptance import AcceptanceResult, ViolationRecord
 
         violations = [
             ViolationRecord(rule="camel_case", line=10, message="函数命名不符合驼峰规范")
@@ -375,7 +375,7 @@ class TestViolationRecord:
 
     def test_violation_record_creation(self):
         """测试：违规记录创建"""
-        from claudeflow.governance.acceptance import ViolationRecord
+        from claudeflow.legacy.governance.acceptance import ViolationRecord
 
         violation = ViolationRecord(
             rule="camel_case",
@@ -394,7 +394,7 @@ class TestL1RealExecution:
 
     def test_run_coverage_check_timeout(self):
         """测试：覆盖率检查超时"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -406,7 +406,7 @@ class TestL1RealExecution:
 
     def test_run_coverage_check_exception(self):
         """测试：覆盖率检查异常"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -418,7 +418,7 @@ class TestL1RealExecution:
 
     def test_run_compile_check_timeout(self):
         """测试：编译检查超时"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -429,7 +429,7 @@ class TestL1RealExecution:
 
     def test_run_compile_check_exception(self):
         """测试：编译检查异常"""
-        from claudeflow.governance.acceptance import L1Validator
+        from claudeflow.legacy.governance.acceptance import L1Validator
 
         validator = L1Validator()
 
@@ -446,7 +446,7 @@ class TestL2FileTraversal:
         """测试：validate遍历真实文件"""
         import tempfile
         import os
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
 
@@ -465,7 +465,7 @@ class TestL2FileTraversal:
         """测试：validate跳过隐藏目录"""
         import tempfile
         import os
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
 
@@ -486,7 +486,7 @@ class TestL2FileTraversal:
         """测试：validate跳过虚拟环境"""
         import tempfile
         import os
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
 
@@ -507,7 +507,7 @@ class TestL2FileTraversal:
         """测试：validate文件读取错误"""
         import tempfile
         import os
-        from claudeflow.governance.acceptance import L2Validator
+        from claudeflow.legacy.governance.acceptance import L2Validator
 
         validator = L2Validator()
 
@@ -531,7 +531,7 @@ class TestL3ArchiveFile:
         import tempfile
         import os
         import json
-        from claudeflow.governance.acceptance import L3Validator
+        from claudeflow.legacy.governance.acceptance import L3Validator
 
         with tempfile.TemporaryDirectory() as tmpdir:
             validator = L3Validator(archive_dir=tmpdir)
@@ -553,7 +553,7 @@ class TestManagerL3Execution:
 
     def test_manager_run_l1_l2_l3(self):
         """测试：验收管理器执行L1+L2+L3"""
-        from claudeflow.governance.acceptance import AcceptanceManager
+        from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
         manager = AcceptanceManager()
 
@@ -579,7 +579,7 @@ class TestManagerL3Execution:
 
     def test_manager_run_only_l1(self):
         """测试：仅执行L1"""
-        from claudeflow.governance.acceptance import AcceptanceManager
+        from claudeflow.legacy.governance.acceptance import AcceptanceManager
 
         manager = AcceptanceManager()
 

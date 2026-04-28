@@ -124,7 +124,7 @@ class TestE2eCheckpointPersistence:
 
     def test_e2e_checkpoint_save_restore(self):
         """E2E测试：Checkpoint保存恢复"""
-        from claudeflow.checkpoint import CheckpointManager
+        from claudeflow.workflow.checkpoint import CheckpointManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_dir = os.path.join(tmpdir, "checkpoint")
@@ -156,9 +156,9 @@ class TestE2eCompleteWorkflow:
 
     def test_e2e_full_task_lifecycle(self):
         """E2E测试：任务完整生命周期"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -194,9 +194,9 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_phase_progression(self):
         """E2E测试：调度器阶段推进"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -217,9 +217,9 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_failure_recovery(self):
         """E2E测试：调度器失败恢复"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -242,8 +242,8 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_progress_tracking(self):
         """E2E测试：调度器进度追踪"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -266,8 +266,8 @@ class TestE2eSchedulerFlow:
 
     def test_e2e_scheduler_employee_management(self):
         """E2E测试：调度器员工管理"""
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)

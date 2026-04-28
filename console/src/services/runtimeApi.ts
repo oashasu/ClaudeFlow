@@ -1,93 +1,31 @@
-export interface RuntimeReasonItem {
-  task_id: string
-  priority: string
-  reason_code: string
-  reason: string
-}
+export type {
+  RuntimeReasonItem,
+  RuntimeRunnableTask,
+  RuntimePlan,
+  RuntimeExplain,
+  RuntimeStartedTask,
+  RuntimeDispatch,
+  RuntimeStatus,
+  RuntimeSession,
+  RuntimeParsedEvent,
+  RuntimeSessionEvents,
+  RuntimeSessionActionResponse,
+  ActionAuditRecord,
+} from '../types/runtime'
 
-export interface RuntimeRunnableTask {
-  task_id: string
-  priority: string
-  owner_role: string
-  task_type: string
-}
+import type {
+  RuntimePlan,
+  RuntimeExplain,
+  RuntimeDispatch,
+  RuntimeStatus,
+  RuntimeSession,
+  RuntimeSessionEvents,
+  RuntimeSessionActionResponse,
+  ActionAuditRecord,
+} from '../types/runtime'
 
-export interface RuntimePlan {
-  runnable: RuntimeRunnableTask[]
-  blocked: RuntimeReasonItem[]
-  running: RuntimeReasonItem[]
-}
-
-export interface RuntimeExplain {
-  task_id: string
-  state: string
-  priority: string
-  reason_code: string
-  reason: string
-  dependencies: string[]
-}
-
-export interface RuntimeStartedTask {
-  task_id: string
-  session_id: string
-  priority: string
-}
-
-export interface RuntimeDispatch {
-  runnable_count: number
-  blocked_count: number
-  active_agents: number
-  available_slots: number
-  max_concurrent: number | null
-  started: RuntimeStartedTask[]
-  skipped: RuntimeReasonItem[]
-  blocked: RuntimeReasonItem[]
-}
-
-export interface RuntimeStatus {
-  repo_path: string
-  active_agents: number
-  queued_tasks: number
-  completed_tasks: number
-  failed_tasks: number
-  intervention_required: boolean
-  running_tasks: string[]
-}
-
-export interface RuntimeSession {
-  task_id: string
-  session_id: string
-  worktree?: string
-  status: string
-  owner_role?: string
-  task_type?: string
-  priority: string
-  summary?: string
-}
-
-export interface RuntimeParsedEvent {
-  type: 'thinking' | 'tool_use' | 'text'
-  text?: string
-  tool_name?: string
-  tool_input?: unknown
-}
-
-export interface RuntimeSessionEvents {
-  session_id: string
-  events_count: number
-  parsed_events: RuntimeParsedEvent[]
-  raw_events: unknown[]
-}
-
-export interface RuntimeSessionActionResponse {
-  session_id?: string
-  task_id?: string
-  status: string
-  summary?: string
-}
-
-const RUNTIME_BASE = '/hermes/runtime'
-const SESSION_BASE = '/hermes/session'
+const RUNTIME_BASE = '/runtime-api/runtime'
+const SESSION_BASE = '/runtime-api/session'
 
 async function fetchRuntime<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${RUNTIME_BASE}${path}`, {
@@ -115,7 +53,7 @@ async function fetchSession<T>(path: string, options?: RequestInit): Promise<T> 
   })
 
   if (!response.ok) {
-    throw new Error(`Runtime Session API Error: ${response.status} ${response.statusText}`)
+    throw new Error(`Runtime API Error: ${response.status} ${response.statusText}`)
   }
 
   return response.json() as Promise<T>
@@ -269,4 +207,16 @@ export const runtimeApi = {
       method: 'POST',
       body: JSON.stringify({ reason }),
     }),
+  // T302: 审计记录 API
+  listActionAudit: (params?: { action_type?: string; target_task_id?: string; limit?: number }) => {
+    const searchParams = new URLSearchParams()
+    if (params?.action_type) searchParams.set('action_type', params.action_type)
+    if (params?.target_task_id) searchParams.set('target_task_id', params.target_task_id)
+    if (params?.limit) searchParams.set('limit', String(params.limit))
+    return fetchRuntime<{ records: ActionAuditRecord[]; total: number }>(
+      `/action-audit?${searchParams.toString()}`
+    )
+  },
+  getActionAudit: (actionId: string) =>
+    fetchRuntime<ActionAuditRecord>(`/action-audit/${actionId}`),
 }

@@ -15,6 +15,7 @@ import os
 
 from claudeflow.runtime.cli_driver import CliDriver
 from claudeflow.runtime.manager import RuntimeManager, UnknownTaskError
+from claudeflow.runtime.action_audit import ActionAuditStore, create_audit_record, ActionAuditRecord
 
 
 # ── 请求/响应模型 ──────────────────────────────────────────
@@ -71,6 +72,7 @@ runtime_manager = RuntimeManager(
     repo_path=os.environ.get("CLAUDFLOW_REPO_DIR", os.getcwd()),
     driver=driver,
 )
+audit_store = ActionAuditStore()
 
 # ── FastAPI 应用 ───────────────────────────────────────────
 
@@ -144,12 +146,46 @@ async def intervene(session_id: str, request: InterveneRequest):
     session = driver.get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session不存在")
+    # T302: 从 session 获取 task_id，优先使用显式属性，否则用 session_id 作为 fallback
+    task_id = getattr(session, 'task_id', None)
+    if not task_id or not isinstance(task_id, str):
+        task_id = session_id
     try:
         driver.intervene(session_id, request.prompt)
+        # T302: 写入审计记录
+        audit_record = create_audit_record(
+            action_type="intervene",
+            target_task_id=task_id,
+            target_session_id=session_id,
+            success=True,
+            message=f"干预成功: {request.prompt[:50]}...",
+            prompt=request.prompt,
+        )
+        audit_store.write_record(audit_record)
         return SessionResponse(session_id=session_id, status="intervened")
     except ValueError as e:
+        # T302: 写入失败审计记录
+        audit_record = create_audit_record(
+            action_type="intervene",
+            target_task_id=task_id,
+            target_session_id=session_id,
+            success=False,
+            message=f"干预失败: {str(e)}",
+            prompt=request.prompt,
+        )
+        audit_store.write_record(audit_record)
         raise HTTPException(status_code=500, detail=f"干预失败: {str(e)}")
     except Exception as e:
+        # T302: 写入失败审计记录
+        audit_record = create_audit_record(
+            action_type="intervene",
+            target_task_id=task_id,
+            target_session_id=session_id,
+            success=False,
+            message=f"CLI干预失败: {str(e)}",
+            prompt=request.prompt,
+        )
+        audit_store.write_record(audit_record)
         raise HTTPException(status_code=500, detail=f"CLI干预失败: {str(e)}")
 
 
@@ -270,22 +306,90 @@ async def complete_runtime_task(task_id: str, request: RuntimeCompleteRequest):
             tests["status"] = request.test_status
         if request.test_count is not None:
             tests["count"] = request.test_count
-        return runtime_manager.complete_worker(
+        result = runtime_manager.complete_worker(
             task_id,
             summary=request.summary,
             changed_files=request.changed_files,
             tests=tests or None,
         )
+        # T302: 写入审计记录
+        audit_record = create_audit_record(
+            action_type="complete",
+            target_task_id=task_id,
+            success=True,
+            message=f"任务完成: {request.summary[:50] if request.summary else '无摘要'}",
+            summary=request.summary,
+            changed_files=request.changed_files,
+            test_status=request.test_status,
+            test_count=request.test_count,
+        )
+        audit_store.write_record(audit_record)
+        return result
     except UnknownTaskError as exc:
+        # T302: 写入失败审计记录
+        audit_record = create_audit_record(
+            action_type="complete",
+            target_task_id=task_id,
+            success=False,
+            message=f"任务完成失败: {str(exc)}",
+            summary=request.summary,
+        )
+        audit_store.write_record(audit_record)
         raise HTTPException(status_code=404, detail=str(exc))
 
 
 @app.post("/api/runtime/task/{task_id}/fail")
 async def fail_runtime_task(task_id: str, request: RuntimeFailRequest):
     try:
-        return runtime_manager.fail_worker(task_id, request.reason)
+        result = runtime_manager.fail_worker(task_id, request.reason)
+        # T302: 写入审计记录
+        audit_record = create_audit_record(
+            action_type="fail",
+            target_task_id=task_id,
+            success=True,
+            message=f"任务标记失败: {request.reason[:50]}",
+            reason=request.reason,
+        )
+        audit_store.write_record(audit_record)
+        return result
     except UnknownTaskError as exc:
+        # T302: 写入失败审计记录
+        audit_record = create_audit_record(
+            action_type="fail",
+            target_task_id=task_id,
+            success=False,
+            message=f"标记失败失败: {str(exc)}",
+            reason=request.reason,
+        )
+        audit_store.write_record(audit_record)
         raise HTTPException(status_code=404, detail=str(exc))
+
+
+# ── Action Audit 端点 (T302) ───────────────────────────────
+
+
+@app.get("/api/runtime/action-audit")
+async def list_action_audit(
+    action_type: Optional[str] = None,
+    target_task_id: Optional[str] = None,
+    limit: int = 50,
+):
+    """T302: 查询审计记录列表"""
+    records = audit_store.list_records(
+        action_type=action_type,
+        target_task_id=target_task_id,
+        limit=limit,
+    )
+    return {"records": [r.model_dump() for r in records], "total": len(records)}
+
+
+@app.get("/api/runtime/action-audit/{action_id}")
+async def get_action_audit(action_id: str):
+    """T302: 查询单个审计记录"""
+    record = audit_store.get_record(action_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="审计记录不存在")
+    return record.model_dump()
 
 
 # ── Health ────────────────────────────────────────────────

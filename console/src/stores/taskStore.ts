@@ -30,6 +30,26 @@ export const useTaskStore = defineStore('task', () => {
   )
 
   // Actions
+  async function createTask(data: {
+    name: string
+    domain: string
+    prompt: string
+    priority?: string
+  }) {
+    loading.value = true
+    error.value = null
+    try {
+      const task = await taskApi.create(data)
+      tasks.value.unshift(task)
+      return task
+    } catch (e) {
+      error.value = (e as Error).message
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchTasks() {
     loading.value = true
     error.value = null
@@ -119,6 +139,38 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
+  async function deleteTask(id: string) {
+    try {
+      await taskApi.delete(id)
+      // 直接从数组中移除
+      const index = tasks.value.findIndex(t => t.id === id)
+      if (index !== -1) {
+        tasks.value.splice(index, 1)
+      }
+      if (currentTask.value?.id === id) {
+        currentTask.value = null
+      }
+      // 刷新统计
+      fetchStats()
+    } catch (e) {
+      error.value = (e as Error).message
+    }
+  }
+
+  async function retryTask(id: string) {
+    try {
+      const updated = await taskApi.retry(id)
+      updateTaskInList(updated)
+      if (currentTask.value?.id === id) {
+        currentTask.value = updated
+      }
+      // 刷新统计
+      fetchStats()
+    } catch (e) {
+      error.value = (e as Error).message
+    }
+  }
+
   async function revertCheckpoint(checkpointId: string) {
     try {
       await checkpointApi.revert(checkpointId)
@@ -178,6 +230,7 @@ export const useTaskStore = defineStore('task', () => {
     waitingTasks,
 
     // Actions
+    createTask,
     fetchTasks,
     fetchStats,
     fetchTaskDetail,
@@ -186,6 +239,8 @@ export const useTaskStore = defineStore('task', () => {
     resumeTask,
     confirmIntervention,
     cancelTask,
+    deleteTask,
+    retryTask,
     revertCheckpoint,
     handleProgressUpdate,
     setFilterStatus,

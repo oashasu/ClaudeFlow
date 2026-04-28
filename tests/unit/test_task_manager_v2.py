@@ -7,7 +7,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import MagicMock, AsyncMock
 
-from claudeflow.task_manager import (
+from claudeflow.workflow.task_manager import (
     Task,
     TaskManager,
     TaskNotFoundError

@@ -13,9 +13,9 @@ class TestEmployeeAssignment:
 
     def test_assign_employee_to_task(self):
         """测试：给任务分配员工"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -30,9 +30,9 @@ class TestEmployeeAssignment:
 
     def test_assign_employee_changes_status_to_running(self):
         """测试：分配员工后状态变为执行中"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -50,9 +50,9 @@ class TestPhaseProgress:
 
     def test_get_current_phase(self):
         """测试：获取当前阶段"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -65,9 +65,9 @@ class TestPhaseProgress:
 
     def test_advance_phase(self):
         """测试：推进到下一阶段"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -81,9 +81,9 @@ class TestPhaseProgress:
 
     def test_advance_to_final_phase(self):
         """测试：推进到最终阶段"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -100,8 +100,8 @@ class TestPhaseProgress:
 
     def test_advance_phase_updates_progress(self):
         """测试：推进阶段更新进度"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -121,9 +121,9 @@ class TestFailureHandling:
 
     def test_handle_task_failure(self):
         """测试：处理任务失败"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -139,8 +139,8 @@ class TestFailureHandling:
 
     def test_handle_failure_records_error(self):
         """测试：记录失败错误信息"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -165,9 +165,9 @@ class TestRetryScheduling:
 
     def test_schedule_retry_for_retriable_error(self):
         """测试：可重试错误触发重试"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -184,8 +184,8 @@ class TestRetryScheduling:
 
     def test_retry_count_increment(self):
         """测试：重试次数递增"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -202,9 +202,9 @@ class TestRetryScheduling:
 
     def test_no_retry_for_non_retriable_error(self):
         """测试：不可重试错误不触发重试"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -226,9 +226,9 @@ class TestTaskCompletion:
 
     def test_complete_task_success(self):
         """测试：任务成功完成"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import TaskStatus
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import TaskStatus
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -244,8 +244,8 @@ class TestTaskCompletion:
 
     def test_complete_task_releases_employee(self):
         """测试：完成任务释放员工"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -265,8 +265,8 @@ class TestSchedulerContext:
 
     def test_scheduler_has_task_context(self):
         """测试：调度器维护任务上下文"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -280,9 +280,9 @@ class TestSchedulerContext:
 
     def test_scheduler_context_tracks_phase(self):
         """测试：上下文跟踪阶段"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
-        from claudeflow.state_machine import Phase
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
+        from claudeflow.workflow.state_machine import Phase
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -299,8 +299,8 @@ class TestSessionLifecycle:
 
     def test_create_session_for_task(self):
         """测试：为任务创建Session"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -314,8 +314,8 @@ class TestSessionLifecycle:
 
     def test_session_linked_to_task(self):
         """测试：Session关联到任务"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -330,8 +330,8 @@ class TestSessionLifecycle:
 
     def test_get_session_state(self):
         """测试：获取Session状态"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -345,8 +345,8 @@ class TestSessionLifecycle:
 
     def test_end_session(self):
         """测试：结束Session"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -362,8 +362,8 @@ class TestSessionLifecycle:
 
     def test_get_session_by_task(self):
         """测试：通过任务获取Session"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -377,8 +377,8 @@ class TestSessionLifecycle:
 
     def test_multiple_sessions_for_different_tasks(self):
         """测试：不同任务有不同Session"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -398,8 +398,8 @@ class TestSubtaskDetection:
 
     def test_detect_explicit_marker(self):
         """测试：检测显式完成标记"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
         from claudeflow.subtask_detector import CompletionType
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -419,8 +419,8 @@ class TestSubtaskDetection:
 
     def test_detect_tests_passed(self):
         """测试：检测pytest测试通过"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
         from claudeflow.subtask_detector import CompletionType
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -439,8 +439,8 @@ class TestSubtaskDetection:
 
     def test_detect_not_complete(self):
         """测试：未完成情况不触发"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -458,8 +458,8 @@ class TestSubtaskDetection:
 
     def test_completion_type_recorded_in_context(self):
         """测试：完成类型记录到上下文"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -479,8 +479,8 @@ class TestQualityCheck:
 
     def test_parse_quality_score(self):
         """测试：解析质量评分"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -494,8 +494,8 @@ class TestQualityCheck:
 
     def test_parse_doubt_flag_yes(self):
         """测试：解析疑虑标记（是）"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -508,8 +508,8 @@ class TestQualityCheck:
 
     def test_parse_doubt_flag_no(self):
         """测试：解析疑虑标记（否）"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -522,8 +522,8 @@ class TestQualityCheck:
 
     def test_should_pause_on_doubt(self):
         """测试：疑虑标记触发暂停"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -541,8 +541,8 @@ class TestQualityCheck:
 
     def test_should_pause_on_low_score(self):
         """测试：低评分触发暂停"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -556,8 +556,8 @@ class TestQualityCheck:
 
     def test_should_not_pause_on_high_score(self):
         """测试：高评分不暂停"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -571,8 +571,8 @@ class TestQualityCheck:
 
     def test_update_quality_metrics(self):
         """测试：更新质量指标"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)
@@ -587,8 +587,8 @@ class TestQualityCheck:
 
     def test_clear_subtask_state(self):
         """测试：清除子任务状态"""
-        from claudeflow.scheduler import Scheduler
-        from claudeflow.task_manager import TaskManager
+        from claudeflow.workflow.scheduler import Scheduler
+        from claudeflow.workflow.task_manager import TaskManager
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tm = TaskManager(tasks_dir=tmpdir)

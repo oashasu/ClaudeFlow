@@ -1,0 +1,23 @@
+{
+  "runnable_count": 2,
+  "blocked_count": 1,
+  "active_agents": 1,
+  "available_slots": 1,
+  "max_concurrent": 2,
+  "started": [
+    {
+      "task_id": "impl_auth_controller",
+      "session_id": "sess-auth-001",
+      "priority": "high"
+    }
+  ],
+  "skipped": [],
+  "blocked": [
+    {
+      "task_id": "impl_auth_tests",
+      "priority": "medium",
+      "reason_code": "waiting_dependency",
+      "reason": "等待依赖完成: impl_auth_controller(running)"
+    }
+  ]
+}
